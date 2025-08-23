@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Globe, Menu, X } from "lucide-react";
+import { Globe, Menu, X, User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 import nawartuLogo from "@/assets/nawartu-logo.png";
 
 interface HeaderProps {
@@ -10,9 +14,16 @@ interface HeaderProps {
 
 export const Header = ({ language, onLanguageChange }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const toggleLanguage = () => {
     onLanguageChange(language === 'ar' ? 'en' : 'ar');
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
   };
 
   const isRTL = language === 'ar';
@@ -60,13 +71,47 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
               </span>
             </Button>
 
-            {/* Auth Buttons */}
-            <Button variant="ghost" size="sm">
-              {language === 'ar' ? 'تسجيل دخول' : 'Login'}
-            </Button>
-            <Button variant="default" size="sm">
-              {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
-            </Button>
+            {/* Auth Section */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={profile?.avatar_url} />
+                      <AvatarFallback className="text-xs">
+                        {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline max-w-20 truncate">
+                      {profile?.full_name || user.email?.split('@')[0]}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? 'الملف الشخصي' : 'Profile'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? 'تسجيل خروج' : 'Sign Out'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/auth">
+                    {language === 'ar' ? 'تسجيل دخول' : 'Login'}
+                  </Link>
+                </Button>
+                <Button variant="default" size="sm" asChild>
+                  <Link to="/auth">
+                    {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
+                  </Link>
+                </Button>
+              </>
+            )}
 
             {/* Mobile Menu Toggle */}
             <Button
