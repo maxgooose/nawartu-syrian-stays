@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { Auth } from "./pages/Auth";
+import { AuthCallback } from "./pages/AuthCallback";
 import HostDashboard from "./pages/HostDashboard";
 import CreateListing from "./pages/CreateListing";
 import GuestDashboard from "./pages/GuestDashboard";
@@ -30,6 +31,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/host-dashboard" element={<HostDashboard />} />
             <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/guest-dashboard" element={<GuestDashboard />} />

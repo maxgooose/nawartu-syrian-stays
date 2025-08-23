@@ -73,10 +73,27 @@ export const Auth = () => {
         navigate('/');
       }
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      // Handle common auth errors with friendly messages
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = language === 'ar' ? 
+          'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 
+          'Invalid email or password';
+      } else if (error.message.includes('User already registered')) {
+        errorMessage = language === 'ar' ? 
+          'هذا البريد الإلكتروني مسجل مسبقاً' : 
+          'This email is already registered';
+      } else if (error.message.includes('Password should be at least')) {
+        errorMessage = language === 'ar' ? 
+          'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 
+          'Password should be at least 6 characters';
+      }
+
       toast({
         variant: 'destructive',
         title: language === 'ar' ? 'خطأ' : 'Error',
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -99,10 +116,18 @@ export const Auth = () => {
 
       if (error) throw error;
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      if (error.message.includes('To signup, please visit')) {
+        errorMessage = language === 'ar' ? 
+          'يرجى استخدام الرابط المرسل إلى بريدك الإلكتروني لإكمال التسجيل' : 
+          'Please check your email and click the confirmation link to complete signup';
+      }
+
       toast({
         variant: 'destructive',
         title: language === 'ar' ? 'خطأ' : 'Error',
-        description: error.message,
+        description: errorMessage,
       });
       setIsLoading(false);
     }
