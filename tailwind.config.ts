@@ -61,6 +61,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Nawartu Custom Colors
+				nawartu: {
+					beige: 'hsl(var(--beige-light))',
+					gray: 'hsl(var(--warm-gray))',
+					green: 'hsl(var(--deep-green))',
+					black: 'hsl(var(--pure-black))'
 				}
 			},
 			borderRadius: {

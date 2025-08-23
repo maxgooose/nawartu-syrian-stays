@@ -1,0 +1,101 @@
+import { Heart, Star, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+interface PropertyCardProps {
+  property: {
+    id: string;
+    title: string;
+    location: string;
+    price: number;
+    currency: 'USD' | 'SYP';
+    rating: number;
+    reviews: number;
+    image: string;
+    type: string;
+    features: string[];
+  };
+  language: 'ar' | 'en';
+}
+
+export const PropertyCard = ({ property, language }: PropertyCardProps) => {
+  const isRTL = language === 'ar';
+
+  const formatPrice = (price: number, currency: 'USD' | 'SYP') => {
+    if (currency === 'USD') {
+      return `$${price}`;
+    } else {
+      return `${price.toLocaleString()} ل.س`;
+    }
+  };
+
+  return (
+    <Card className="overflow-hidden hover-lift cursor-pointer group">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img 
+          src={property.image} 
+          alt={property.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-3 right-3 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
+        >
+          <Heart className="h-4 w-4" />
+        </Button>
+        <div className="absolute bottom-3 left-3 bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+          {language === 'ar' ? property.type : property.type}
+        </div>
+      </div>
+
+      <CardContent className="p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="flex items-start justify-between mb-2">
+          <h3 className={`font-semibold text-lg text-foreground line-clamp-1 ${isRTL ? 'text-arabic' : 'text-latin'}`}>
+            {property.title}
+          </h3>
+          <div className="flex items-center space-x-1 rtl:space-x-reverse">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium">{property.rating}</span>
+            <span className="text-sm text-muted-foreground">({property.reviews})</span>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-1 rtl:space-x-reverse text-muted-foreground mb-3">
+          <MapPin className="h-4 w-4" />
+          <span className="text-sm">{property.location}</span>
+        </div>
+
+        <div className="flex items-center space-x-2 rtl:space-x-reverse mb-3">
+          {property.features.slice(0, 2).map((feature, index) => (
+            <span 
+              key={index}
+              className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
+            >
+              {feature}
+            </span>
+          ))}
+          {property.features.length > 2 && (
+            <span className="text-xs text-muted-foreground">
+              +{property.features.length - 2} {language === 'ar' ? 'المزيد' : 'more'}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
+            <span className="text-lg font-bold text-foreground">
+              {formatPrice(property.price, property.currency)}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {language === 'ar' ? ' / ليلة' : ' / night'}
+            </span>
+          </div>
+          <Button variant="outline" size="sm">
+            {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
