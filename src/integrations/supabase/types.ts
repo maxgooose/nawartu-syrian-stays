@@ -231,6 +231,45 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          booking_id: string
+          comment: string
+          created_at: string
+          guest_id: string
+          host_response: string | null
+          id: string
+          listing_id: string
+          rating: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          comment: string
+          created_at?: string
+          guest_id: string
+          host_response?: string | null
+          id?: string
+          listing_id: string
+          rating: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string
+          created_at?: string
+          guest_id?: string
+          host_response?: string | null
+          id?: string
+          listing_id?: string
+          rating?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       terms_acceptance: {
         Row: {
           accepted_at: string
@@ -275,7 +314,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_review_booking: {
+        Args: { booking_uuid: string }
+        Returns: boolean
+      }
+      get_listing_average_rating: {
+        Args: { listing_uuid: string }
+        Returns: {
+          average_rating: number
+          review_count: number
+        }[]
+      }
     }
     Enums: {
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
