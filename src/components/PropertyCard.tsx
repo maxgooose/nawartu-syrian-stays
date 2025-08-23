@@ -30,7 +30,7 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden hover-lift cursor-pointer group">
+    <Card className="overflow-hidden hover-lift cursor-pointer group pattern-subtle border border-primary/5 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up">
       <div className="relative aspect-[4/3] overflow-hidden">
         <img 
           src={property.image} 
@@ -44,7 +44,7 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
         >
           <Heart className="h-4 w-4" />
         </Button>
-        <div className="absolute bottom-3 left-3 bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+        <div className="absolute bottom-3 left-3 bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
           {language === 'ar' ? property.type : property.type}
         </div>
       </div>

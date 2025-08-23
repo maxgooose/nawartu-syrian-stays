@@ -91,11 +91,33 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				// Islamic pattern animations
+				'pattern-rotate': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
+				},
+				'pattern-pulse': {
+					'0%, 100%': { opacity: '0.5' },
+					'50%': { opacity: '0.8' }
+				},
+				'fade-in-up': {
+					'0%': { 
+						opacity: '0', 
+						transform: 'translateY(20px)' 
+					},
+					'100%': { 
+						opacity: '1', 
+						transform: 'translateY(0)' 
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pattern-rotate': 'pattern-rotate 20s linear infinite',
+				'pattern-pulse': 'pattern-pulse 3s ease-in-out infinite',
+				'fade-in-up': 'fade-in-up 0.6s ease-out'
 			}
 		}
 	},

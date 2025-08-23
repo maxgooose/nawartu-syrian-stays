@@ -24,7 +24,7 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center pattern-islamic">
+    <section className="relative min-h-screen flex items-center pattern-islamic overflow-hidden">
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -60,8 +60,14 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
           </div>
 
           {/* Search Form */}
-          <div className="bg-background/95 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-floating max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
+          <div className="bg-background/95 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-floating max-w-5xl mx-auto border border-primary/10 pattern-subtle relative animate-fade-in-up">
+            {/* Decorative Islamic corner elements */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-primary/20 rounded-tl-lg transform -translate-x-1 -translate-y-1"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-primary/20 rounded-tr-lg transform translate-x-1 -translate-y-1"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-primary/20 rounded-bl-lg transform -translate-x-1 translate-y-1"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-primary/20 rounded-br-lg transform translate-x-1 translate-y-1"></div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 relative z-10" dir={isRTL ? 'rtl' : 'ltr'}>
               {/* Location */}
               <div className="relative">
                 <label className="block text-sm font-medium text-foreground mb-2">
@@ -132,7 +138,7 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
             <Button 
               onClick={handleSearch}
               size="lg"
-              className="w-full md:w-auto px-12 h-12 text-lg font-semibold hover-lift"
+              className="w-full md:w-auto px-12 h-12 text-lg font-semibold hover-lift relative z-10"
             >
               <Search className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
               {language === 'ar' ? 'البحث عن عقار' : 'Search Properties'}
@@ -141,19 +147,19 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-3xl mx-auto">
-            <div className="text-center">
+            <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">500+</div>
               <div className="text-primary-foreground/80">
                 {language === 'ar' ? 'عقار مميز' : 'Premium Properties'}
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">15</div>
               <div className="text-primary-foreground/80">
                 {language === 'ar' ? 'مدينة سورية' : 'Syrian Cities'}
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">50K+</div>
               <div className="text-primary-foreground/80">
                 {language === 'ar' ? 'مسافر راضي' : 'Happy Travelers'}

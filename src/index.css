@@ -104,27 +104,64 @@
   }
 }
 
-/* Islamic Geometric Pattern */
+/* Islamic Geometric Patterns */
 .pattern-islamic {
   background-image: 
-    radial-gradient(circle at 25% 25%, hsl(var(--deep-green) / 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, hsl(var(--warm-gray) / 0.1) 0%, transparent 50%),
-    linear-gradient(45deg, hsl(var(--deep-green) / 0.05) 25%, transparent 25%),
-    linear-gradient(-45deg, hsl(var(--warm-gray) / 0.05) 25%, transparent 25%);
-  background-size: 40px 40px, 40px 40px, 20px 20px, 20px 20px;
-  background-position: 0 0, 20px 20px, 0 0, 10px 10px;
+    /* Star pattern */
+    conic-gradient(from 0deg at 50% 50%, 
+      hsl(var(--deep-green) / 0.08) 0deg, 
+      transparent 45deg, 
+      hsl(var(--warm-gray) / 0.06) 90deg, 
+      transparent 135deg, 
+      hsl(var(--deep-green) / 0.08) 180deg, 
+      transparent 225deg, 
+      hsl(var(--warm-gray) / 0.06) 270deg, 
+      transparent 315deg),
+    /* Interlocking squares */
+    linear-gradient(45deg, 
+      hsl(var(--deep-green) / 0.04) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      hsl(var(--deep-green) / 0.04) 75%),
+    linear-gradient(-45deg, 
+      hsl(var(--warm-gray) / 0.04) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      hsl(var(--warm-gray) / 0.04) 75%);
+  background-size: 80px 80px, 40px 40px, 40px 40px;
+  background-position: 0 0, 0 0, 20px 20px;
 }
 
-.pattern-geometric {
+.pattern-geometric-stars {
   background-image: 
-    conic-gradient(from 0deg at 50% 50%, 
-      hsl(var(--deep-green) / 0.1) 0deg, 
-      transparent 60deg, 
-      hsl(var(--warm-gray) / 0.1) 120deg, 
-      transparent 180deg, 
-      hsl(var(--deep-green) / 0.1) 240deg, 
-      transparent 300deg);
-  background-size: 60px 60px;
+    /* Large stars */
+    radial-gradient(circle at 50% 50%, 
+      hsl(var(--deep-green) / 0.1) 0%, 
+      hsl(var(--deep-green) / 0.05) 30%, 
+      transparent 40%),
+    /* Small connecting points */
+    radial-gradient(circle at 25% 25%, 
+      hsl(var(--warm-gray) / 0.08) 0%, 
+      transparent 20%),
+    radial-gradient(circle at 75% 75%, 
+      hsl(var(--warm-gray) / 0.08) 0%, 
+      transparent 20%);
+  background-size: 100px 100px, 50px 50px, 50px 50px;
+  background-position: 0 0, 25px 25px, -25px -25px;
+}
+
+.pattern-subtle {
+  background-image: 
+    linear-gradient(90deg, 
+      transparent 0%, 
+      hsl(var(--deep-green) / 0.02) 50%, 
+      transparent 100%),
+    linear-gradient(0deg, 
+      transparent 0%, 
+      hsl(var(--warm-gray) / 0.02) 50%, 
+      transparent 100%);
+  background-size: 60px 60px, 60px 60px;
+  background-position: 0 0, 30px 30px;
 }
 
 @layer base {
