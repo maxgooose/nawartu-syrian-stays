@@ -11,6 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Separator } from "@/components/ui/separator";
+import { ReviewsList } from "@/components/ReviewsList";
+import { StarRating } from "@/components/StarRating";
 import { 
   ArrowRight, 
   MapPin, 
@@ -27,7 +31,28 @@ import {
   AirVent,
   Coffee,
   Shield,
-  Zap
+  Zap,
+  Share2,
+  Check,
+  X,
+  Clock,
+  Home,
+  Building,
+  TreePine,
+  Utensils,
+  Tv,
+  Wind,
+  Snowflake,
+  Waves,
+  ParkingCircle,
+  DogIcon,
+  Cigarette,
+  Music,
+  ChevronLeft,
+  ChevronRight,
+  MapPinIcon,
+  InfoIcon,
+  AlertTriangle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays, addDays } from "date-fns";
@@ -51,13 +76,68 @@ interface Listing {
   };
 }
 
+// Enhanced amenity icons with comprehensive mapping
 const amenityIcons: Record<string, any> = {
   wifi: Wifi,
-  parking: Car,
-  air_conditioning: AirVent,
-  kitchen: Coffee,
+  parking: ParkingCircle,
+  air_conditioning: Wind,
+  kitchen: Utensils,
   security: Shield,
   elevator: Zap,
+  tv: Tv,
+  heating: Snowflake,
+  pool: Waves,
+  pets_allowed: DogIcon,
+  balcony: TreePine,
+  garden: TreePine,
+  terrace: Home,
+  dishwasher: Coffee,
+  washing_machine: Coffee,
+  refrigerator: Coffee,
+  microwave: Coffee,
+  coffee_maker: Coffee,
+  gym: Building,
+  spa: Waves,
+  restaurant: Utensils,
+  room_service: Utensils,
+  concierge: Shield,
+  valet_parking: Car,
+  business_center: Building,
+  conference_rooms: Building,
+  free_breakfast: Coffee,
+  airport_shuttle: Car,
+  car_rental: Car,
+  tour_desk: MapPinIcon,
+  laundry_service: Coffee,
+  dry_cleaning: Coffee,
+  currency_exchange: Building,
+  atm: Building,
+  safe_deposit_box: Shield,
+  luggage_storage: Shield,
+  twenty_four_hour_reception: Clock,
+  multilingual_staff: InfoIcon,
+  non_smoking_rooms: X,
+  family_rooms: Users,
+  accessible_rooms: InfoIcon,
+  soundproof_rooms: Music,
+  air_purifier: Wind,
+  first_aid_kit: Shield,
+  fire_extinguisher: Shield,
+  smoke_detector: Shield,
+  carbon_monoxide_detector: Shield
+};
+
+// Property type icons
+const propertyTypeIcons: Record<string, any> = {
+  apartment: Building,
+  villa: Home,
+  guesthouse: TreePine,
+  hotel: Building,
+  hostel: Users,
+  studio: Home,
+  loft: Building,
+  townhouse: Home,
+  cottage: TreePine
 };
 
 const PropertyDetails = () => {
@@ -75,6 +155,8 @@ const PropertyDetails = () => {
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'cash'>('stripe');
   const [specialRequests, setSpecialRequests] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [showFullMap, setShowFullMap] = useState(false);
 
   // Mock language - in real app this would come from context
   const language: 'ar' | 'en' = 'ar';
@@ -254,46 +336,62 @@ const PropertyDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Property Details */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Image Gallery */}
-            <Card className="overflow-hidden pattern-subtle border border-primary/10">
-              <div className="relative aspect-[16/10]">
-                {listing.images?.[currentImageIndex] ? (
-                  <img 
-                    src={listing.images[currentImageIndex]} 
-                    alt={listing.name}
-                    className="w-full h-full object-cover"
-                  />
+            {/* Enhanced Photo Gallery with Carousel */}
+            <Card className="overflow-hidden pattern-subtle border border-primary/10 shadow-card">
+              <div className="relative">
+                {listing.images && listing.images.length > 0 ? (
+                  <Carousel className="w-full">
+                    <CarouselContent>
+                      {listing.images.map((image, index) => (
+                        <CarouselItem key={index}>
+                          <div className="aspect-[16/10] relative group">
+                            <img 
+                              src={image} 
+                              alt={`${listing.name} - صورة ${index + 1}`}
+                              className="w-full h-full object-cover hover-lift cursor-pointer transition-transform duration-300"
+                              onClick={() => setCurrentImageIndex(index)}
+                            />
+                            {/* Image overlay on hover */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <Badge variant="secondary" className="bg-background/90 text-foreground">
+                                  {index + 1} من {listing.images.length}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="left-4" />
+                    <CarouselNext className="right-4" />
+                  </Carousel>
                 ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <MapPin className="h-12 w-12 text-muted-foreground" />
+                  <div className="aspect-[16/10] bg-muted flex items-center justify-center">
+                    <div className="text-center">
+                      <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground">لا توجد صور متاحة</p>
+                    </div>
                   </div>
                 )}
                 
-                {/* Image Navigation */}
-                {listing.images && listing.images.length > 1 && (
-                  <div className="absolute bottom-4 left-4 flex gap-2">
-                    {listing.images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentImageIndex(index)}
-                        className={`w-3 h-3 rounded-full transition-colors ${
-                          index === currentImageIndex 
-                            ? 'bg-white' 
-                            : 'bg-white/50 hover:bg-white/75'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Favorite Button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-4 right-4 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
-                >
-                  <Heart className="h-5 w-5" />
-                </Button>
+                {/* Action Buttons */}
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-background/80 hover:bg-background text-foreground rounded-full p-2 backdrop-blur-sm"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-background/80 hover:bg-background text-foreground rounded-full p-2 backdrop-blur-sm"
+                  >
+                    <Heart className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </Card>
 
@@ -317,19 +415,35 @@ const PropertyDetails = () => {
                   </div>
                 </div>
 
-                {/* Property Stats */}
-                <div className="flex gap-6 mb-6 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>{listing.max_guests} ضيوف</span>
+                 {/* Property Type & Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
+                    <Building className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">نوع العقار</p>
+                      <p className="font-medium text-sm">شقة</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Bed className="h-4 w-4 text-muted-foreground" />
-                    <span>{listing.bedrooms} غرف نوم</span>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
+                    <Users className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">الضيوف</p>
+                      <p className="font-medium text-sm">{listing.max_guests} ضيوف</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Bath className="h-4 w-4 text-muted-foreground" />
-                    <span>{listing.bathrooms} حمام</span>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
+                    <Bed className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">غرف النوم</p>
+                      <p className="font-medium text-sm">{listing.bedrooms} غرف</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
+                    <Bath className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">الحمامات</p>
+                      <p className="font-medium text-sm">{listing.bathrooms} حمام</p>
+                    </div>
                   </div>
                 </div>
 
@@ -341,21 +455,33 @@ const PropertyDetails = () => {
                   </p>
                 </div>
 
-                {/* Amenities */}
+                {/* Enhanced Amenities */}
                 {listing.amenities && listing.amenities.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3">المرافق والخدمات</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-primary" />
+                      المرافق والخدمات
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {listing.amenities.map((amenity) => {
                         const IconComponent = amenityIcons[amenity] || Zap;
                         return (
-                          <div key={amenity} className="flex items-center gap-2">
-                            <IconComponent className="h-4 w-4 text-primary" />
-                            <span className="text-sm">{amenity}</span>
+                          <div key={amenity} className="flex items-center gap-3 p-3 rounded-lg border border-primary/10 bg-background/50 hover:bg-muted/30 transition-colors">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <IconComponent className="h-4 w-4 text-primary" />
+                            </div>
+                            <span className="text-sm font-medium">{amenity}</span>
                           </div>
                         );
                       })}
                     </div>
+                    
+                    {/* Show all amenities link */}
+                    {listing.amenities.length > 6 && (
+                      <Button variant="ghost" className="mt-3 text-primary">
+                        عرض جميع المرافق ({listing.amenities.length})
+                      </Button>
+                    )}
                   </div>
                 )}
 
@@ -379,6 +505,226 @@ const PropertyDetails = () => {
                     <div>
                       <p className="font-medium">{listing.host.full_name}</p>
                       <p className="text-sm text-muted-foreground">مضيف منذ 2023</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location Section */}
+            <Card className="pattern-subtle border border-primary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2" dir="rtl">
+                  <MapPinIcon className="h-5 w-5 text-primary" />
+                  الموقع والمنطقة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4" dir="rtl">
+                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  <MapPin className="h-4 w-4" />
+                  <span>{listing.location}</span>
+                </div>
+                
+                {/* Mock Map */}
+                <div className="aspect-video bg-muted rounded-lg relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5">
+                    <div className="text-center">
+                      <MapPin className="h-12 w-12 text-primary mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">خريطة الموقع</p>
+                      <p className="text-xs text-muted-foreground mt-1">اضغط لعرض الخريطة الكاملة</p>
+                    </div>
+                  </div>
+                  {/* Map Overlay Button */}
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="absolute bottom-4 right-4"
+                    onClick={() => setShowFullMap(true)}
+                  >
+                    عرض الخريطة الكاملة
+                  </Button>
+                </div>
+
+                {/* Nearby Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <h4 className="font-medium mb-2">معالم قريبة</h4>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Building className="h-3 w-3" />
+                        <span>مركز تسوق - 5 دقائق مشياً</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Car className="h-3 w-3" />
+                        <span>محطة باص - 3 دقائق مشياً</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Utensils className="h-3 w-3" />
+                        <span>مطاعم - 2 دقيقة مشياً</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">وصف المنطقة</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      منطقة هادئة وآمنة في قلب المدينة، قريبة من جميع الخدمات والمرافق الأساسية. 
+                      تتميز بسهولة الوصول إلى وسائل النقل العام والأماكن السياحية.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reviews Section */}
+            <Card className="pattern-subtle border border-primary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2" dir="rtl">
+                  <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                  التقييمات والمراجعات
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ReviewsList listingId={listing.id} />
+              </CardContent>
+            </Card>
+
+            {/* Rules & Policies Section */}
+            <Card className="pattern-subtle border border-primary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2" dir="rtl">
+                  <Shield className="h-5 w-5 text-primary" />
+                  القوانين والسياسات
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6" dir="rtl">
+                {/* House Rules */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Home className="h-4 w-4 text-primary" />
+                    قوانين المنزل
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span className="text-sm">مسموح بالأطفال</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <X className="h-4 w-4 text-red-500" />
+                        <span className="text-sm">غير مسموح بالتدخين</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <X className="h-4 w-4 text-red-500" />
+                        <span className="text-sm">غير مسموح بالحفلات</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span className="text-sm">مسموح بالحيوانات الأليفة</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">هدوء بعد الساعة 10 مساءً</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Users className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">حد أقصى {listing.max_guests} ضيوف</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Check-in/Check-out */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    أوقات الوصول والمغادرة
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <CalendarIcon className="h-4 w-4 text-green-500" />
+                        <span className="font-medium">الوصول</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">من 3:00 مساءً إلى 10:00 مساءً</p>
+                      <p className="text-xs text-muted-foreground">تسجيل وصول ذاتي بصندوق الأمان</p>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <CalendarIcon className="h-4 w-4 text-red-500" />
+                        <span className="font-medium">المغادرة</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">حتى 11:00 صباحاً</p>
+                      <p className="text-xs text-muted-foreground">مغادرة ذاتية</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Cancellation Policy */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-primary" />
+                    سياسة الإلغاء
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <h5 className="font-medium text-green-800 dark:text-green-200 mb-2">إلغاء مجاني</h5>
+                      <p className="text-sm text-green-600 dark:text-green-300">
+                        يمكن الإلغاء مجاناً حتى 24 ساعة قبل الوصول للحصول على استرداد كامل.
+                      </p>
+                    </div>
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                      <h5 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2">استرداد جزئي</h5>
+                      <p className="text-sm text-yellow-600 dark:text-yellow-300">
+                        إلغاء خلال 24 ساعة من الوصول: استرداد 50% من المبلغ.
+                      </p>
+                    </div>
+                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                      <h5 className="font-medium text-red-800 dark:text-red-200 mb-2">لا استرداد</h5>
+                      <p className="text-sm text-red-600 dark:text-red-300">
+                        لا يوجد استرداد في حالة عدم الحضور أو الإلغاء في نفس يوم الوصول.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Safety & Security */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-primary" />
+                    الأمان والسلامة
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-xs">كاشف دخان</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-xs">طفاية حريق</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-xs">حقيبة إسعافات أولية</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-xs">كاميرات أمنية خارجية</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-xs">إضاءة خارجية</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-xs">خزنة آمنة</span>
                     </div>
                   </div>
                 </div>
