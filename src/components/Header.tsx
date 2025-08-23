@@ -36,7 +36,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
             <img src={nawartuLogo} alt="Nawartu" className="h-10 w-10" />
             <span className="text-2xl font-bold text-primary tracking-wide">
-              نوارتو
+              {language === 'ar' ? 'نورتوا' : 'Nawartu'}
             </span>
           </div>
 
