@@ -60,7 +60,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
   ];
 
   return (
-    <section className="py-16 bg-background pattern-geometric-stars relative">
+    <section className="py-16 bg-background pattern-classic-elegant relative">
       <div className="container-custom relative z-10">
         <div className={`text-center mb-12 ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">

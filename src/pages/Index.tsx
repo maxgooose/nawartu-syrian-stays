@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturedProperties } from "@/components/FeaturedProperties";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   const [language, setLanguage] = useState<'ar' | 'en'>('ar');
@@ -20,6 +21,7 @@ const Index = () => {
         <HeroSection language={language} />
         <FeaturedProperties language={language} />
       </main>
+      <Footer language={language} onLanguageChange={handleLanguageChange} />
     </div>
   );
 };

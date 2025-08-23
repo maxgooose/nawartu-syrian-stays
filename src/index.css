@@ -132,22 +132,19 @@
   background-position: 0 0, 0 0, 20px 20px;
 }
 
-.pattern-geometric-stars {
+.pattern-classic-elegant {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted) / 0.3) 100%);
+  position: relative;
+}
+
+.pattern-classic-elegant::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: 
-    /* Large stars */
-    radial-gradient(circle at 50% 50%, 
-      hsl(var(--deep-green) / 0.1) 0%, 
-      hsl(var(--deep-green) / 0.05) 30%, 
-      transparent 40%),
-    /* Small connecting points */
-    radial-gradient(circle at 25% 25%, 
-      hsl(var(--warm-gray) / 0.08) 0%, 
-      transparent 20%),
-    radial-gradient(circle at 75% 75%, 
-      hsl(var(--warm-gray) / 0.08) 0%, 
-      transparent 20%);
-  background-size: 100px 100px, 50px 50px, 50px 50px;
-  background-position: 0 0, 25px 25px, -25px -25px;
+    radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: 0.5;
 }
 
 .pattern-subtle {
