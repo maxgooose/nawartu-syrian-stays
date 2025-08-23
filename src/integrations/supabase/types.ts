@@ -14,7 +14,262 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_approvals: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_approvals_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          admin_notes: string | null
+          check_in_date: string
+          check_out_date: string
+          created_at: string
+          guest_id: string
+          id: string
+          listing_id: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          special_requests: string | null
+          status: Database["public"]["Enums"]["booking_status"]
+          stripe_payment_intent_id: string | null
+          total_amount_syp: number | null
+          total_amount_usd: number
+          total_nights: number
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          check_in_date: string
+          check_out_date: string
+          created_at?: string
+          guest_id: string
+          id?: string
+          listing_id: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          special_requests?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          stripe_payment_intent_id?: string | null
+          total_amount_syp?: number | null
+          total_amount_usd: number
+          total_nights: number
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          check_in_date?: string
+          check_out_date?: string
+          created_at?: string
+          guest_id?: string
+          id?: string
+          listing_id?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          special_requests?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          stripe_payment_intent_id?: string | null
+          total_amount_syp?: number | null
+          total_amount_usd?: number
+          total_nights?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listings: {
+        Row: {
+          admin_notes: string | null
+          amenities: string[] | null
+          bathrooms: number | null
+          bedrooms: number | null
+          created_at: string
+          description: string
+          host_id: string
+          id: string
+          images: string[] | null
+          latitude: number | null
+          location: string
+          longitude: number | null
+          max_guests: number
+          name: string
+          price_per_night_syp: number | null
+          price_per_night_usd: number
+          status: Database["public"]["Enums"]["listing_status"]
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amenities?: string[] | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          created_at?: string
+          description: string
+          host_id: string
+          id?: string
+          images?: string[] | null
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          max_guests?: number
+          name: string
+          price_per_night_syp?: number | null
+          price_per_night_usd: number
+          status?: Database["public"]["Enums"]["listing_status"]
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amenities?: string[] | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          created_at?: string
+          description?: string
+          host_id?: string
+          id?: string
+          images?: string[] | null
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          max_guests?: number
+          name?: string
+          price_per_night_syp?: number | null
+          price_per_night_usd?: number
+          status?: Database["public"]["Enums"]["listing_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listings_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          preferred_language: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          preferred_language?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          preferred_language?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      terms_acceptance: {
+        Row: {
+          accepted_at: string
+          booking_id: string | null
+          id: string
+          terms_version: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          booking_id?: string | null
+          id?: string
+          terms_version?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          booking_id?: string | null
+          id?: string
+          terms_version?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terms_acceptance_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "terms_acceptance_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +278,10 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      booking_status: "pending" | "confirmed" | "cancelled" | "completed"
+      listing_status: "pending" | "approved" | "rejected"
+      payment_method: "cash" | "stripe"
+      user_role: "guest" | "host" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +408,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      booking_status: ["pending", "confirmed", "cancelled", "completed"],
+      listing_status: ["pending", "approved", "rejected"],
+      payment_method: ["cash", "stripe"],
+      user_role: ["guest", "host", "admin"],
+    },
   },
 } as const
