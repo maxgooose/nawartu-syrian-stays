@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import { Auth } from "./pages/Auth";
 import HostDashboard from "./pages/HostDashboard";
 import CreateListing from "./pages/CreateListing";
+import GuestDashboard from "./pages/GuestDashboard";
+import PropertyDetails from "./pages/PropertyDetails";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/host-dashboard" element={<HostDashboard />} />
             <Route path="/create-listing" element={<CreateListing />} />
+            <Route path="/guest-dashboard" element={<GuestDashboard />} />
+            <Route path="/property/:id" element={<PropertyDetails />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

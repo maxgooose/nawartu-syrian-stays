@@ -42,15 +42,17 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
-            <a href="#" className="text-foreground hover:text-primary transition-colors">
+            <Link to="/" className="text-foreground hover:text-primary transition-colors">
               {language === 'ar' ? 'الرئيسية' : 'Home'}
-            </a>
-            <a href="#" className="text-foreground hover:text-primary transition-colors">
-              {language === 'ar' ? 'البحث' : 'Search'}
-            </a>
-            <a href="#" className="text-foreground hover:text-primary transition-colors">
-              {language === 'ar' ? 'استضافة' : 'Host'}
-            </a>
+            </Link>
+            <Link to="/guest-dashboard" className="text-foreground hover:text-primary transition-colors">
+              {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+            </Link>
+            {profile?.role === 'host' && (
+              <Link to="/host-dashboard" className="text-foreground hover:text-primary transition-colors">
+                {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
+              </Link>
+            )}
             <a href="#" className="text-foreground hover:text-primary transition-colors">
               {language === 'ar' ? 'حول' : 'About'}
             </a>
@@ -88,6 +90,16 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
+                  {profile?.role === 'host' && (
+                    <DropdownMenuItem onClick={() => navigate('/host-dashboard')}>
+                      <User className="mr-2 h-4 w-4" />
+                      {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={() => navigate('/guest-dashboard')}>
+                    <User className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/profile')}>
                     <User className="mr-2 h-4 w-4" />
                     {language === 'ar' ? 'الملف الشخصي' : 'Profile'}
@@ -129,15 +141,17 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border/20 animate-slide-up">
             <nav className="flex flex-col space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
-              <a href="#" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/" className="text-foreground hover:text-primary transition-colors">
                 {language === 'ar' ? 'الرئيسية' : 'Home'}
-              </a>
-              <a href="#" className="text-foreground hover:text-primary transition-colors">
-                {language === 'ar' ? 'البحث' : 'Search'}
-              </a>
-              <a href="#" className="text-foreground hover:text-primary transition-colors">
-                {language === 'ar' ? 'استضافة' : 'Host'}
-              </a>
+              </Link>
+              <Link to="/guest-dashboard" className="text-foreground hover:text-primary transition-colors">
+                {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+              </Link>
+              {profile?.role === 'host' && (
+                <Link to="/host-dashboard" className="text-foreground hover:text-primary transition-colors">
+                  {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
+                </Link>
+              )}
               <a href="#" className="text-foreground hover:text-primary transition-colors">
                 {language === 'ar' ? 'حول' : 'About'}
               </a>
