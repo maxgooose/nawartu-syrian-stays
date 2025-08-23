@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Calendar, Users } from "lucide-react";
-import heroProperty from "@/assets/hero-property.jpg";
+import syrianHouse from "@/assets/syrian-traditional-house.jpg";
 
 interface HeroSectionProps {
   language: 'ar' | 'en';
@@ -29,12 +29,14 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pattern-islamic-hero">
-      {/* Animated Islamic Geometric Overlay */}
-      <div className="absolute inset-0 pattern-islamic animate-pattern-pulse opacity-20"></div>
-      
-      {/* Gradient overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/50 to-primary/80"></div>
+    <section 
+      className="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url(${syrianHouse})`
+      }}
+    >
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/60"></div>
 
       {/* Content */}
       <div className="relative z-10 container-custom text-center">
