@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Instagram, MessageCircle, Music } from "lucide-react";
 
 interface FooterProps {
   language: 'ar' | 'en';
@@ -124,15 +125,71 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
             <h4 className="font-semibold mb-4 text-foreground">
               {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}
             </h4>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>info@nawartu.com</p>
-              <p>
-                {language === 'ar' ? 'هاتف: ' : 'Phone: '}
-                +963 XXX XXX XXX
-              </p>
-              <p>
-                {language === 'ar' ? 'العنوان: دمشق، سوريا' : 'Address: Damascus, Syria'}
-              </p>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <div>
+                <p className="font-medium text-foreground mb-1">
+                  {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                </p>
+                <a 
+                  href="mailto:info@nawartu.com" 
+                  className="text-primary hover:underline"
+                >
+                  info@nawartu.com
+                </a>
+              </div>
+              
+              <div>
+                <p className="font-medium text-foreground mb-1">
+                  {language === 'ar' ? 'واتساب' : 'WhatsApp'}
+                </p>
+                <a 
+                  href="https://wa.me/19296679792" 
+                  className="text-primary hover:underline flex items-center gap-1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  +1 (929) 667-9792
+                </a>
+              </div>
+              
+              <div>
+                <p className="font-medium text-foreground mb-1">
+                  {language === 'ar' ? 'سوريا' : 'Syria'}
+                </p>
+                <a 
+                  href="tel:+963969864741" 
+                  className="text-primary hover:underline"
+                >
+                  +963 969 864 741
+                </a>
+              </div>
+
+              <div>
+                <p className="font-medium text-foreground mb-2">
+                  {language === 'ar' ? 'تابعونا' : 'Follow Us'}
+                </p>
+                <div className="flex gap-3">
+                  <a 
+                    href="https://instagram.com/nawartuofficial" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-primary/80 transition-colors"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="h-4 w-4" />
+                  </a>
+                  <a 
+                    href="https://tiktok.com/@nawartu" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-primary/80 transition-colors"
+                    aria-label="TikTok"
+                  >
+                    <Music className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

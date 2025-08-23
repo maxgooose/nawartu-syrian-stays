@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Instagram, Music } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ContactUs = () => {
@@ -85,6 +85,30 @@ const ContactUs = () => {
                     </CardContent>
                   </Card>
 
+                  {/* WhatsApp */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                        <div className="bg-primary/10 p-3 rounded-lg">
+                          <MessageCircle className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-foreground">
+                            {language === 'ar' ? 'واتساب' : 'WhatsApp Support'}
+                          </h3>
+                          <a 
+                            href="https://wa.me/19296679792" 
+                            className="text-primary hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            +1 (929) 667-9792
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* Phone */}
                   <Card>
                     <CardContent className="p-6">
@@ -94,21 +118,20 @@ const ContactUs = () => {
                         </div>
                         <div>
                           <h3 className="font-medium text-foreground">
-                            {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                            {language === 'ar' ? 'أرقام الهاتف' : 'Phone Numbers'}
                           </h3>
                           <div className="space-y-1">
-                            <a 
-                              href="tel:+963123456789" 
-                              className="block text-primary hover:underline"
-                            >
-                              +963 12 3456 789
-                            </a>
-                            <a 
-                              href="tel:+963987654321" 
-                              className="block text-primary hover:underline"
-                            >
-                              +963 98 7654 321
-                            </a>
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                {language === 'ar' ? 'سوريا:' : 'Syria:'}
+                              </p>
+                              <a 
+                                href="tel:+963969864741" 
+                                className="text-primary hover:underline"
+                              >
+                                +963 969 864 741
+                              </a>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -162,6 +185,37 @@ const ContactUs = () => {
                               }
                             </p>
                           </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Social Media */}
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-foreground">
+                          {language === 'ar' ? 'تابعونا على وسائل التواصل' : 'Follow Us on Social Media'}
+                        </h3>
+                        <div className="flex gap-4">
+                          <a 
+                            href="https://instagram.com/nawartuofficial" 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                          >
+                            <Instagram className="h-5 w-5" />
+                            <span className="text-sm font-medium">Instagram</span>
+                          </a>
+                          <a 
+                            href="https://tiktok.com/@nawartu" 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                          >
+                            <Music className="h-5 w-5" />
+                            <span className="text-sm font-medium">TikTok</span>
+                          </a>
                         </div>
                       </div>
                     </CardContent>
