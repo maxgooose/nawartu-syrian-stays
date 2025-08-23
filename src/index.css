@@ -132,6 +132,29 @@
   background-position: 0 0, 0 0, 20px 20px;
 }
 
+/* Enhanced Islamic Hero Pattern */
+.pattern-islamic-hero {
+  background-image: 
+    radial-gradient(circle at 25% 25%, hsl(var(--primary)) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, hsl(var(--primary)) 2px, transparent 2px),
+    linear-gradient(45deg, transparent 40%, hsl(var(--primary) / 0.1) 45%, hsl(var(--primary) / 0.1) 55%, transparent 60%),
+    linear-gradient(-45deg, transparent 40%, hsl(var(--primary) / 0.1) 45%, hsl(var(--primary) / 0.1) 55%, transparent 60%),
+    conic-gradient(from 0deg at 50% 50%, transparent 0deg, hsl(var(--primary) / 0.3) 45deg, transparent 90deg, hsl(var(--primary) / 0.3) 135deg, transparent 180deg, hsl(var(--primary) / 0.3) 225deg, transparent 270deg, hsl(var(--primary) / 0.3) 315deg, transparent 360deg);
+  background-size: 40px 40px, 40px 40px, 80px 80px, 80px 80px, 120px 120px;
+  background-position: 0 0, 20px 20px, 0 0, 0 0, 0 0;
+}
+
+/* Geometric Stars Pattern */
+.pattern-geometric-stars {
+  background-image:
+    radial-gradient(circle at 20% 20%, hsl(var(--primary) / 0.1) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, hsl(var(--primary) / 0.1) 1px, transparent 1px),
+    linear-gradient(45deg, transparent 30%, hsl(var(--primary) / 0.05) 32%, hsl(var(--primary) / 0.05) 35%, transparent 37%),
+    linear-gradient(-45deg, transparent 30%, hsl(var(--primary) / 0.05) 32%, hsl(var(--primary) / 0.05) 35%, transparent 37%);
+  background-size: 25px 25px, 25px 25px, 50px 50px, 50px 50px;
+  background-position: 0 0, 12.5px 12.5px, 0 0, 0 0;
+}
+
 .pattern-classic-elegant {
   background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted) / 0.3) 100%);
   position: relative;

@@ -19,19 +19,22 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
   const isRTL = language === 'ar';
 
   const handleSearch = () => {
-    console.log('Search data:', searchData);
-    // TODO: Implement search functionality
+    const params = new URLSearchParams();
+    if (searchData.location) params.set('location', searchData.location);
+    if (searchData.guests) params.set('guests', searchData.guests);
+    if (searchData.checkIn) params.set('checkin', searchData.checkIn);
+    if (searchData.checkOut) params.set('checkout', searchData.checkOut);
+    
+    window.location.href = `/browse?${params.toString()}`;
   };
 
   return (
-    <section className="relative min-h-screen flex items-center pattern-islamic overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroProperty})` }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary/40"></div>
-      </div>
+    <section className="relative min-h-screen flex items-center overflow-hidden pattern-islamic-hero">
+      {/* Animated Islamic Geometric Overlay */}
+      <div className="absolute inset-0 pattern-islamic animate-pattern-pulse opacity-20"></div>
+      
+      {/* Gradient overlay for better text readability */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/50 to-primary/80"></div>
 
       {/* Content */}
       <div className="relative z-10 container-custom text-center">

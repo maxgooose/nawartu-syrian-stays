@@ -85,7 +85,10 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="text-primary hover:text-primary/80 font-semibold transition-colors">
+          <button 
+            onClick={() => window.location.href = '/browse'}
+            className="text-primary hover:text-primary/80 font-semibold transition-colors"
+          >
             {language === 'ar' ? 'عرض جميع العقارات ←' : 'View All Properties →'}
           </button>
         </div>

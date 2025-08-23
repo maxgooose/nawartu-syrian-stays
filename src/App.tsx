@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { Auth } from "./pages/Auth";
 import { AuthCallback } from "./pages/AuthCallback";
+import PropertyBrowse from "./pages/PropertyBrowse";
 import HostDashboard from "./pages/HostDashboard";
 import CreateListing from "./pages/CreateListing";
 import GuestDashboard from "./pages/GuestDashboard";
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/browse" element={<PropertyBrowse language="ar" />} />
             <Route path="/host-dashboard" element={<HostDashboard />} />
             <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/guest-dashboard" element={<GuestDashboard />} />
