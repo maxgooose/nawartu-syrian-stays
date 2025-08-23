@@ -41,13 +41,13 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground mb-6 text-shadow">
               {language === 'ar' ? (
                 <>
-                  <span className="block">اكتشف جمال</span>
-                  <span className="block text-secondary">سوريا التراثية</span>
+                  <span className="block">الضيافة السورية</span>
+                  <span className="block text-secondary">عأصولها</span>
                 </>
               ) : (
                 <>
-                  <span className="block">Discover the Beauty</span>
-                  <span className="block text-secondary">of Historic Syria</span>
+                  <span className="block">Syrian Hospitality</span>
+                  <span className="block text-secondary">Done Right</span>
                 </>
               )}
             </h1>
