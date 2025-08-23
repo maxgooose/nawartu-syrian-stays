@@ -11,6 +11,7 @@ import HostDashboard from "./pages/HostDashboard";
 import CreateListing from "./pages/CreateListing";
 import GuestDashboard from "./pages/GuestDashboard";
 import PropertyDetails from "./pages/PropertyDetails";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/guest-dashboard" element={<GuestDashboard />} />
             <Route path="/property/:id" element={<PropertyDetails />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Globe, Menu, X, User, LogOut } from "lucide-react";
+import { Globe, Menu, X, User, LogOut, Shield } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,6 +53,11 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                 {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
               </Link>
             )}
+            {profile?.role === 'admin' && (
+              <Link to="/admin-dashboard" className="text-foreground hover:text-primary transition-colors">
+                {language === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
+              </Link>
+            )}
             <a href="#" className="text-foreground hover:text-primary transition-colors">
               {language === 'ar' ? 'حول' : 'About'}
             </a>
@@ -90,6 +95,12 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
+                  {profile?.role === 'admin' && (
+                    <DropdownMenuItem onClick={() => navigate('/admin-dashboard')}>
+                      <Shield className="mr-2 h-4 w-4" />
+                      {language === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
+                    </DropdownMenuItem>
+                  )}
                   {profile?.role === 'host' && (
                     <DropdownMenuItem onClick={() => navigate('/host-dashboard')}>
                       <User className="mr-2 h-4 w-4" />
@@ -150,6 +161,11 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
               {profile?.role === 'host' && (
                 <Link to="/host-dashboard" className="text-foreground hover:text-primary transition-colors">
                   {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
+                </Link>
+              )}
+              {profile?.role === 'admin' && (
+                <Link to="/admin-dashboard" className="text-foreground hover:text-primary transition-colors">
+                  {language === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
                 </Link>
               )}
               <a href="#" className="text-foreground hover:text-primary transition-colors">
