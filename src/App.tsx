@@ -13,6 +13,8 @@ import GuestDashboard from "./pages/GuestDashboard";
 import PropertyDetails from "./pages/PropertyDetails";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProfileManagement from "./pages/ProfileManagement";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/property/:id" element={<PropertyDetails />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/profile" element={<ProfileManagement />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
