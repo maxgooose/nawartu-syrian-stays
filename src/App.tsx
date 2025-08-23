@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ProfileManagement from "./pages/ProfileManagement";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import PropertyGuidelines from "./pages/PropertyGuidelines";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/profile" element={<ProfileManagement />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/guidelines" element={<PropertyGuidelines />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
