@@ -45,7 +45,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Sending booking confirmation email to:", guestEmail);
 
     const emailResponse = await resend.emails.send({
-      from: "Nawartu <onboarding@resend.dev>",
+      from: "Nawartu <info@nawartu.com>",
       to: [guestEmail],
       subject: "تأكيد استلام طلب الحجز - نوارتو",
       html: `

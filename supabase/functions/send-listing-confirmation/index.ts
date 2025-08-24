@@ -29,7 +29,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Sending listing confirmation email to:", hostEmail);
 
     const emailResponse = await resend.emails.send({
-      from: "Nawartu <onboarding@resend.dev>",
+      from: "Nawartu <info@nawartu.com>",
       to: [hostEmail],
       subject: "تأكيد استلام طلب إضافة العقار - نوارتو",
       html: `
