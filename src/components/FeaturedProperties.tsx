@@ -1,4 +1,8 @@
 import { PropertyCard } from "./PropertyCard";
+import damascusHouse1 from "@/assets/damascus-house-1.jpg";
+import damascusHouse2 from "@/assets/damascus-house-2.jpg";
+import damascusHouse3 from "@/assets/damascus-house-3.jpg";
+import damascusHouse4 from "@/assets/damascus-house-4.jpg";
 
 interface FeaturedPropertiesProps {
   language: 'ar' | 'en';
@@ -17,7 +21,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
       currency: 'USD' as const,
       rating: 4.8,
       reviews: 127,
-      image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80',
+      image: damascusHouse1,
       type: language === 'ar' ? 'بيت تراثي' : 'Heritage House',
       features: language === 'ar' ? ['حديقة خاصة', 'واي فاي', 'مطبخ كامل'] : ['Private Garden', 'WiFi', 'Full Kitchen']
     },
@@ -29,7 +33,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
       currency: 'SYP' as const,
       rating: 4.6,
       reviews: 89,
-      image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
+      image: damascusHouse2,
       type: language === 'ar' ? 'شقة' : 'Apartment',
       features: language === 'ar' ? ['إطلالة رائعة', 'مكيف', 'موقف سيارة'] : ['Great View', 'AC', 'Parking']
     },
@@ -41,7 +45,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
       currency: 'USD' as const,
       rating: 4.9,
       reviews: 203,
-      image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80',
+      image: damascusHouse3,
       type: language === 'ar' ? 'فيلا' : 'Villa',
       features: language === 'ar' ? ['أمام البحر', 'مسبح خاص', 'شرفة كبيرة'] : ['Beachfront', 'Private Pool', 'Large Terrace']
     },
@@ -53,7 +57,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
       currency: 'SYP' as const,
       rating: 4.7,
       reviews: 156,
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80',
+      image: damascusHouse4,
       type: language === 'ar' ? 'كوخ' : 'Cabin',
       features: language === 'ar' ? ['إطلالة جبلية', 'هواء نقي', 'مدفأة'] : ['Mountain View', 'Fresh Air', 'Fireplace']
     }
