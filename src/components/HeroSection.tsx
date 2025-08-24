@@ -133,18 +133,14 @@ export const HeroSection = ({
             <div className="text-center animate-fade-in-up" style={{
             animationDelay: '0.4s'
           }}>
-              <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">15</div>
-              <div className="text-primary-foreground/80">
-                {language === 'ar' ? 'مدينة سورية' : 'Syrian Cities'}
-              </div>
+              
+              
             </div>
             <div className="text-center animate-fade-in-up" style={{
             animationDelay: '0.6s'
           }}>
-              <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">200</div>
-              <div className="text-primary-foreground/80">
-                {language === 'ar' ? 'مسافر راضي' : 'Happy Travelers'}
-              </div>
+              
+              
             </div>
           </div>
         </div>
