@@ -1,6 +1,7 @@
 import { Heart, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface PropertyCardProps {
   property: {
@@ -20,6 +21,7 @@ interface PropertyCardProps {
 
 export const PropertyCard = ({ property, language }: PropertyCardProps) => {
   const isRTL = language === 'ar';
+  const navigate = useNavigate();
 
   const formatPrice = (price: number, currency: 'USD' | 'SYP') => {
     if (currency === 'USD') {
@@ -91,7 +93,12 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
               {language === 'ar' ? ' / ليلة' : ' / night'}
             </span>
           </div>
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate(`/property/${property.id}`)}
+            className="bg-gradient-to-r from-yellow-500 to-amber-600 text-white border-none hover:from-yellow-600 hover:to-amber-700 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+          >
             {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
           </Button>
         </div>
