@@ -27,9 +27,8 @@ interface Booking {
   check_in_date: string;
   check_out_date: string;
   total_nights: number;
-  total_amount_usd: number;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  payment_method: 'stripe' | 'cash';
+  special_requests?: string;
   guest: {
     full_name: string;
     email: string;
@@ -65,11 +64,16 @@ const HostDashboard = () => {
 
       if (listingsError) throw listingsError;
 
-      // Fetch bookings for host's listings
+      // Fetch bookings for host's listings (excluding payment data for security)
       const { data: bookingsData, error: bookingsError } = await supabase
         .from('bookings')
         .select(`
-          *,
+          id,
+          check_in_date,
+          check_out_date,
+          total_nights,
+          status,
+          special_requests,
           guest:profiles!bookings_guest_id_fkey(full_name, email),
           listing:listings!bookings_listing_id_fkey(name)
         `)
@@ -254,8 +258,8 @@ const HostDashboard = () => {
                           <span className="font-medium">{booking.total_nights}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">المبلغ الإجمالي</span>
-                          <span className="font-medium">${booking.total_amount_usd}</span>
+                          <span className="text-muted-foreground block">طلبات خاصة</span>
+                          <span className="font-medium">{booking.special_requests || 'لا توجد'}</span>
                         </div>
                       </div>
                     </CardContent>
