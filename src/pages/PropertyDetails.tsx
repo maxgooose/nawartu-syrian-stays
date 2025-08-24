@@ -15,6 +15,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Separator } from "@/components/ui/separator";
 import { ReviewsList } from "@/components/ReviewsList";
 import { StarRating } from "@/components/StarRating";
+import GoogleMap from "@/components/GoogleMap";
 import { 
   ArrowRight, 
   MapPin, 
@@ -70,6 +71,8 @@ interface Listing {
   bathrooms: number;
   images: string[];
   amenities: string[];
+  latitude?: number;
+  longitude?: number;
   host: {
     full_name: string;
     avatar_url?: string;
@@ -644,15 +647,19 @@ const PropertyDetails = () => {
                   <span>{listing.location}</span>
                 </div>
                 
-                {/* Mock Map */}
+                {/* Google Map */}
                 <div className="aspect-video bg-muted rounded-lg relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5">
-                    <div className="text-center">
-                      <MapPin className="h-12 w-12 text-primary mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">خريطة الموقع</p>
-                      <p className="text-xs text-muted-foreground mt-1">اضغط لعرض الخريطة الكاملة</p>
-                    </div>
-                  </div>
+                  <GoogleMap
+                    lat={listing.latitude || 33.5138}
+                    lng={listing.longitude || 36.2765}
+                    zoom={15}
+                    height="100%"
+                    markers={[{
+                      lat: listing.latitude || 33.5138,
+                      lng: listing.longitude || 36.2765,
+                      title: listing.name
+                    }]}
+                  />
                   {/* Map Overlay Button */}
                   <Button 
                     variant="secondary" 

@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign } from "lucide-react";
+import LocationSelector from "@/components/LocationSelector";
 
 const AMENITIES = [
   { id: 'wifi', label: 'واي فاي', value: 'wifi' },
@@ -191,20 +192,21 @@ const CreateListing = () => {
                     />
                   </div>
                   
-                  <div>
-                    <Label htmlFor="location">الموقع *</Label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="location"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleInputChange}
-                        placeholder="المدينة، الحي"
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                  <div className="md:col-span-2">
+                    <LocationSelector
+                      onLocationSelect={(location, lat, lng) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          location,
+                          latitude: lat.toString(),
+                          longitude: lng.toString()
+                        }));
+                      }}
+                      initialLocation={formData.location}
+                      initialLat={formData.latitude ? parseFloat(formData.latitude) : undefined}
+                      initialLng={formData.longitude ? parseFloat(formData.longitude) : undefined}
+                      language="ar"
+                    />
                   </div>
                 </div>
 
