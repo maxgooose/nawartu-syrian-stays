@@ -28,7 +28,7 @@ export const HeroSection = ({
     backgroundImage: `url(${syrianHouse})`
   }}>
       {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/60"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/60 rounded-none bg-pink-100"></div>
 
       {/* Content */}
       <div className="relative z-10 container-custom text-center">
