@@ -97,7 +97,7 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
             variant="outline" 
             size="sm"
             onClick={() => navigate(`/property/${property.id}`)}
-            className="bg-amber-500 text-white border-none hover:bg-amber-600 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+            className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
           >
             {language === 'ar' ? 'عرض' : 'View'}
           </Button>
