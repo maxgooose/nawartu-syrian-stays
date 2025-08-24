@@ -86,10 +86,10 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
 
         <div className="flex items-center justify-between">
           <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
-            <span className="text-lg font-bold text-foreground">
+            <span className="text-sm font-medium text-gray-400">
               {formatPrice(property.price, property.currency)}
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs text-gray-400">
               {language === 'ar' ? ' / ليلة' : ' / night'}
             </span>
           </div>
@@ -97,9 +97,9 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
             variant="outline" 
             size="sm"
             onClick={() => navigate(`/property/${property.id}`)}
-            className="bg-gradient-to-r from-yellow-500 to-amber-600 text-white border-none hover:from-yellow-600 hover:to-amber-700 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+            className="bg-amber-500 text-white border-none hover:bg-amber-600 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
           >
-            {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+            {language === 'ar' ? 'عرض' : 'View'}
           </Button>
         </div>
       </CardContent>
