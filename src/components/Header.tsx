@@ -58,9 +58,11 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                 {language === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
               </Link>
             )}
-            <a href="#" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-              {language === 'ar' ? 'حول' : 'About'}
-            </a>
+            {profile?.role !== 'host' && (
+              <Link to="/become-host" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                {language === 'ar' ? 'كن مضيف' : 'Become a Host'}
+              </Link>
+            )}
           </nav>
 
           {/* Right Section */}
@@ -184,9 +186,15 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                   {language === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
                 </Link>
               )}
-              <a href="#" className="text-foreground hover:text-primary transition-colors py-2 border-b border-border/50">
-                {language === 'ar' ? 'حول' : 'About'}
-              </a>
+              {profile?.role !== 'host' && (
+                <Link 
+                  to="/become-host" 
+                  className="text-foreground hover:text-primary transition-colors py-2 border-b border-border/50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {language === 'ar' ? 'كن مضيف' : 'Become a Host'}
+                </Link>
+              )}
               
               {/* Mobile Auth Buttons */}
               {!user && (

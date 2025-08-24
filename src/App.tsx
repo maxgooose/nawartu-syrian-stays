@@ -20,6 +20,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import PropertyGuidelines from "./pages/PropertyGuidelines";
 import ContactUs from "./pages/ContactUs";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import BecomeHost from "./pages/BecomeHost";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/browse" element={<PropertyBrowse language="ar" />} />
             <Route path="/host-dashboard" element={<HostDashboard />} />
             <Route path="/create-listing" element={<CreateListing />} />
+            <Route path="/become-host" element={<BecomeHost />} />
             <Route path="/guest-dashboard" element={<GuestDashboard />} />
             <Route path="/property/:id" element={<PropertyDetails />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
