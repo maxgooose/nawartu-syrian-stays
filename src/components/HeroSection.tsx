@@ -3,38 +3,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Calendar, Users } from "lucide-react";
 import syrianHouse from "@/assets/syrian-traditional-house.jpg";
-
 interface HeroSectionProps {
   language: 'ar' | 'en';
 }
-
-export const HeroSection = ({ language }: HeroSectionProps) => {
+export const HeroSection = ({
+  language
+}: HeroSectionProps) => {
   const [searchData, setSearchData] = useState({
     location: '',
     checkIn: '',
     checkOut: '',
     guests: ''
   });
-
   const isRTL = language === 'ar';
-
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchData.location) params.set('location', searchData.location);
     if (searchData.guests) params.set('guests', searchData.guests);
     if (searchData.checkIn) params.set('checkin', searchData.checkIn);
     if (searchData.checkOut) params.set('checkout', searchData.checkOut);
-    
     window.location.href = `/browse?${params.toString()}`;
   };
-
-  return (
-    <section 
-      className="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: `url(${syrianHouse})`
-      }}
-    >
+  return <section className="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center bg-no-repeat" style={{
+    backgroundImage: `url(${syrianHouse})`
+  }}>
       {/* Dark overlay for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/60"></div>
 
@@ -44,23 +36,16 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
           {/* Hero Text */}
           <div className={`mb-12 ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground mb-6 text-shadow">
-              {language === 'ar' ? (
-                <>
+              {language === 'ar' ? <>
                   <span className="block">الضيافة السورية</span>
                   <span className="block text-secondary">عأصولها</span>
-                </>
-              ) : (
-                <>
+                </> : <>
                   <span className="block">Syrian Hospitality</span>
                   <span className="block text-secondary">Done Right</span>
-                </>
-              )}
+                </>}
             </h1>
             <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-2xl mx-auto leading-relaxed">
-              {language === 'ar' 
-                ? 'استأجر أجمل العقارات التراثية والحديثة في سوريا. تجربة إقامة أصيلة وفريدة.'
-                : 'Rent the most beautiful heritage and modern properties in Syria. An authentic and unique stay experience.'
-              }
+              {language === 'ar' ? 'استأجر أجمل العقارات التراثية والحديثة في سوريا. تجربة إقامة أصيلة وفريدة.' : 'Rent the most beautiful heritage and modern properties in Syria. An authentic and unique stay experience.'}
             </p>
           </div>
 
@@ -80,12 +65,10 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
                 </label>
                 <div className="relative">
                   <MapPin className={`absolute top-3 h-5 w-5 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
-                  <Input
-                    placeholder={language === 'ar' ? 'دمشق، حلب، حمص...' : 'Damascus, Aleppo, Homs...'}
-                    value={searchData.location}
-                    onChange={(e) => setSearchData({...searchData, location: e.target.value})}
-                    className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`}
-                  />
+                  <Input placeholder={language === 'ar' ? 'دمشق، حلب، حمص...' : 'Damascus, Aleppo, Homs...'} value={searchData.location} onChange={e => setSearchData({
+                  ...searchData,
+                  location: e.target.value
+                })} className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`} />
                 </div>
               </div>
 
@@ -96,12 +79,10 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
                 </label>
                 <div className="relative">
                   <Calendar className={`absolute top-3 h-5 w-5 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
-                  <Input
-                    type="date"
-                    value={searchData.checkIn}
-                    onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
-                    className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`}
-                  />
+                  <Input type="date" value={searchData.checkIn} onChange={e => setSearchData({
+                  ...searchData,
+                  checkIn: e.target.value
+                })} className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`} />
                 </div>
               </div>
 
@@ -112,12 +93,10 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
                 </label>
                 <div className="relative">
                   <Calendar className={`absolute top-3 h-5 w-5 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
-                  <Input
-                    type="date"
-                    value={searchData.checkOut}
-                    onChange={(e) => setSearchData({...searchData, checkOut: e.target.value})}
-                    className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`}
-                  />
+                  <Input type="date" value={searchData.checkOut} onChange={e => setSearchData({
+                  ...searchData,
+                  checkOut: e.target.value
+                })} className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`} />
                 </div>
               </div>
 
@@ -128,23 +107,16 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
                 </label>
                 <div className="relative">
                   <Users className={`absolute top-3 h-5 w-5 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
-                  <Input
-                    type="number"
-                    placeholder={language === 'ar' ? 'عدد الضيوف' : 'Number of guests'}
-                    value={searchData.guests}
-                    onChange={(e) => setSearchData({...searchData, guests: e.target.value})}
-                    className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`}
-                  />
+                  <Input type="number" placeholder={language === 'ar' ? 'عدد الضيوف' : 'Number of guests'} value={searchData.guests} onChange={e => setSearchData({
+                  ...searchData,
+                  guests: e.target.value
+                })} className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-12`} />
                 </div>
               </div>
             </div>
 
             {/* Search Button */}
-            <Button 
-              onClick={handleSearch}
-              size="lg"
-              className="w-full md:w-auto px-12 h-12 text-lg font-semibold hover-lift relative z-10"
-            >
+            <Button onClick={handleSearch} size="lg" className="w-full md:w-auto px-12 h-12 text-lg font-semibold hover-lift relative z-10">
               <Search className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
               {language === 'ar' ? 'البحث عن عقار' : 'Search Properties'}
             </Button>
@@ -152,20 +124,24 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-3xl mx-auto">
-            <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">500+</div>
-              <div className="text-primary-foreground/80">
-                {language === 'ar' ? 'عقار مميز' : 'Premium Properties'}
-              </div>
+            <div className="text-center animate-fade-in-up" style={{
+            animationDelay: '0.2s'
+          }}>
+              
+              
             </div>
-            <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <div className="text-center animate-fade-in-up" style={{
+            animationDelay: '0.4s'
+          }}>
               <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">15</div>
               <div className="text-primary-foreground/80">
                 {language === 'ar' ? 'مدينة سورية' : 'Syrian Cities'}
               </div>
             </div>
-            <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-              <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">50K+</div>
+            <div className="text-center animate-fade-in-up" style={{
+            animationDelay: '0.6s'
+          }}>
+              <div className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">200</div>
               <div className="text-primary-foreground/80">
                 {language === 'ar' ? 'مسافر راضي' : 'Happy Travelers'}
               </div>
@@ -176,10 +152,7 @@ export const HeroSection = ({ language }: HeroSectionProps) => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-float">
-        <div className="w-6 h-10 border-2 border-primary-foreground/50 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-primary-foreground/50 rounded-full mt-2 animate-pulse"></div>
-        </div>
+        
       </div>
-    </section>
-  );
+    </section>;
 };
