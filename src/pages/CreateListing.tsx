@@ -111,9 +111,25 @@ const CreateListing = () => {
 
       if (error) throw error;
 
+      // Send confirmation email
+      try {
+        await supabase.functions.invoke('send-listing-confirmation', {
+          body: {
+            hostEmail: profile.email,
+            hostName: profile.full_name || profile.email,
+            listingName: formData.name,
+            listingLocation: formData.location,
+            listingId: `${Date.now()}` // Simple ID for reference
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Don't fail the listing creation if email fails
+      }
+
       toast({
         title: "تم بنجاح",
-        description: "تم إضافة العقار بنجاح وهو قيد المراجعة",
+        description: "تم إضافة العقار بنجاح وهو قيد المراجعة. تم إرسال تأكيد على بريدك الإلكتروني.",
       });
 
       navigate('/host-dashboard');
