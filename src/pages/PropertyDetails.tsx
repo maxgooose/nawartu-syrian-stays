@@ -231,6 +231,28 @@ const PropertyDetails = () => {
       return;
     }
 
+    // Check if user already has an active booking
+    try {
+      const { data: existingBookings, error: checkError } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('guest_id', profile.id)
+        .in('status', ['pending', 'confirmed']);
+
+      if (checkError) throw checkError;
+
+      if (existingBookings && existingBookings.length > 0) {
+        toast({
+          title: "خطأ",
+          description: "لديك حجز نشط بالفعل. لا يمكن إجراء حجز جديد.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (error: any) {
+      console.error('Error checking existing bookings:', error);
+    }
+
     // Check cash booking constraints
     if (paymentMethod === 'cash') {
       const daysDiff = differenceInDays(checkInDate, new Date());
@@ -253,10 +275,55 @@ const PropertyDetails = () => {
       }
     }
 
+    // Check availability for the requested dates
+    try {
+      const { data: conflictingBookings, error: availabilityError } = await supabase
+        .from('bookings')
+        .select('id, check_in_date, check_out_date, payment_method')
+        .eq('listing_id', listing.id)
+        .in('status', ['pending', 'confirmed'])
+        .or(`check_in_date.lte.${format(checkOutDate, 'yyyy-MM-dd')},check_out_date.gte.${format(checkInDate, 'yyyy-MM-dd')}`);
+
+      if (availabilityError) throw availabilityError;
+
+      if (conflictingBookings && conflictingBookings.length > 0) {
+        // For cash bookings, only check first 3 days
+        if (paymentMethod === 'cash') {
+          const cashCheckEndDate = addDays(checkInDate, 3);
+          const hasConflict = conflictingBookings.some(booking => {
+            const bookingStart = new Date(booking.check_in_date);
+            const bookingEnd = new Date(booking.check_out_date);
+            return (
+              (bookingStart < cashCheckEndDate && bookingEnd > checkInDate) ||
+              (booking.payment_method === 'cash' && bookingStart < checkOutDate && bookingEnd > checkInDate)
+            );
+          });
+
+          if (hasConflict) {
+            toast({
+              title: "خطأ",
+              description: "التواريخ المختارة غير متاحة",
+              variant: "destructive",
+            });
+            return;
+          }
+        } else {
+          toast({
+            title: "خطأ",
+            description: "التواريخ المختارة غير متاحة",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+    } catch (error: any) {
+      console.error('Error checking availability:', error);
+    }
+
     setBookingLoading(true);
 
     try {
-      const { error } = await supabase
+      const { data: bookingData, error } = await supabase
         .from('bookings')
         .insert({
           guest_id: profile.id,
@@ -268,23 +335,75 @@ const PropertyDetails = () => {
           payment_method: paymentMethod,
           special_requests: specialRequests || null,
           status: 'pending'
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "تم بنجاح",
-        description: paymentMethod === 'cash' 
-          ? "تم إرسال طلب الحجز. سيتم التواصل معك قريباً لتأكيد الحجز."
-          : "تم إرسال طلب الحجز. ستتم إعادة توجيهك للدفع.",
-      });
+      // Send confirmation email
+      try {
+        await supabase.functions.invoke('send-booking-confirmation', {
+          body: {
+            guestEmail: profile.email,
+            guestName: profile.full_name || profile.email,
+            listingName: listing.name,
+            listingLocation: listing.location,
+            checkInDate: format(checkInDate, 'yyyy-MM-dd'),
+            checkOutDate: format(checkOutDate, 'yyyy-MM-dd'),
+            totalNights: nights,
+            totalAmount: calculateTotalAmount(),
+            paymentMethod: paymentMethod,
+            bookingId: bookingData.id
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Don't fail the booking if email fails
+      }
 
       if (paymentMethod === 'stripe') {
-        // TODO: Redirect to Stripe payment
-        navigate('/guest-dashboard');
+        // Create Stripe checkout session
+        try {
+          const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-stripe-checkout', {
+            body: {
+              bookingId: bookingData.id,
+              totalAmount: calculateTotalAmount(),
+              listingName: listing.name,
+              nights: nights
+            }
+          });
+
+          if (checkoutError) throw checkoutError;
+
+          // Redirect to Stripe checkout
+          window.open(checkoutData.url, '_blank');
+          
+          toast({
+            title: "تم إنشاء الحجز",
+            description: "تم فتح صفحة الدفع في نافذة جديدة. أكمل عملية الدفع لتأكيد حجزك.",
+          });
+        } catch (stripeError) {
+          console.error('Stripe checkout error:', stripeError);
+          toast({
+            title: "خطأ في الدفع",
+            description: "حدث خطأ في إنشاء جلسة الدفع. يرجى المحاولة مرة أخرى.",
+            variant: "destructive",
+          });
+        }
       } else {
-        navigate('/guest-dashboard');
+        toast({
+          title: "تم بنجاح",
+          description: "تم إرسال طلب الحجز. سيتم التواصل معك قريباً لتأكيد الحجز. تم حجز الأيام الثلاثة الأولى.",
+        });
       }
+
+      // Reset form
+      setCheckInDate(undefined);
+      setCheckOutDate(undefined);
+      setGuests('2');
+      setSpecialRequests('');
+
     } catch (error: any) {
       toast({
         title: "خطأ",
