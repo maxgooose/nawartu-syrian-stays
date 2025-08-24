@@ -36,43 +36,69 @@ export const Auth = () => {
     setIsLoading(true);
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
-          email,
+        console.log('Starting signup process...', { email, fullName, language });
+        
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: {
-              full_name: fullName,
-              phone,
+              full_name: fullName.trim(),
+              phone: phone.trim(),
               preferred_language: language,
             }
           }
         });
 
-        if (error) throw error;
+        console.log('Signup response:', { data, error });
 
-        toast({
-          title: language === 'ar' ? 'تم إنشاء الحساب' : 'Account created',
-          description: language === 'ar' ? 
-            'تم إرسال رابط التأكيد إلى بريدك الإلكتروني' : 
-            'Confirmation link sent to your email',
-        });
+        if (error) {
+          console.error('Signup error:', error);
+          throw error;
+        }
+
+        // Check if user needs email confirmation
+        if (data?.user && !data.session) {
+          toast({
+            title: language === 'ar' ? 'تم إنشاء الحساب' : 'Account created',
+            description: language === 'ar' ? 
+              'تم إرسال رابط التأكيد إلى بريدك الإلكتروني. يرجى فحص بريدك وإنجاز التأكيد.' : 
+              'Confirmation link sent to your email. Please check your email and confirm your account.',
+          });
+        } else if (data?.session) {
+          // User was created and logged in immediately
+          toast({
+            title: language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully',
+            description: language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu',
+          });
+          navigate('/');
+        }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
+        console.log('Starting signin process...', { email });
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
           password,
         });
 
-        if (error) throw error;
+        console.log('Signin response:', { data, error });
 
-        toast({
-          title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Successfully signed in',
-          description: language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu',
-        });
+        if (error) {
+          console.error('Signin error:', error);
+          throw error;
+        }
 
-        navigate('/');
+        if (data?.session) {
+          toast({
+            title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Successfully signed in',
+            description: language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu',
+          });
+          navigate('/');
+        }
       }
     } catch (error: any) {
+      console.error('Auth error details:', error);
       let errorMessage = error.message;
       
       // Handle common auth errors with friendly messages
@@ -88,6 +114,14 @@ export const Auth = () => {
         errorMessage = language === 'ar' ? 
           'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 
           'Password should be at least 6 characters';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = language === 'ar' ? 
+          'يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول' : 
+          'Please confirm your email before signing in';
+      } else if (error.message.includes('Signup disabled')) {
+        errorMessage = language === 'ar' ? 
+          'التسجيل معطل حالياً' : 
+          'Signup is currently disabled';
       }
 
       toast({
@@ -103,10 +137,12 @@ export const Auth = () => {
   const handleGoogleAuth = async () => {
     setIsLoading(true);
     try {
+      console.log('Starting Google OAuth...');
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -114,8 +150,14 @@ export const Auth = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Google OAuth error:', error);
+        throw error;
+      }
+      
+      // Don't set loading to false here since we're redirecting
     } catch (error: any) {
+      console.error('Google auth error details:', error);
       let errorMessage = error.message;
       
       if (error.message.includes('To signup, please visit')) {

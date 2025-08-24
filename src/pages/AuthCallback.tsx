@@ -10,30 +10,49 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log('Processing auth callback...');
+        
+        // First, try to exchange the code for a session
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Auth callback error:', error);
+          console.error('Auth callback session error:', error);
           toast({
             variant: 'destructive',
             title: 'Authentication Error',
-            description: error.message,
+            description: 'Failed to complete authentication. Please try signing in again.',
           });
           navigate('/auth');
           return;
         }
 
         if (data?.session) {
-          toast({
-            title: 'Welcome to Nawartu!',
-            description: 'You have been successfully authenticated.',
-          });
-          navigate('/');
+          console.log('Session established successfully:', data.session.user.email);
+          
+          // Give some time for the profile creation trigger to complete
+          setTimeout(() => {
+            toast({
+              title: 'Welcome to Nawartu!',
+              description: 'Your account has been confirmed successfully.',
+            });
+            navigate('/');
+          }, 1000);
         } else {
+          console.log('No session found, redirecting to auth');
+          toast({
+            variant: 'destructive',
+            title: 'Authentication Issue',
+            description: 'Could not establish session. Please try signing in again.',
+          });
           navigate('/auth');
         }
       } catch (error) {
-        console.error('Unexpected error:', error);
+        console.error('Unexpected auth callback error:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Unexpected Error',
+          description: 'Something went wrong during authentication.',
+        });
         navigate('/auth');
       }
     };

@@ -47,8 +47,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, retryCount = 0) => {
     try {
+      console.log(`Fetching profile for user ${userId}, attempt ${retryCount + 1}`);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -57,9 +59,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       if (error) {
         console.error('Error fetching profile:', error);
+        
+        // If profile doesn't exist and it's the first retry, wait and try again
+        // This handles the case where the trigger hasn't fired yet
+        if (error.code === 'PGRST116' && retryCount < 3) {
+          console.log('Profile not found, retrying in 1 second...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return fetchProfile(userId, retryCount + 1);
+        }
+        
         return null;
       }
 
+      console.log('Profile fetched successfully:', data);
       return data;
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -128,10 +140,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (session?.user) {
           // Defer profile fetching to avoid auth state change conflicts
           setTimeout(async () => {
-            const profileData = await fetchProfile(session.user.id);
+            let profileData = await fetchProfile(session.user.id);
+            
+            // If profile doesn't exist, create it manually as fallback
+            if (!profileData) {
+              console.log('Profile not found, creating manually...');
+              try {
+                const { data: newProfile, error } = await supabase
+                  .from('profiles')
+                  .insert({
+                    user_id: session.user.id,
+                    email: session.user.email!,
+                    full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '',
+                    phone: session.user.user_metadata?.phone || '',
+                    preferred_language: session.user.user_metadata?.preferred_language || 'ar',
+                    role: 'guest'
+                  })
+                  .select()
+                  .single();
+                
+                if (error) {
+                  console.error('Error creating profile:', error);
+                } else {
+                  console.log('Profile created manually:', newProfile);
+                  profileData = newProfile;
+                }
+              } catch (createError) {
+                console.error('Error in manual profile creation:', createError);
+              }
+            }
+            
             setProfile(profileData);
             setLoading(false);
-          }, 0);
+          }, 500);
         } else {
           setProfile(null);
           setLoading(false);
