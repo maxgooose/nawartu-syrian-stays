@@ -138,7 +138,7 @@ export const Auth = () => {
       <Card className="w-full max-w-md bg-background/95 backdrop-blur-sm shadow-elegant">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-            <img src="/src/assets/nawartu-logo.png" alt="Nawartu" className="w-10 h-10" />
+            <img src="/nawartu-logo.png" alt="Nawartu" className="w-10 h-10" />
           </div>
           <CardTitle className="text-2xl font-arabic">
             {language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu'}
