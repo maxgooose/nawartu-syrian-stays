@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Mail, Lock, Globe } from 'lucide-react';
 
-export const Auth = () => {
+const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -400,3 +400,5 @@ export const Auth = () => {
     </div>
   );
 };
+
+export default Auth;

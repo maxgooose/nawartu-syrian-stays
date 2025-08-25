@@ -30,7 +30,7 @@ interface Listing {
 }
 
 interface PropertyBrowseProps {
-  language: 'ar' | 'en';
+  language?: 'ar' | 'en';
 }
 
 const PropertyBrowse = ({ language = 'ar' }: PropertyBrowseProps) => {
