@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 
 const PrivacyPolicy = () => {
-  const [language, setLanguage] = useState<'ar' | 'en'>('en');
+  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
 
   return (
     <div className="min-h-screen bg-background">

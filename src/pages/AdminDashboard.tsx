@@ -8,19 +8,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { 
-  Shield, 
-  Users, 
-  Home, 
-  Calendar, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Shield,
+  Users,
+  Home,
+  Calendar,
+  CheckCircle,
+  XCircle,
   Eye,
   MessageSquare,
   BarChart3,
   MapPin,
   DollarSign,
-  Clock
+  Clock,
+  Globe
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -77,11 +78,20 @@ const AdminDashboard = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Mock language - in real app this would come from context
-  const language: 'ar' | 'en' = 'ar';
+  const isRTL = language === 'ar';
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'ar' ? 'en' : 'ar');
+    // Update document direction
+    document.documentElement.dir = language === 'ar' ? 'ltr' : 'rtl';
+    document.documentElement.lang = language === 'ar' ? 'en' : 'ar';
+  };
+
+  const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
   useEffect(() => {
     if (!user || profile?.role !== 'admin') {
@@ -99,9 +109,12 @@ const AdminDashboard = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (usersError) throw usersError;
+      if (usersError) {
+        console.error('Users fetch error:', usersError);
+        throw usersError;
+      }
 
-      // Fetch pending listings
+      // Fetch ALL listings (not just pending) so we can show stats
       const { data: listingsData, error: listingsError } = await supabase
         .from('listings')
         .select(`
@@ -110,7 +123,10 @@ const AdminDashboard = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (listingsError) throw listingsError;
+      if (listingsError) {
+        console.error('Listings fetch error:', listingsError);
+        throw listingsError;
+      }
 
       // Fetch all bookings
       const { data: bookingsData, error: bookingsError } = await supabase
@@ -122,15 +138,25 @@ const AdminDashboard = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (bookingsError) throw bookingsError;
+      if (bookingsError) {
+        console.error('Bookings fetch error:', bookingsError);
+        throw bookingsError;
+      }
+
+      console.log('Admin data fetched:', {
+        users: usersData?.length || 0,
+        listings: listingsData?.length || 0,
+        bookings: bookingsData?.length || 0
+      });
 
       setUsers(usersData || []);
       setListings(listingsData || []);
       setBookings(bookingsData || []);
     } catch (error: any) {
+      console.error('Admin dashboard error:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ في تحميل البيانات",
+        title: t("خطأ", "Error"),
+        description: t("حدث خطأ في تحميل البيانات", "Error loading data"),
         variant: "destructive",
       });
     } finally {
@@ -192,8 +218,8 @@ const AdminDashboard = () => {
       }
 
       toast({
-        title: "تم بنجاح",
-        description: action === 'approve' ? "تم الموافقة بنجاح" : "تم الرفض بنجاح",
+        title: t("تم بنجاح", "Success"),
+        description: action === 'approve' ? t("تم الموافقة بنجاح", "Approved successfully") : t("تم الرفض بنجاح", "Rejected successfully"),
       });
 
       fetchAdminData();
@@ -201,8 +227,8 @@ const AdminDashboard = () => {
       setAdminNotes('');
     } catch (error: any) {
       toast({
-        title: "خطأ",
-        description: error.message || "حدث خطأ في العملية",
+        title: t("خطأ", "Error"),
+        description: error.message || t("حدث خطأ في العملية", "An error occurred during the operation"),
         variant: "destructive",
       });
     } finally {
@@ -222,15 +248,15 @@ const AdminDashboard = () => {
       if (error) throw error;
 
       toast({
-        title: "تم بنجاح",
-        description: "تم تحديث دور المستخدم بنجاح",
+        title: t("تم بنجاح", "Success"),
+        description: t("تم تحديث دور المستخدم بنجاح", "User role updated successfully"),
       });
 
       fetchAdminData();
     } catch (error: any) {
       toast({
-        title: "خطأ",
-        description: error.message || "حدث خطأ في تحديث الدور",
+        title: t("خطأ", "Error"),
+        description: error.message || t("حدث خطأ في تحديث الدور", "Error updating role"),
         variant: "destructive",
       });
     } finally {
@@ -251,14 +277,14 @@ const AdminDashboard = () => {
     } as const;
 
     const labels = {
-      pending: 'قيد المراجعة',
-      approved: 'مُعتمد',
-      rejected: 'مرفوض',
-      confirmed: 'مؤكد',
-      cancelled: 'ملغى',
-      guest: 'ضيف',
-      host: 'مضيف',
-      admin: 'مدير'
+      pending: t('قيد المراجعة', 'Pending'),
+      approved: t('مُعتمد', 'Approved'),
+      rejected: t('مرفوض', 'Rejected'),
+      confirmed: t('مؤكد', 'Confirmed'),
+      cancelled: t('ملغى', 'Cancelled'),
+      guest: t('ضيف', 'Guest'),
+      host: t('مضيف', 'Host'),
+      admin: t('مدير', 'Admin')
     };
 
     return (
@@ -285,22 +311,33 @@ const AdminDashboard = () => {
       <div className="min-h-screen flex items-center justify-center pattern-subtle">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>جاري التحميل...</p>
+          <p>{t('جاري التحميل...', 'Loading...')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pattern-geometric-stars">
+    <div className="min-h-screen bg-background pattern-geometric-stars" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-custom py-6">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
               <Shield className="h-8 w-8 text-primary" />
-              لوحة الإدارة
+              {t('لوحة الإدارة', 'Admin Dashboard')}
             </h1>
-            <p className="text-muted-foreground mt-2">إدارة المنصة والموافقات</p>
+            <p className="text-muted-foreground mt-2">{t('إدارة المنصة والموافقات', 'Platform management and approvals')}</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleLanguage}
+              className="flex items-center gap-2"
+            >
+              <Globe className="h-4 w-4" />
+              {language === 'ar' ? 'English' : 'العربية'}
+            </Button>
           </div>
         </div>
 
@@ -310,7 +347,7 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">المستخدمين</p>
+                  <p className="text-sm text-muted-foreground">{t('المستخدمين', 'Users')}</p>
                   <p className="text-2xl font-bold">{stats.totalUsers}</p>
                 </div>
                 <Users className="h-8 w-8 text-primary" />
@@ -322,9 +359,9 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">العقارات</p>
+                  <p className="text-sm text-muted-foreground">{t('العقارات', 'Properties')}</p>
                   <p className="text-2xl font-bold">{stats.totalListings}</p>
-                  <p className="text-xs text-orange-600">{stats.pendingListings} قيد المراجعة</p>
+                  <p className="text-xs text-orange-600">{stats.pendingListings} {t('قيد المراجعة', 'pending')}</p>
                 </div>
                 <Home className="h-8 w-8 text-primary" />
               </div>
@@ -335,9 +372,9 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">الحجوزات</p>
+                  <p className="text-sm text-muted-foreground">{t('الحجوزات', 'Bookings')}</p>
                   <p className="text-2xl font-bold">{stats.totalBookings}</p>
-                  <p className="text-xs text-orange-600">{stats.pendingBookings} قيد المراجعة</p>
+                  <p className="text-xs text-orange-600">{stats.pendingBookings} {t('قيد المراجعة', 'pending')}</p>
                 </div>
                 <Calendar className="h-8 w-8 text-primary" />
               </div>
@@ -348,7 +385,7 @@ const AdminDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">الإيرادات</p>
+                  <p className="text-sm text-muted-foreground">{t('الإيرادات', 'Revenue')}</p>
                   <p className="text-2xl font-bold">${stats.totalRevenue}</p>
                 </div>
                 <DollarSign className="h-8 w-8 text-primary" />
@@ -361,30 +398,31 @@ const AdminDashboard = () => {
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="listings" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
-              العقارات ({listings.filter(l => l.status === 'pending').length})
+              {t('العقارات', 'Properties')} ({listings.filter(l => l.status === 'pending').length})
             </TabsTrigger>
             <TabsTrigger value="bookings" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              الحجوزات ({bookings.filter(b => b.status === 'pending').length})
+              {t('الحجوزات', 'Bookings')} ({bookings.filter(b => b.status === 'pending').length})
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              المستخدمين ({stats.totalUsers})
+              {t('المستخدمين', 'Users')} ({stats.totalUsers})
             </TabsTrigger>
           </TabsList>
 
           {/* Listings Tab */}
           <TabsContent value="listings" className="space-y-4">
-            {listings.length === 0 ? (
+            {listings.filter(l => l.status === 'pending').length === 0 ? (
               <Card className="text-center py-12">
                 <CardContent>
                   <Home className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد عقارات</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('لا توجد عقارات قيد المراجعة', 'No pending properties')}</h3>
+                  <p className="text-muted-foreground">{t('جميع العقارات تمت مراجعتها', 'All properties have been reviewed')}</p>
                 </CardContent>
               </Card>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {listings.map((listing) => (
+                {listings.filter(listing => listing.status === 'pending').map((listing) => (
                   <Card key={listing.id} className="pattern-subtle border border-primary/5">
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start mb-4" dir="rtl">
@@ -403,9 +441,9 @@ const AdminDashboard = () => {
                               {listing.location}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              بواسطة: {listing.host.full_name} ({listing.host.email})
+                              {t('بواسطة:', 'By:')} {listing.host.full_name} ({listing.host.email})
                             </p>
-                            <p className="text-primary font-semibold">${listing.price_per_night_usd}/ليلة</p>
+                            <p className="text-primary font-semibold">${listing.price_per_night_usd}/{t('ليلة', 'night')}</p>
                           </div>
                         </div>
                         {getStatusBadge(listing.status, 'listing')}
@@ -417,7 +455,7 @@ const AdminDashboard = () => {
 
                       <div className="flex gap-2 text-xs text-muted-foreground mb-4">
                         <Clock className="h-4 w-4" />
-                        {new Date(listing.created_at).toLocaleDateString('ar-SA')}
+                        {t('تم الإنشاء:', 'Created:')} {new Date(listing.created_at).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
                       </div>
 
                       {listing.status === 'pending' && (
@@ -431,21 +469,21 @@ const AdminDashboard = () => {
                                 disabled={actionLoading === listing.id}
                               >
                                 <CheckCircle className="h-4 w-4 mr-1" />
-                                موافقة
+                                {t('موافقة', 'Approve')}
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="pattern-subtle" dir="rtl">
+                            <DialogContent className="pattern-subtle" dir={isRTL ? 'rtl' : 'ltr'}>
                               <DialogHeader>
-                                <DialogTitle>موافقة على العقار</DialogTitle>
+                                <DialogTitle>{t('موافقة على العقار', 'Approve Property')}</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
-                                  <Label>ملاحظات (اختياري)</Label>
+                                  <Label>{t('ملاحظات (اختياري)', 'Notes (optional)')}</Label>
                                   <Textarea
                                     value={adminNotes}
                                     onChange={(e) => setAdminNotes(e.target.value)}
-                                    placeholder="أضف ملاحظات حول الموافقة..."
-                                    className="text-right"
+                                    placeholder={t('أضف ملاحظات حول الموافقة...', 'Add notes about the approval...')}
+                                    className={isRTL ? "text-right" : ""}
                                   />
                                 </div>
                                 <div className="flex gap-2">
@@ -454,14 +492,14 @@ const AdminDashboard = () => {
                                     disabled={actionLoading === listing.id}
                                     className="flex-1"
                                   >
-                                    {actionLoading === listing.id ? "جاري المعالجة..." : "موافقة"}
+                                    {actionLoading === listing.id ? t("جاري المعالجة...", "Processing...") : t("موافقة", "Approve")}
                                   </Button>
                                   <Button
                                     variant="outline"
                                     onClick={() => setDialogOpen(false)}
                                     className="flex-1"
                                   >
-                                    إلغاء
+                                    {t('إلغاء', 'Cancel')}
                                   </Button>
                                 </div>
                               </div>
@@ -477,21 +515,21 @@ const AdminDashboard = () => {
                                 disabled={actionLoading === listing.id}
                               >
                                 <XCircle className="h-4 w-4 mr-1" />
-                                رفض
+                                {t('رفض', 'Reject')}
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="pattern-subtle" dir="rtl">
+                            <DialogContent className="pattern-subtle" dir={isRTL ? 'rtl' : 'ltr'}>
                               <DialogHeader>
-                                <DialogTitle>رفض العقار</DialogTitle>
+                                <DialogTitle>{t('رفض العقار', 'Reject Property')}</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
-                                  <Label>سبب الرفض *</Label>
+                                  <Label>{t('سبب الرفض *', 'Reason for rejection *')}</Label>
                                   <Textarea
                                     value={adminNotes}
                                     onChange={(e) => setAdminNotes(e.target.value)}
-                                    placeholder="اشرح سبب رفض العقار..."
-                                    className="text-right"
+                                    placeholder={t('اشرح سبب رفض العقار...', 'Explain why the property is being rejected...')}
+                                    className={isRTL ? "text-right" : ""}
                                     required
                                   />
                                 </div>
@@ -502,7 +540,7 @@ const AdminDashboard = () => {
                                     disabled={actionLoading === listing.id || !adminNotes.trim()}
                                     className="flex-1"
                                   >
-                                    {actionLoading === listing.id ? "جاري المعالجة..." : "رفض"}
+                                    {actionLoading === listing.id ? t("جاري المعالجة...", "Processing...") : t("رفض", "Reject")}
                                   </Button>
                                   <Button
                                     variant="outline"
@@ -512,7 +550,7 @@ const AdminDashboard = () => {
                                     }}
                                     className="flex-1"
                                   >
-                                    إلغاء
+                                    {t('إلغاء', 'Cancel')}
                                   </Button>
                                 </div>
                               </div>
@@ -525,7 +563,7 @@ const AdminDashboard = () => {
                             onClick={() => navigate(`/property/${listing.id}`)}
                           >
                             <Eye className="h-4 w-4 mr-1" />
-                            عرض
+                            {t('عرض', 'View')}
                           </Button>
                         </div>
                       )}
@@ -538,16 +576,17 @@ const AdminDashboard = () => {
 
           {/* Bookings Tab */}
           <TabsContent value="bookings" className="space-y-4">
-            {bookings.length === 0 ? (
+            {bookings.filter(b => b.status === 'pending').length === 0 ? (
               <Card className="text-center py-12">
                 <CardContent>
                   <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد حجوزات</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('لا توجد حجوزات قيد المراجعة', 'No pending bookings')}</h3>
+                  <p className="text-muted-foreground">{t('جميع الحجوزات تمت مراجعتها', 'All bookings have been reviewed')}</p>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-4">
-                {bookings.map((booking) => (
+                {bookings.filter(booking => booking.status === 'pending').map((booking) => (
                   <Card key={booking.id} className="pattern-subtle border border-primary/5">
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start mb-4" dir="rtl">
@@ -558,28 +597,28 @@ const AdminDashboard = () => {
                             {booking.listing.location}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            الضيف: {booking.guest.full_name} ({booking.guest.email})
+                            {t('الضيف:', 'Guest:')} {booking.guest.full_name} ({booking.guest.email})
                           </p>
                         </div>
                         {getStatusBadge(booking.status, 'booking')}
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4" dir="rtl">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4" dir={isRTL ? 'rtl' : 'ltr'}>
                         <div>
-                          <span className="text-muted-foreground block">تاريخ الوصول</span>
-                          <span className="font-medium">{new Date(booking.check_in_date).toLocaleDateString('ar-SA')}</span>
+                          <span className="text-muted-foreground block">{t('تاريخ الوصول', 'Check-in')}</span>
+                          <span className="font-medium">{new Date(booking.check_in_date).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">تاريخ المغادرة</span>
-                          <span className="font-medium">{new Date(booking.check_out_date).toLocaleDateString('ar-SA')}</span>
+                          <span className="text-muted-foreground block">{t('تاريخ المغادرة', 'Check-out')}</span>
+                          <span className="font-medium">{new Date(booking.check_out_date).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">المبلغ</span>
+                          <span className="text-muted-foreground block">{t('المبلغ', 'Amount')}</span>
                           <span className="font-medium">${booking.total_amount_usd}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">طريقة الدفع</span>
-                          <span className="font-medium">{booking.payment_method === 'cash' ? 'نقداً' : 'بطاقة'}</span>
+                          <span className="text-muted-foreground block">{t('طريقة الدفع', 'Payment')}</span>
+                          <span className="font-medium">{booking.payment_method === 'cash' ? t('نقداً', 'Cash') : t('بطاقة', 'Card')}</span>
                         </div>
                       </div>
 
@@ -592,7 +631,7 @@ const AdminDashboard = () => {
                             disabled={actionLoading === booking.id}
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
-                            {actionLoading === booking.id ? "جاري المعالجة..." : "تأكيد"}
+                            {actionLoading === booking.id ? t("جاري المعالجة...", "Processing...") : t("تأكيد", "Confirm")}
                           </Button>
                           <Button
                             variant="destructive"
@@ -601,7 +640,7 @@ const AdminDashboard = () => {
                             disabled={actionLoading === booking.id}
                           >
                             <XCircle className="h-4 w-4 mr-1" />
-                            إلغاء
+                            {t('إلغاء', 'Cancel')}
                           </Button>
                         </div>
                       )}
@@ -618,12 +657,12 @@ const AdminDashboard = () => {
               {users.map((user) => (
                 <Card key={user.id} className="pattern-subtle border border-primary/5">
                   <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4" dir="rtl">
+                    <div className="flex justify-between items-start mb-4" dir={isRTL ? 'rtl' : 'ltr'}>
                       <div>
-                        <h3 className="font-semibold text-lg">{user.full_name || 'بدون اسم'}</h3>
+                        <h3 className="font-semibold text-lg">{user.full_name || t('بدون اسم', 'No name')}</h3>
                         <p className="text-muted-foreground">{user.email}</p>
                         <p className="text-xs text-muted-foreground">
-                          انضم في: {new Date(user.created_at).toLocaleDateString('ar-SA')}
+                          {t('انضم في:', 'Joined:')} {new Date(user.created_at).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
                         </p>
                       </div>
                       {getStatusBadge(user.role, 'user')}
@@ -636,7 +675,7 @@ const AdminDashboard = () => {
                         onClick={() => updateUserRole(user.id, 'guest')}
                         disabled={actionLoading === user.id || user.role === 'guest'}
                       >
-                        ضيف
+                        {t('ضيف', 'Guest')}
                       </Button>
                       <Button
                         variant={user.role === 'host' ? 'default' : 'outline'}
@@ -644,7 +683,7 @@ const AdminDashboard = () => {
                         onClick={() => updateUserRole(user.id, 'host')}
                         disabled={actionLoading === user.id || user.role === 'host'}
                       >
-                        مضيف
+                        {t('مضيف', 'Host')}
                       </Button>
                       <Button
                         variant={user.role === 'admin' ? 'default' : 'outline'}
@@ -652,7 +691,7 @@ const AdminDashboard = () => {
                         onClick={() => updateUserRole(user.id, 'admin')}
                         disabled={actionLoading === user.id || user.role === 'admin'}
                       >
-                        مدير
+                        {t('مدير', 'Admin')}
                       </Button>
                     </div>
                   </CardContent>

@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Instagram, Music } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Instagram } from "lucide-react";
+import { TikTokIcon } from "@/components/ui/icons";
 import { useToast } from "@/hooks/use-toast";
 
 const ContactUs = () => {
-  const [language, setLanguage] = useState<'ar' | 'en'>('en');
+  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -96,11 +97,12 @@ const ContactUs = () => {
                           <h3 className="font-medium text-foreground">
                             {language === 'ar' ? 'واتساب' : 'WhatsApp Support'}
                           </h3>
-                          <a 
-                            href="https://wa.me/19296679792" 
+                          <a
+                            href="https://wa.me/19296679792"
                             className="text-primary hover:underline"
                             target="_blank"
                             rel="noopener noreferrer"
+                            dir="ltr"
                           >
                             +1 (929) 667-9792
                           </a>
@@ -125,9 +127,10 @@ const ContactUs = () => {
                               <p className="text-xs text-muted-foreground">
                                 {language === 'ar' ? 'سوريا:' : 'Syria:'}
                               </p>
-                              <a 
-                                href="tel:+963969864741" 
+                              <a
+                                href="tel:+963969864741"
                                 className="text-primary hover:underline"
+                                dir="ltr"
                               >
                                 +963 969 864 741
                               </a>
@@ -207,13 +210,13 @@ const ContactUs = () => {
                             <Instagram className="h-5 w-5" />
                             <span className="text-sm font-medium">Instagram</span>
                           </a>
-                          <a 
-                            href="https://tiktok.com/@nawartu" 
+                          <a
+                            href="https://tiktok.com/@nawartu"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                           >
-                            <Music className="h-5 w-5" />
+                            <TikTokIcon className="h-5 w-5" />
                             <span className="text-sm font-medium">TikTok</span>
                           </a>
                         </div>

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Instagram, MessageCircle, Music } from "lucide-react";
+import { Instagram, MessageCircle } from "lucide-react";
+import { TikTokIcon } from "@/components/ui/icons";
 
 interface FooterProps {
   language: 'ar' | 'en';
@@ -50,7 +51,7 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
           {/* Company Info */}
           <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
             <h3 className="font-bold text-lg mb-4 text-foreground">
-              {language === 'ar' ? 'نوارتو' : 'Nawartu'}
+              {language === 'ar' ? 'نورتوا' : 'Nawartu'}
             </h3>
             <p className="text-muted-foreground text-sm mb-4">
               {language === 'ar' 
@@ -142,11 +143,12 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
                 <p className="font-medium text-foreground mb-1">
                   {language === 'ar' ? 'واتساب' : 'WhatsApp'}
                 </p>
-                <a 
-                  href="https://wa.me/19296679792" 
+                <a
+                  href="https://wa.me/19296679792"
                   className="text-primary hover:underline flex items-center gap-1"
                   target="_blank"
                   rel="noopener noreferrer"
+                  dir="ltr"
                 >
                   <MessageCircle className="h-3 w-3" />
                   +1 (929) 667-9792
@@ -157,9 +159,10 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
                 <p className="font-medium text-foreground mb-1">
                   {language === 'ar' ? 'سوريا' : 'Syria'}
                 </p>
-                <a 
-                  href="tel:+963969864741" 
+                <a
+                  href="tel:+963969864741"
                   className="text-primary hover:underline"
+                  dir="ltr"
                 >
                   +963 969 864 741
                 </a>
@@ -179,14 +182,14 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
                   >
                     <Instagram className="h-4 w-4" />
                   </a>
-                  <a 
-                    href="https://tiktok.com/@nawartu" 
+                  <a
+                    href="https://tiktok.com/@nawartu"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary hover:text-primary/80 transition-colors"
                     aria-label="TikTok"
                   >
-                    <Music className="h-4 w-4" />
+                    <TikTokIcon className="h-4 w-4" />
                   </a>
                 </div>
               </div>
@@ -197,8 +200,8 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
         {/* Copyright */}
         <div className={`border-t mt-8 pt-8 text-center ${isRTL ? 'text-arabic' : 'text-latin'}`}>
           <p className="text-muted-foreground text-sm">
-            {language === 'ar' 
-              ? `© ${new Date().getFullYear()} نوارتو. جميع الحقوق محفوظة.`
+            {language === 'ar'
+              ? `© ${new Date().getFullYear()} نورتوا. جميع الحقوق محفوظة.`
               : `© ${new Date().getFullYear()} Nawartu. All rights reserved.`
             }
           </p>
