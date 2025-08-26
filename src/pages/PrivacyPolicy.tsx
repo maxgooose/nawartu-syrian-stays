@@ -1,12 +1,12 @@
-import { useState } from "react";
 import { Header } from "@/components/Header";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const PrivacyPolicy = () => {
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  const { language, handleLanguageChange } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background">
-      <Header language={language} onLanguageChange={setLanguage} />
+      <Header language={language} onLanguageChange={handleLanguageChange} />
       <main className="container-custom py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-primary mb-8">Nawartu – Privacy Policy</h1>

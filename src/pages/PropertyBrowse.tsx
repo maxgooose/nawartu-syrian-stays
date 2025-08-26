@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,7 +34,8 @@ interface PropertyBrowseProps {
   language?: 'ar' | 'en';
 }
 
-const PropertyBrowse = ({ language = 'ar' }: PropertyBrowseProps) => {
+const PropertyBrowse = ({ language: propLanguage }: PropertyBrowseProps) => {
+  const { language } = useLanguage();
   const [searchParams] = useSearchParams();
   const [listings, setListings] = useState<Listing[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);

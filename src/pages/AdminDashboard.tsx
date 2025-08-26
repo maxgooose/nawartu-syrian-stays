@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,6 +71,7 @@ interface Booking {
 
 const AdminDashboard = () => {
   const { user, profile } = useAuth();
+  const { language, handleLanguageChange } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [listings, setListings] = useState<Listing[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -78,18 +80,10 @@ const AdminDashboard = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const isRTL = language === 'ar';
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'ar' ? 'en' : 'ar');
-    // Update document direction
-    document.documentElement.dir = language === 'ar' ? 'ltr' : 'rtl';
-    document.documentElement.lang = language === 'ar' ? 'en' : 'ar';
-  };
 
   const t = (ar: string, en: string) => language === 'ar' ? ar : en;
 
@@ -332,7 +326,7 @@ const AdminDashboard = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={toggleLanguage}
+              onClick={() => handleLanguageChange(language === 'ar' ? 'en' : 'ar')}
               className="flex items-center gap-2"
             >
               <Globe className="h-4 w-4" />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Instagram } from "lucide-react";
 import { TikTokIcon } from "@/components/ui/icons";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ContactUs = () => {
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  const { language, handleLanguageChange } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -41,7 +43,7 @@ const ContactUs = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header language={language} onLanguageChange={setLanguage} />
+      <Header language={language} onLanguageChange={handleLanguageChange} />
       <main className="container-custom py-8" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -320,6 +322,10 @@ const ContactUs = () => {
           </div>
         </div>
       </main>
+      <Footer 
+        language={language} 
+        onLanguageChange={handleLanguageChange}
+      />
     </div>
   );
 };

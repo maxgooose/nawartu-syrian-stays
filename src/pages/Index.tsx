@@ -1,18 +1,11 @@
-import { useState } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturedProperties } from "@/components/FeaturedProperties";
 import { Footer } from "@/components/Footer";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
-
-  const handleLanguageChange = (lang: 'ar' | 'en') => {
-    setLanguage(lang);
-    // Update document direction
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lang;
-  };
+  const { language, handleLanguageChange } = useLanguage();
 
   return (
     <div className="min-h-screen">

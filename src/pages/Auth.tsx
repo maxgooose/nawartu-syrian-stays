@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Mail, Lock, Globe } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +18,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  const { language, handleLanguageChange } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -193,7 +194,7 @@ const Auth = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+              onClick={() => handleLanguageChange(language === 'ar' ? 'en' : 'ar')}
               className="gap-2"
             >
               <Globe className="h-4 w-4" />
