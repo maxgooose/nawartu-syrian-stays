@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,11 +41,13 @@ interface Booking {
 
 const HostDashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
+  const { language } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isRTL = language === 'ar';
 
   // Helper function to get proper image URL
   const getImageUrl = (imagePath: string) => {
@@ -148,23 +151,27 @@ const HostDashboard = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>جاري التحميل...</p>
+          <p>{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-6" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">لوحة المضيف</h1>
-            <p className="text-muted-foreground mt-2">إدارة عقاراتك وحجوزاتك</p>
+            <h1 className="text-3xl font-bold text-foreground">
+              {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              {language === 'ar' ? 'إدارة عقاراتك وحجوزاتك' : 'Manage your properties and bookings'}
+            </p>
           </div>
           <Button onClick={() => navigate('/create-listing')} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            إضافة عقار جديد
+            {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Property'}
           </Button>
         </div>
 
@@ -172,11 +179,11 @@ const HostDashboard = () => {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="listings" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
-              عقاراتي ({listings.length})
+              {language === 'ar' ? 'عقاراتي' : 'My Properties'} ({listings.length})
             </TabsTrigger>
             <TabsTrigger value="bookings" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              الحجوزات ({bookings.length})
+              {language === 'ar' ? 'الحجوزات' : 'Bookings'} ({bookings.length})
             </TabsTrigger>
           </TabsList>
 
@@ -185,10 +192,14 @@ const HostDashboard = () => {
               <Card>
                 <CardContent className="text-center py-12">
                   <Home className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد عقارات بعد</h3>
-                  <p className="text-muted-foreground mb-4">ابدأ بإضافة عقارك الأول</p>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {language === 'ar' ? 'لا توجد عقارات بعد' : 'No properties yet'}
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    {language === 'ar' ? 'ابدأ بإضافة عقارك الأول' : 'Start by adding your first property'}
+                  </p>
                   <Button onClick={() => navigate('/create-listing')}>
-                    إضافة عقار جديد
+                    {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Property'}
                   </Button>
                 </CardContent>
               </Card>
@@ -222,20 +233,20 @@ const HostDashboard = () => {
                     <CardContent>
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-lg font-semibold text-primary">
-                          ${listing.price_per_night_usd}/ليلة
+                          ${listing.price_per_night_usd}/{language === 'ar' ? 'ليلة' : 'night'}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          {listing.max_guests} ضيوف
+                          {listing.max_guests} {language === 'ar' ? 'ضيوف' : 'guests'}
                         </span>
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" className="flex-1">
                           <Eye className="h-4 w-4 mr-1" />
-                          عرض
+                          {language === 'ar' ? 'عرض' : 'View'}
                         </Button>
                         <Button variant="outline" size="sm" className="flex-1">
                           <Edit className="h-4 w-4 mr-1" />
-                          تعديل
+                          {language === 'ar' ? 'تعديل' : 'Edit'}
                         </Button>
                       </div>
                     </CardContent>
@@ -250,8 +261,12 @@ const HostDashboard = () => {
               <Card>
                 <CardContent className="text-center py-12">
                   <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد حجوزات بعد</h3>
-                  <p className="text-muted-foreground">ستظهر الحجوزات هنا عندما يحجز الضيوف عقاراتك</p>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {language === 'ar' ? 'لا توجد حجوزات بعد' : 'No bookings yet'}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {language === 'ar' ? 'ستظهر الحجوزات هنا عندما يحجز الضيوف عقاراتك' : 'Bookings will appear here when guests book your properties'}
+                  </p>
                 </CardContent>
               </Card>
             ) : (
@@ -263,7 +278,7 @@ const HostDashboard = () => {
                         <div>
                           <h3 className="font-semibold text-lg">{booking.listing.name}</h3>
                           <p className="text-muted-foreground">
-                            ضيف: {booking.guest.full_name} ({booking.guest.email})
+                            {language === 'ar' ? 'ضيف:' : 'Guest:'} {booking.guest.full_name} ({booking.guest.email})
                           </p>
                         </div>
                         <div className="text-left">
@@ -272,20 +287,34 @@ const HostDashboard = () => {
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <span className="text-muted-foreground block">تاريخ الوصول</span>
-                          <span className="font-medium">{new Date(booking.check_in_date).toLocaleDateString('ar-SA')}</span>
+                          <span className="text-muted-foreground block">
+                            {language === 'ar' ? 'تاريخ الوصول' : 'Check-in Date'}
+                          </span>
+                          <span className="font-medium">
+                            {new Date(booking.check_in_date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">تاريخ المغادرة</span>
-                          <span className="font-medium">{new Date(booking.check_out_date).toLocaleDateString('ar-SA')}</span>
+                          <span className="text-muted-foreground block">
+                            {language === 'ar' ? 'تاريخ المغادرة' : 'Check-out Date'}
+                          </span>
+                          <span className="font-medium">
+                            {new Date(booking.check_out_date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">عدد الليالي</span>
+                          <span className="text-muted-foreground block">
+                            {language === 'ar' ? 'عدد الليالي' : 'Nights'}
+                          </span>
                           <span className="font-medium">{booking.total_nights}</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground block">طلبات خاصة</span>
-                          <span className="font-medium">{booking.special_requests || 'لا توجد'}</span>
+                          <span className="text-muted-foreground block">
+                            {language === 'ar' ? 'طلبات خاصة' : 'Special Requests'}
+                          </span>
+                          <span className="font-medium">
+                            {booking.special_requests || (language === 'ar' ? 'لا توجد' : 'None')}
+                          </span>
                         </div>
                       </div>
                     </CardContent>

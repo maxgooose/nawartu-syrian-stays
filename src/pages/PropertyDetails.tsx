@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -161,8 +162,7 @@ const PropertyDetails = () => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showFullMap, setShowFullMap] = useState(false);
 
-  // Mock language - in real app this would come from context
-  const language: 'ar' | 'en' = 'ar';
+  const { language } = useLanguage();
   const isRTL = language === 'ar';
 
   useEffect(() => {

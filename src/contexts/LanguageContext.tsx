@@ -4,6 +4,7 @@ interface LanguageContextType {
   language: 'ar' | 'en';
   setLanguage: (lang: 'ar' | 'en') => void;
   handleLanguageChange: (lang: 'ar' | 'en') => void;
+  isInitialized: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -21,10 +22,11 @@ interface LanguageProviderProps {
 }
 
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
-  // Default to English and persist in localStorage
+  const [isInitialized, setIsInitialized] = useState(false);
+  // Default to Arabic (matching backend) and persist in localStorage
   const [language, setLanguage] = useState<'ar' | 'en'>(() => {
     const saved = localStorage.getItem('nawartu-language');
-    return (saved as 'ar' | 'en') || 'en';
+    return (saved as 'ar' | 'en') || 'ar';
   });
 
   const handleLanguageChange = (lang: 'ar' | 'en') => {
@@ -35,14 +37,15 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
     document.documentElement.lang = lang;
   };
 
-  // Set initial document direction on mount
+  // Set initial document direction on mount and update when language changes
   useEffect(() => {
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
-  }, []);
+    setIsInitialized(true);
+  }, [language]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, handleLanguageChange }}>
+    <LanguageContext.Provider value={{ language, setLanguage, handleLanguageChange, isInitialized }}>
       {children}
     </LanguageContext.Provider>
   );

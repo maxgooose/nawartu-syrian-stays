@@ -30,11 +30,7 @@ interface Listing {
   };
 }
 
-interface PropertyBrowseProps {
-  language?: 'ar' | 'en';
-}
-
-const PropertyBrowse = ({ language: propLanguage }: PropertyBrowseProps) => {
+const PropertyBrowse = () => {
   const { language } = useLanguage();
   const [searchParams] = useSearchParams();
   const [listings, setListings] = useState<Listing[]>([]);
