@@ -46,6 +46,21 @@ const HostDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Helper function to get proper image URL
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return null;
+    
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) return imagePath;
+    
+    // Get public URL from Supabase storage
+    const { data: { publicUrl } } = supabase.storage
+      .from('property-images')
+      .getPublicUrl(imagePath);
+    
+    return publicUrl;
+  };
+
   useEffect(() => {
     if (!user || profile?.role !== 'host') {
       navigate('/auth');
@@ -176,9 +191,12 @@ const HostDashboard = () => {
                     <div className="aspect-video bg-muted relative">
                       {listing.images?.[0] ? (
                         <img 
-                          src={listing.images[0]} 
+                          src={getImageUrl(listing.images[0]) || '/placeholder.svg'} 
                           alt={listing.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
