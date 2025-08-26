@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useHostUpgrade } from '@/hooks/useHostUpgrade';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface HostRegistrationButtonProps {
   variant?: 'default' | 'outline' | 'ghost';
@@ -25,6 +26,7 @@ export function HostRegistrationButton({
   const { isLoading, upgradeToHost } = useHostUpgrade();
   const { profile, refreshProfile } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleHostUpgrade = async () => {
     setMessage('');
@@ -37,9 +39,11 @@ export function HostRegistrationButton({
       // Refresh user session to get updated role
       await refreshProfile();
       
-      // Call success callback if provided
+      // Call success callback if provided; otherwise navigate to host dashboard
       if (onSuccess) {
         onSuccess();
+      } else {
+        navigate('/host-dashboard');
       }
       
       toast({
