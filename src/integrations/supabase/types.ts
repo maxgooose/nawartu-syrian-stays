@@ -368,6 +368,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      request_host_upgrade: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
