@@ -4,18 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useHostUpgrade } from "@/hooks/useHostUpgrade";
 import { Home, Users, DollarSign, Shield } from "lucide-react";
 
 const BecomeHost = () => {
   const [motivation, setMotivation] = useState("");
-  const [loading, setLoading] = useState(false);
   const { user, profile, refreshProfile } = useAuth();
+  const { isLoading, upgradeToHost } = useHostUpgrade();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user || !profile) {
@@ -37,26 +37,29 @@ const BecomeHost = () => {
       return;
     }
 
-    setLoading(true);
-
     try {
-      // Update user profile to host role
-      const { error } = await supabase
-        .from("profiles")
-        .update({ role: "host" })
-        .eq("user_id", user.id);
+      // Use the hook to request host upgrade
+      const result = await upgradeToHost();
 
-      if (error) throw error;
+      if (result.success) {
+        // Successfully upgraded to host
+        // Refresh profile to get updated role
+        await refreshProfile();
 
-      // Refresh profile to get updated role
-      await refreshProfile();
+        toast({
+          title: "Welcome to Hosting!",
+          description: "You are now a host. Start adding your first property!",
+        });
 
-      toast({
-        title: "Welcome to Hosting!",
-        description: "You are now a host. Start adding your first property!",
-      });
-
-      navigate("/host-dashboard");
+        navigate("/host-dashboard");
+      } else {
+        // Upgrade failed
+        toast({
+          title: "Upgrade Failed",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error("Error becoming host:", error);
       toast({
@@ -64,8 +67,6 @@ const BecomeHost = () => {
         description: "Failed to register as host. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -195,10 +196,10 @@ const BecomeHost = () => {
                   </Button>
                   <Button
                     type="submit"
-                    disabled={loading}
+                    disabled={isLoading}
                     className="flex-1"
                   >
-                    {loading ? "Processing..." : "Become a Host"}
+                    {isLoading ? "Processing..." : "Become a Host"}
                   </Button>
                 </div>
               </form>

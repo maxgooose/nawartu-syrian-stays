@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
+import { HostRegistrationButton } from "@/components/HostRegistrationButton";
 import { Search, Filter, MapPin, Calendar, Users, Heart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -198,6 +199,13 @@ const GuestDashboard = () => {
             <h1 className="text-3xl font-bold text-foreground">مرحباً بك في نورتوا</h1>
             <p className="text-muted-foreground mt-2">اكتشف أجمل العقارات في سوريا</p>
           </div>
+          {profile?.role === 'guest' && (
+            <HostRegistrationButton 
+              variant="outline" 
+              size="sm"
+              onSuccess={() => navigate('/host-dashboard')}
+            />
+          )}
         </div>
 
         <Tabs defaultValue="browse" className="w-full">

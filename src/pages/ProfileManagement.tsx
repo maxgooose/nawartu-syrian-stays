@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { HostRegistrationButton } from "@/components/HostRegistrationButton";
 
 const ProfileManagement = () => {
   const { user, profile, updateProfile, signOut } = useAuth();
@@ -449,6 +450,18 @@ const ProfileManagement = () => {
                             {profile.role === 'guest' && 'يمكنك حجز العقارات'}
                           </span>
                         </div>
+                        {profile.role === 'guest' && (
+                          <div className="mt-3">
+                            <HostRegistrationButton 
+                              variant="outline" 
+                              size="sm"
+                              onSuccess={() => {
+                                // Refresh the page to show updated role
+                                window.location.reload();
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
 
                       <Button type="submit" disabled={loading} className="w-full md:w-auto">
