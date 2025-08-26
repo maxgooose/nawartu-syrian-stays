@@ -39,7 +39,7 @@ interface Booking {
 }
 
 const HostDashboard = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,12 +62,20 @@ const HostDashboard = () => {
   };
 
   useEffect(() => {
-    if (!user || profile?.role !== 'host') {
+    if (authLoading) return;
+
+    if (!user) {
       navigate('/auth');
       return;
     }
+
+    if (profile?.role !== 'host') {
+      navigate('/become-host');
+      return;
+    }
+
     fetchHostData();
-  }, [user, profile]);
+  }, [user, profile, authLoading]);
 
   const fetchHostData = async () => {
     try {
