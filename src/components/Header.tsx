@@ -34,7 +34,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
         <div className="flex items-center justify-between h-16" dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Logo */}
           <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0">
-            <img src="/nawartu-logo.png" alt="Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
+            <img src="/lovable-uploads/dd52c715-fae8-488a-86ee-6666b8b7ebe5.png" alt="Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
             <span className="text-lg sm:text-2xl font-bold text-primary tracking-wide">
               {language === 'ar' ? 'نورتوا' : 'Nawartu'}
             </span>

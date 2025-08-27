@@ -182,7 +182,7 @@ const Auth = () => {
       <Card className="w-full max-w-md bg-background/95 backdrop-blur-sm shadow-elegant">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-            <img src="/lovable-uploads/224dce06-9efd-402a-93b9-01ef7b9f4add.png" alt="Nawartu" className="w-10 h-10" />
+            <img src="/lovable-uploads/dd52c715-fae8-488a-86ee-6666b8b7ebe5.png" alt="Nawartu" className="w-10 h-10" />
           </div>
           <CardTitle className="text-2xl font-arabic">
             {language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu'}

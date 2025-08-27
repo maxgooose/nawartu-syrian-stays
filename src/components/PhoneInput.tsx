@@ -18,7 +18,7 @@ export const PhoneInputComponent: React.FC<PhoneInputComponentProps> = ({
   placeholder,
   disabled = false,
   className,
-  defaultCountry = 'SY', // Default to Syria
+  defaultCountry = 'SY' as any, // Default to Syria
 }) => {
   return (
     <PhoneInput
