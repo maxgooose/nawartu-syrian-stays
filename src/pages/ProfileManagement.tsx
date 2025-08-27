@@ -301,9 +301,11 @@ const ProfileManagement = () => {
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
               <User className="h-8 w-8 text-primary" />
-              الملف الشخصي
+              {language === 'ar' ? 'الملف الشخصي' : 'Profile'}
             </h1>
-            <p className="text-muted-foreground mt-2">إدارة حسابك والإعدادات</p>
+            <p className="text-muted-foreground mt-2">
+              {language === 'ar' ? 'إدارة حسابك والإعدادات' : 'Manage your account and settings'}
+            </p>
           </div>
         </div>
 
@@ -334,7 +336,7 @@ const ProfileManagement = () => {
                 </div>
                 
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  {profile.full_name || 'بدون اسم'}
+                  {profile.full_name || (language === 'ar' ? 'بدون اسم' : 'No Name')}
                 </h3>
                 <p className="text-muted-foreground text-sm mb-3">{profile.email}</p>
                 
@@ -345,12 +347,12 @@ const ProfileManagement = () => {
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex items-center justify-center gap-2">
                     <Mail className="h-4 w-4" />
-                    <span>البريد مؤكد</span>
+                    <span>{language === 'ar' ? 'البريد مؤكد' : 'Email Verified'}</span>
                   </div>
                   {profile.phone && (
                     <div className="flex items-center justify-center gap-2">
                       <Phone className="h-4 w-4" />
-                      <span>الهاتف مؤكد</span>
+                      <span>{language === 'ar' ? 'الهاتف مؤكد' : 'Phone Verified'}</span>
                     </div>
                   )}
                   <div className="flex items-center justify-center gap-2">
@@ -368,15 +370,15 @@ const ProfileManagement = () => {
               <TabsList className="grid w-full grid-cols-3 mb-8">
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  المعلومات الشخصية
+                  {language === 'ar' ? 'المعلومات الشخصية' : 'Personal Info'}
                 </TabsTrigger>
                 <TabsTrigger value="security" className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
-                  الأمان
+                  {language === 'ar' ? 'الأمان' : 'Security'}
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
-                  الإعدادات
+                  {language === 'ar' ? 'الإعدادات' : 'Settings'}
                 </TabsTrigger>
               </TabsList>
 
@@ -384,53 +386,53 @@ const ProfileManagement = () => {
               <TabsContent value="profile">
                 <Card className="pattern-subtle border border-primary/10">
                   <CardHeader>
-                    <CardTitle>المعلومات الشخصية</CardTitle>
+                    <CardTitle>{language === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleProfileUpdate} className="space-y-6" dir="rtl">
+                    <form onSubmit={handleProfileUpdate} className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <Label htmlFor="full_name">الاسم الكامل</Label>
+                          <Label htmlFor="full_name">{language === 'ar' ? 'الاسم الكامل' : 'Full Name'}</Label>
                           <Input
                             id="full_name"
                             value={profileData.full_name}
                             onChange={(e) => setProfileData({...profileData, full_name: e.target.value})}
-                            className="text-right"
-                            placeholder="أدخل اسمك الكامل"
+                            className={isRTL ? 'text-right' : 'text-left'}
+                            placeholder={language === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
                           />
                         </div>
                         
                         <div>
-                          <Label htmlFor="phone">رقم الهاتف</Label>
+                          <Label htmlFor="phone">{language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
                           <Input
                             id="phone"
                             type="tel"
                             value={profileData.phone}
                             onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                            className="text-right"
-                            placeholder="+963 xxx xxx xxx"
+                            className={isRTL ? 'text-right' : 'text-left'}
+                            placeholder={language === 'ar' ? '+963 xxx xxx xxx' : '+963 xxx xxx xxx'}
                           />
                         </div>
                       </div>
 
                       <div>
-                        <Label htmlFor="email">البريد الإلكتروني</Label>
+                        <Label htmlFor="email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
                         <Input
                           id="email"
                           type="email"
                           value={profile.email}
                           disabled
-                          className="text-right bg-muted"
+                                                      className={`${isRTL ? 'text-right' : 'text-left'} bg-muted`}
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          لا يمكن تغيير البريد الإلكتروني
+                          {language === 'ar' ? 'لا يمكن تغيير البريد الإلكتروني' : 'Email cannot be changed'}
                         </p>
                       </div>
 
                       <div>
-                        <Label htmlFor="preferred_language">اللغة المفضلة</Label>
+                        <Label htmlFor="preferred_language">{language === 'ar' ? 'اللغة المفضلة' : 'Preferred Language'}</Label>
                         <Select value={profileData.preferred_language} onValueChange={(value) => setProfileData({...profileData, preferred_language: value})}>
-                          <SelectTrigger className="text-right">
+                          <SelectTrigger className={isRTL ? 'text-right' : 'text-left'}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -441,13 +443,13 @@ const ProfileManagement = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="role">نوع الحساب</Label>
+                        <Label htmlFor="role">{language === 'ar' ? 'نوع الحساب' : 'Account Type'}</Label>
                         <div className="flex items-center gap-2 mt-2">
                           {getRoleBadge(profile.role)}
                           <span className="text-sm text-muted-foreground">
-                            {profile.role === 'admin' && 'يمكنك إدارة المنصة'}
-                            {profile.role === 'host' && 'يمكنك إضافة عقارات'}
-                            {profile.role === 'guest' && 'يمكنك حجز العقارات'}
+                            {profile.role === 'admin' && (language === 'ar' ? 'يمكنك إدارة المنصة' : 'You can manage the platform')}
+                            {profile.role === 'host' && (language === 'ar' ? 'يمكنك إضافة عقارات' : 'You can add properties')}
+                            {profile.role === 'guest' && (language === 'ar' ? 'يمكنك حجز العقارات' : 'You can book properties')}
                           </span>
                         </div>
                         {profile.role === 'guest' && (
@@ -466,7 +468,7 @@ const ProfileManagement = () => {
 
                       <Button type="submit" disabled={loading} className="w-full md:w-auto">
                         <Save className="h-4 w-4 mr-2" />
-                        {loading ? "جاري الحفظ..." : "حفظ التغييرات"}
+                        {loading ? (language === 'ar' ? "جاري الحفظ..." : "Saving...") : (language === 'ar' ? "حفظ التغييرات" : "Save Changes")}
                       </Button>
                     </form>
                   </CardContent>
@@ -481,25 +483,25 @@ const ProfileManagement = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Key className="h-5 w-5" />
-                        تغيير كلمة المرور
+                        {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <form onSubmit={handlePasswordChange} className="space-y-4" dir="rtl">
+                      <form onSubmit={handlePasswordChange} className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
                         <div>
-                          <Label htmlFor="current_password">كلمة المرور الحالية</Label>
+                          <Label htmlFor="current_password">{language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}</Label>
                           <div className="relative">
                             <Input
                               id="current_password"
                               type={showOldPassword ? "text" : "password"}
                               value={passwordData.currentPassword}
                               onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                              className="text-right pr-10"
+                              className={`${isRTL ? 'text-right pr-10' : 'text-left pl-10'}`}
                             />
                             <button
                               type="button"
                               onClick={() => setShowOldPassword(!showOldPassword)}
-                              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                              className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 text-muted-foreground hover:text-foreground`}
                             >
                               {showOldPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
@@ -507,19 +509,19 @@ const ProfileManagement = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="new_password">كلمة المرور الجديدة</Label>
+                          <Label htmlFor="new_password">{language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}</Label>
                           <div className="relative">
                             <Input
                               id="new_password"
                               type={showNewPassword ? "text" : "password"}
                               value={passwordData.newPassword}
                               onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                              className="text-right pr-10"
+                              className={`${isRTL ? 'text-right pr-10' : 'text-left pl-10'}`}
                             />
                             <button
                               type="button"
                               onClick={() => setShowNewPassword(!showNewPassword)}
-                              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                              className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 text-muted-foreground hover:text-foreground`}
                             >
                               {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>

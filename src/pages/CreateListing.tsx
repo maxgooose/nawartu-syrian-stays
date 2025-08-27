@@ -205,7 +205,6 @@ const CreateListing = () => {
                       initialLocation={formData.location}
                       initialLat={formData.latitude ? parseFloat(formData.latitude) : undefined}
                       initialLng={formData.longitude ? parseFloat(formData.longitude) : undefined}
-                      language="ar"
                     />
                   </div>
                 </div>
