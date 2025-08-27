@@ -1,7 +1,11 @@
+Airbnb - but better done - and for syria
+
+
+
 ciao
 
 Node.js & npm required to play w code
-Follow these steps:
+
 
 we are using :
 
@@ -11,4 +15,11 @@ we are using :
 - shadcn-ui
 - Tailwind CSS
 
-Airbnb - but better done - and for syria
+
+
+backend is on supabase
+dataserver authentication also handled by supabase
+
+
+
+
