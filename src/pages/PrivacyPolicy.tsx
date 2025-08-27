@@ -1,4 +1,6 @@
 import { Header } from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const PrivacyPolicy = () => {
@@ -11,6 +13,18 @@ const PrivacyPolicy = () => {
       <Header language={language} onLanguageChange={handleLanguageChange} />
       <main className="container-custom py-8">
         <div className="max-w-4xl mx-auto">
+          {/* Back Button */}
+          <div className="mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {language === 'ar' ? 'العودة' : 'Go Back'}
+            </Button>
+          </div>
+
           <h1 className="text-4xl font-bold text-primary mb-8">
             {language === 'ar' ? 'نوارتو - سياسة الخصوصية' : 'Nawartu – Privacy Policy'}
           </h1>

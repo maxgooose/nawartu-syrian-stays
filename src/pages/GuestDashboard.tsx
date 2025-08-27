@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
 import { HostRegistrationButton } from "@/components/HostRegistrationButton";
-import { Search, Filter, MapPin, Calendar, Users, Heart, Star } from "lucide-react";
+import { Search, Filter, MapPin, Calendar, Users, Heart, Star, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -194,6 +194,18 @@ const GuestDashboard = () => {
   return (
     <div className="min-h-screen bg-background pattern-geometric-stars">
       <div className="container-custom py-6">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            العودة للرئيسية
+          </Button>
+        </div>
+
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">مرحباً بك في نورتوا</h1>

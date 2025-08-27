@@ -14,19 +14,7 @@ import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign, Message
 import LocationSelector from "@/components/LocationSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
-
-const AMENITIES = [
-  { id: 'wifi', label: 'واي فاي', value: 'wifi' },
-  { id: 'parking', label: 'موقف سيارات', value: 'parking' },
-  { id: 'pool', label: 'مسبح', value: 'pool' },
-  { id: 'gym', label: 'صالة رياضية', value: 'gym' },
-  { id: 'kitchen', label: 'مطبخ مجهز', value: 'kitchen' },
-  { id: 'ac', label: 'تكييف', value: 'air_conditioning' },
-  { id: 'balcony', label: 'شرفة', value: 'balcony' },
-  { id: 'garden', label: 'حديقة', value: 'garden' },
-  { id: 'security', label: 'أمن 24/7', value: 'security' },
-  { id: 'elevator', label: 'مصعد', value: 'elevator' },
-];
+import { AMENITIES } from "@/lib/amenities";
 
 const CreateListing = () => {
   const { language } = useLanguage();
@@ -46,8 +34,6 @@ const CreateListing = () => {
     bathrooms: '1',
     amenities: [] as string[],
     images: [] as string[],
-    latitude: '',
-    longitude: '',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -93,8 +79,7 @@ const CreateListing = () => {
           bathrooms: parseInt(formData.bathrooms),
           amenities: formData.amenities,
           images: formData.images,
-          latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-          longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+
           status: 'pending'
         });
 
@@ -165,8 +150,8 @@ const CreateListing = () => {
             {/* WhatsApp Contact Option */}
             <Alert className="mb-6 border-primary/20 bg-primary/5">
               <MessageCircle className="h-4 w-4" />
-              <AlertDescription>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <AlertDescription className="w-full">
+                <div className="flex flex-col gap-4 w-full">
                   <div>
                     <p className="font-medium mb-1">
                       {language === 'ar' 
@@ -181,35 +166,37 @@ const CreateListing = () => {
                       }
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full max-w-full overflow-hidden">
                     <Button
                       variant="outline"
                       size="sm"
                       asChild
-                      className="flex items-center gap-2"
+                      className="flex items-center justify-center gap-2 w-full sm:flex-1 min-w-0 text-sm"
                     >
                       <a
                         href="https://wa.me/19296679792?text=مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا"
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 w-full"
                       >
-                        <MessageCircle className="h-4 w-4" />
-                        {language === 'ar' ? 'واتساب US' : 'WhatsApp US'}
+                        <MessageCircle className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{language === 'ar' ? 'واتساب US' : 'WhatsApp US'}</span>
                       </a>
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       asChild
-                      className="flex items-center gap-2"
+                      className="flex items-center justify-center gap-2 w-full sm:flex-1 min-w-0 text-sm"
                     >
                       <a
                         href="https://wa.me/963969864741?text=مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا"
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 w-full"
                       >
-                        <Phone className="h-4 w-4" />
-                        {language === 'ar' ? 'واتساب سوريا' : 'WhatsApp Syria'}
+                        <Phone className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{language === 'ar' ? 'واتساب سوريا' : 'WhatsApp Syria'}</span>
                       </a>
                     </Button>
                   </div>
@@ -239,17 +226,13 @@ const CreateListing = () => {
                   
                   <div className="md:col-span-2">
                     <LocationSelector
-                      onLocationSelect={(location, lat, lng) => {
+                      onLocationSelect={(location) => {
                         setFormData(prev => ({
                           ...prev,
-                          location,
-                          latitude: lat.toString(),
-                          longitude: lng.toString()
+                          location
                         }));
                       }}
                       initialLocation={formData.location}
-                      initialLat={formData.latitude ? parseFloat(formData.latitude) : undefined}
-                      initialLng={formData.longitude ? parseFloat(formData.longitude) : undefined}
                     />
                   </div>
                 </div>
@@ -403,40 +386,6 @@ const CreateListing = () => {
                   bucketName="property-images"
                   folder="listings"
                 />
-              </div>
-
-              {/* Location Coordinates (Optional) */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  الإحداثيات (اختياري)
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="latitude">خط العرض</Label>
-                    <Input
-                      id="latitude"
-                      name="latitude"
-                      type="number"
-                      step="any"
-                      value={formData.latitude}
-                      onChange={handleInputChange}
-                      placeholder="33.5138"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="longitude">خط الطول</Label>
-                    <Input
-                      id="longitude"
-                      name="longitude"
-                      type="number"
-                      step="any"
-                      value={formData.longitude}
-                      onChange={handleInputChange}
-                      placeholder="36.2765"
-                    />
-                  </div>
-                </div>
               </div>
 
               <div className="flex gap-4 pt-6">

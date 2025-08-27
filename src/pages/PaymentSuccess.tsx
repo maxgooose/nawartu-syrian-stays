@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Calendar, MapPin, Users, CreditCard } from "lucide-react";
+import { CheckCircle, Calendar, MapPin, Users, CreditCard, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface BookingDetails {
@@ -105,6 +105,18 @@ const PaymentSuccess = () => {
     <div className="min-h-screen bg-background pattern-subtle">
       <div className="container-custom py-12">
         <div className="max-w-2xl mx-auto">
+          {/* Back Button */}
+          <div className="mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/guest-dashboard')}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              العودة للحجوزات
+            </Button>
+          </div>
+
           {/* Success Header */}
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">

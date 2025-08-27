@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
-import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map } from "lucide-react";
+import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -153,6 +153,18 @@ const PropertyBrowse = () => {
       </section>
 
       <div className="container-custom py-6">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {language === 'ar' ? 'العودة للرئيسية' : 'Back to Home'}
+          </Button>
+        </div>
+
         {/* Results Header */}
         <div className="flex justify-between items-center mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
           <div>

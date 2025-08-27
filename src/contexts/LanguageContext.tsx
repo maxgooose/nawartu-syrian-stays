@@ -23,10 +23,10 @@ interface LanguageProviderProps {
 
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const [isInitialized, setIsInitialized] = useState(false);
-  // Default to Arabic (matching backend) and persist in localStorage
+  // Default to English and persist in localStorage
   const [language, setLanguage] = useState<'ar' | 'en'>(() => {
     const saved = localStorage.getItem('nawartu-language');
-    return (saved as 'ar' | 'en') || 'ar';
+    return (saved as 'ar' | 'en') || 'en';
   });
 
   const handleLanguageChange = (lang: 'ar' | 'en') => {

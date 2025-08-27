@@ -86,7 +86,6 @@ const amenityIcons: Record<string, any> = {
   parking: ParkingCircle,
   air_conditioning: Wind,
   kitchen: Utensils,
-  security: Shield,
   elevator: Zap,
   tv: Tv,
   heating: Snowflake,
@@ -128,8 +127,13 @@ const amenityIcons: Record<string, any> = {
   first_aid_kit: Shield,
   fire_extinguisher: Shield,
   smoke_detector: Shield,
-  carbon_monoxide_detector: Shield
+  carbon_monoxide_detector: Shield,
+  electric_fans: Wind,
+  electric_generators: Zap,
+  electric_batteries: Zap
 };
+
+import { amenityLabels } from "@/lib/amenities";
 
 // Property type icons
 const propertyTypeIcons: Record<string, any> = {
@@ -587,12 +591,14 @@ const PropertyDetails = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {listing.amenities.map((amenity) => {
                         const IconComponent = amenityIcons[amenity] || Zap;
+                        const amenityLabel = amenityLabels[amenity];
+                        const displayText = amenityLabel ? (language === 'ar' ? amenityLabel.ar : amenityLabel.en) : amenity;
                         return (
                           <div key={amenity} className="flex items-center gap-3 p-3 rounded-lg border border-primary/10 bg-background/50 hover:bg-muted/30 transition-colors">
                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                               <IconComponent className="h-4 w-4 text-primary" />
                             </div>
-                            <span className="text-sm font-medium">{amenity}</span>
+                            <span className="text-sm font-medium">{displayText}</span>
                           </div>
                         );
                       })}

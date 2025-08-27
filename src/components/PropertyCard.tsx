@@ -2,6 +2,7 @@ import { Heart, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { getAmenityLabel } from "@/lib/amenities";
 
 interface PropertyCardProps {
   property: {
@@ -74,7 +75,7 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
               key={index}
               className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
             >
-              {feature}
+              {getAmenityLabel(feature, language)}
             </span>
           ))}
           {property.features.length > 2 && (

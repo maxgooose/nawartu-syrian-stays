@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Home, Calendar, Eye, Edit } from "lucide-react";
+import { Plus, Home, Calendar, Eye, Edit, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -160,6 +160,18 @@ const HostDashboard = () => {
   return (
     <div className="min-h-screen bg-background p-6" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {language === 'ar' ? 'العودة للرئيسية' : 'Back to Home'}
+          </Button>
+        </div>
+
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">
@@ -240,11 +252,21 @@ const HostDashboard = () => {
                         </span>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="flex-1">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => navigate(`/property/${listing.id}`)}
+                        >
                           <Eye className="h-4 w-4 mr-1" />
                           {language === 'ar' ? 'عرض' : 'View'}
                         </Button>
-                        <Button variant="outline" size="sm" className="flex-1">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => navigate(`/edit-listing/${listing.id}`)}
+                        >
                           <Edit className="h-4 w-4 mr-1" />
                           {language === 'ar' ? 'تعديل' : 'Edit'}
                         </Button>

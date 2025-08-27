@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Instagram, ArrowLeft } from "lucide-react";
 import { TikTokIcon } from "@/components/ui/icons";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -46,6 +46,18 @@ const ContactUs = () => {
       <Header language={language} onLanguageChange={handleLanguageChange} />
       <main className="container-custom py-8" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-6xl mx-auto">
+          {/* Back Button */}
+          <div className="mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {language === 'ar' ? 'العودة' : 'Go Back'}
+            </Button>
+          </div>
+
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-primary mb-4">
               {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}

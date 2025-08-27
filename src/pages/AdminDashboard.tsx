@@ -22,7 +22,8 @@ import {
   MapPin,
   DollarSign,
   Clock,
-  Globe
+  Globe,
+  ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -314,6 +315,18 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background pattern-geometric-stars" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-custom py-6">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t('العودة للرئيسية', 'Back to Home')}
+          </Button>
+        </div>
+
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
