@@ -55,8 +55,8 @@ const CreateListing = () => {
     
     if (!user || profile?.role !== 'host') {
       toast({
-        title: "خطأ",
-        description: "يجب أن تكون مضيفاً لإضافة عقار",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "يجب أن تكون مضيفاً لإضافة عقار" : "You must be a host to add a property",
         variant: "destructive",
       });
       return;
@@ -102,15 +102,15 @@ const CreateListing = () => {
       }
 
       toast({
-        title: "تم بنجاح",
-        description: "تم إضافة العقار بنجاح وهو قيد المراجعة. تم إرسال تأكيد على بريدك الإلكتروني.",
+        title: language === 'ar' ? "تم بنجاح" : "Success",
+        description: language === 'ar' ? "تم إضافة العقار بنجاح وهو قيد المراجعة. تم إرسال تأكيد على بريدك الإلكتروني." : "Property added successfully and is under review. A confirmation has been sent to your email.",
       });
 
       navigate('/host-dashboard');
     } catch (error: any) {
       toast({
-        title: "خطأ",
-        description: error.message || "حدث خطأ في إضافة العقار",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: error.message || (language === 'ar' ? "حدث خطأ في إضافة العقار" : "An error occurred while adding the property"),
         variant: "destructive",
       });
     } finally {
@@ -129,7 +129,7 @@ const CreateListing = () => {
             className="flex items-center gap-2"
           >
             <ArrowRight className="h-4 w-4" />
-            العودة للوحة المضيف
+            {language === 'ar' ? 'العودة للوحة المضيف' : 'Back to Host Dashboard'}
           </Button>
         </div>
 
@@ -174,7 +174,11 @@ const CreateListing = () => {
                       className="flex items-center justify-center gap-2 w-full sm:flex-1 min-w-0 text-sm"
                     >
                       <a
-                        href="https://wa.me/19296679792?text=مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا"
+                        href={`https://wa.me/19296679792?text=${encodeURIComponent(
+                          language === 'ar' 
+                            ? 'مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا'
+                            : 'Hello, I would like help adding my property to the Nawartu platform'
+                        )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 w-full"
@@ -190,7 +194,11 @@ const CreateListing = () => {
                       className="flex items-center justify-center gap-2 w-full sm:flex-1 min-w-0 text-sm"
                     >
                       <a
-                        href="https://wa.me/963969864741?text=مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا"
+                        href={`https://wa.me/963969864741?text=${encodeURIComponent(
+                          language === 'ar' 
+                            ? 'مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا'
+                            : 'Hello, I would like help adding my property to the Nawartu platform'
+                        )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 w-full"
@@ -208,18 +216,18 @@ const CreateListing = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Home className="h-5 w-5" />
-                  المعلومات الأساسية
+                  {language === 'ar' ? 'المعلومات الأساسية' : 'Basic Information'}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">اسم العقار *</Label>
+                    <Label htmlFor="name">{language === 'ar' ? 'اسم العقار *' : 'Property Name *'}</Label>
                     <Input
                       id="name"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      placeholder="مثال: شقة فاخرة في وسط المدينة"
+                      placeholder={language === 'ar' ? 'مثال: شقة فاخرة في وسط المدينة' : 'Example: Luxury apartment in city center'}
                       required
                     />
                   </div>
@@ -238,13 +246,13 @@ const CreateListing = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="description">الوصف *</Label>
+                  <Label htmlFor="description">{language === 'ar' ? 'الوصف *' : 'Description *'}</Label>
                   <Textarea
                     id="description"
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    placeholder="اكتب وصفاً جذاباً لعقارك..."
+                    placeholder={language === 'ar' ? 'اكتب وصفاً جذاباً لعقارك...' : 'Write an attractive description of your property...'}
                     rows={4}
                     required
                   />
@@ -255,12 +263,12 @@ const CreateListing = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  تفاصيل العقار
+                  {language === 'ar' ? 'تفاصيل العقار' : 'Property Details'}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="max_guests">عدد الضيوف الأقصى *</Label>
+                    <Label htmlFor="max_guests">{language === 'ar' ? 'عدد الضيوف الأقصى *' : 'Max Guests *'}</Label>
                     <div className="relative">
                       <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -277,7 +285,7 @@ const CreateListing = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="bedrooms">عدد غرف النوم</Label>
+                    <Label htmlFor="bedrooms">{language === 'ar' ? 'عدد غرف النوم' : 'Bedrooms'}</Label>
                     <div className="relative">
                       <Bed className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -293,7 +301,7 @@ const CreateListing = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="bathrooms">عدد الحمامات</Label>
+                    <Label htmlFor="bathrooms">{language === 'ar' ? 'عدد الحمامات' : 'Bathrooms'}</Label>
                     <div className="relative">
                       <Bath className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -314,12 +322,12 @@ const CreateListing = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
-                  التسعير
+                  {language === 'ar' ? 'التسعير' : 'Pricing'}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="price_per_night_usd">السعر بالدولار/ليلة *</Label>
+                    <Label htmlFor="price_per_night_usd">{language === 'ar' ? 'السعر بالدولار/ليلة *' : 'Price in USD/night *'}</Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -338,7 +346,7 @@ const CreateListing = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="price_per_night_syp">السعر بالليرة السورية/ليلة</Label>
+                    <Label htmlFor="price_per_night_syp">{language === 'ar' ? 'السعر بالليرة السورية/ليلة' : 'Price in Syrian Pounds/night'}</Label>
                     <Input
                       id="price_per_night_syp"
                       name="price_per_night_syp"
@@ -346,7 +354,7 @@ const CreateListing = () => {
                       min="0"
                       value={formData.price_per_night_syp}
                       onChange={handleInputChange}
-                      placeholder="اختياري"
+                      placeholder={language === 'ar' ? 'اختياري' : 'Optional'}
                     />
                   </div>
                 </div>
@@ -354,7 +362,7 @@ const CreateListing = () => {
 
               {/* Amenities */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">الخدمات والمرافق</h3>
+                <h3 className="text-lg font-semibold">{language === 'ar' ? 'الخدمات والمرافق' : 'Amenities & Facilities'}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {AMENITIES.map((amenity) => (
                     <div key={amenity.id} className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -377,7 +385,7 @@ const CreateListing = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Upload className="h-5 w-5" />
-                  صور العقار
+                  {language === 'ar' ? 'صور العقار' : 'Property Images'}
                 </h3>
                 <ImageUpload
                   onImagesUploaded={(urls) => setFormData(prev => ({ ...prev, images: urls }))}
@@ -395,10 +403,13 @@ const CreateListing = () => {
                   onClick={() => navigate('/host-dashboard')}
                   className="flex-1"
                 >
-                  إلغاء
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
                 </Button>
                 <Button type="submit" disabled={loading} className="flex-1">
-                  {loading ? "جاري الحفظ..." : "إضافة العقار"}
+                  {loading 
+                    ? (language === 'ar' ? "جاري الحفظ..." : "Saving...") 
+                    : (language === 'ar' ? "إضافة العقار" : "Add Property")
+                  }
                 </Button>
               </div>
             </form>
