@@ -5,20 +5,20 @@ export const AMENITIES = [
   { id: 'pool', label: 'مسبح', value: 'pool' },
   { id: 'gym', label: 'صالة رياضية', value: 'gym' },
   { id: 'kitchen', label: 'مطبخ مجهز', value: 'kitchen' },
-  { id: 'ac', label: 'تكييف', value: 'air_conditioning' },
+  { id: 'ac', label: 'تكييف', value: 'airconditioning' },
   { id: 'balcony', label: 'شرفة', value: 'balcony' },
   { id: 'garden', label: 'حديقة', value: 'garden' },
   { id: 'elevator', label: 'مصعد', value: 'elevator' },
-  { id: 'electric_fans', label: 'مراوح كهربائية', value: 'electric_fans' },
-  { id: 'electric_generators', label: 'مولدات كهربائية', value: 'electric_generators' },
-  { id: 'electric_batteries', label: 'بطارية كهرباء', value: 'electric_batteries' },
+  { id: 'electricfans', label: 'مراوح كهربائية', value: 'electricfans' },
+  { id: 'electricgenerators', label: 'مولدات كهربائية', value: 'electricgenerators' },
+  { id: 'electricbatteries', label: 'بطارية كهرباء', value: 'electricbatteries' },
 ];
 
 // Amenity labels mapping for proper display
 export const amenityLabels: Record<string, { ar: string; en: string }> = {
   wifi: { ar: 'واي فاي', en: 'WiFi' },
   parking: { ar: 'موقف سيارات', en: 'Parking' },
-  air_conditioning: { ar: 'تكييف', en: 'Air Conditioning' },
+  airconditioning: { ar: 'تكييف', en: 'Air Conditioning' },
   kitchen: { ar: 'مطبخ مجهز', en: 'Kitchen' },
   elevator: { ar: 'مصعد', en: 'Elevator' },
   tv: { ar: 'تلفاز', en: 'TV' },
@@ -62,9 +62,9 @@ export const amenityLabels: Record<string, { ar: string; en: string }> = {
   fire_extinguisher: { ar: 'مطفأة حريق', en: 'Fire Extinguisher' },
   smoke_detector: { ar: 'كاشف دخان', en: 'Smoke Detector' },
   carbon_monoxide_detector: { ar: 'كاشف أول أكسيد الكربون', en: 'Carbon Monoxide Detector' },
-  electric_fans: { ar: 'مراوح كهربائية', en: 'Electric Fans' },
-  electric_generators: { ar: 'مولدات كهربائية', en: 'Electric Generators' },
-  electric_batteries: { ar: 'بطارية كهرباء', en: 'Electric Batteries' }
+  electricfans: { ar: 'مراوح كهربائية', en: 'Electric Fans' },
+  electricgenerators: { ar: 'مولدات كهربائية', en: 'Electric Generators' },
+  electricbatteries: { ar: 'بطارية كهرباء', en: 'Electric Batteries' }
 };
 
 // Helper function to get amenity label

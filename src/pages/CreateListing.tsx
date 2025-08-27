@@ -14,7 +14,7 @@ import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign, Message
 import LocationSelector from "@/components/LocationSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
-import { AMENITIES } from "@/lib/amenities";
+import { AMENITIES, getAmenityLabel } from "@/lib/amenities";
 
 const CreateListing = () => {
   const { language } = useLanguage();
@@ -374,7 +374,7 @@ const CreateListing = () => {
                         }
                       />
                       <Label htmlFor={amenity.id} className="text-sm font-normal">
-                        {amenity.label}
+                        {getAmenityLabel(amenity.value, language)}
                       </Label>
                     </div>
                   ))}
