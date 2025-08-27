@@ -17,7 +17,7 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
     },
     { 
       label: language === 'ar' ? 'تصفح العقارات' : 'Browse Properties', 
-      href: '/properties' 
+      href: '/browse' 
     },
     { 
       label: language === 'ar' ? 'كن مضيفاً' : 'Become a Host', 

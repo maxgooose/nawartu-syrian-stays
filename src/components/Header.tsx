@@ -45,7 +45,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
             <Link to="/" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
               {language === 'ar' ? 'الرئيسية' : 'Home'}
             </Link>
-            <Link to="/guest-dashboard" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+            <Link to="/browse" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
               {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
             </Link>
             {profile?.role === 'host' && (
@@ -109,7 +109,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                       {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={() => navigate('/guest-dashboard')}>
+                  <DropdownMenuItem onClick={() => navigate('/browse')}>
                     <User className="mr-2 h-4 w-4" />
                     {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
                   </DropdownMenuItem>
@@ -162,7 +162,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                 {language === 'ar' ? 'الرئيسية' : 'Home'}
               </Link>
               <Link 
-                to="/guest-dashboard" 
+                to="/browse" 
                 className="text-foreground hover:text-primary transition-colors py-2 border-b border-border/50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
