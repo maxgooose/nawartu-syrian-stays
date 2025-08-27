@@ -73,10 +73,21 @@ export const HeroSection = ({
                 </label>
                 <div className="relative">
                   <Calendar className={`absolute top-3 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
-                  <Input type="date" value={searchData.checkIn} onChange={e => setSearchData({
-                  ...searchData,
-                  checkIn: e.target.value
-                })} className={`${isRTL ? 'pr-8 sm:pr-10 text-right' : 'pl-8 sm:pl-10'} h-10 sm:h-12 text-sm sm:text-base`} />
+                  <Input 
+                    type="date" 
+                    value={searchData.checkIn} 
+                    onChange={e => setSearchData({
+                      ...searchData,
+                      checkIn: e.target.value
+                    })} 
+                    className={`${isRTL ? 'pr-8 sm:pr-10 text-right' : 'pl-8 sm:pl-10'} h-10 sm:h-12 text-sm sm:text-base`}
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                  {!searchData.checkIn && (
+                    <div className={`absolute top-3 ${isRTL ? 'right-8 sm:right-10 text-right' : 'left-8 sm:left-10'} text-muted-foreground/70 pointer-events-none text-sm sm:text-base z-10`}>
+                      {language === 'ar' ? 'اختر التاريخ' : 'Select date'}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -87,10 +98,21 @@ export const HeroSection = ({
                 </label>
                 <div className="relative">
                   <Calendar className={`absolute top-3 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
-                  <Input type="date" value={searchData.checkOut} onChange={e => setSearchData({
-                  ...searchData,
-                  checkOut: e.target.value
-                })} className={`${isRTL ? 'pr-8 sm:pr-10 text-right' : 'pl-8 sm:pl-10'} h-10 sm:h-12 text-sm sm:text-base`} />
+                  <Input 
+                    type="date" 
+                    value={searchData.checkOut} 
+                    onChange={e => setSearchData({
+                      ...searchData,
+                      checkOut: e.target.value
+                    })} 
+                    className={`${isRTL ? 'pr-8 sm:pr-10 text-right' : 'pl-8 sm:pl-10'} h-10 sm:h-12 text-sm sm:text-base`}
+                    min={searchData.checkIn || new Date().toISOString().split('T')[0]}
+                  />
+                  {!searchData.checkOut && (
+                    <div className={`absolute top-3 ${isRTL ? 'right-8 sm:right-10 text-right' : 'left-8 sm:left-10'} text-muted-foreground/70 pointer-events-none text-sm sm:text-base z-10`}>
+                      {language === 'ar' ? 'اختر التاريخ' : 'Select date'}
+                    </div>
+                  )}
                 </div>
               </div>
 
