@@ -35,8 +35,14 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
+        console.log('Fetching Google Maps API key...');
         const { data, error } = await supabase.functions.invoke('get-google-maps-key');
+        console.log('API key response:', { data, error });
         if (error) throw error;
+        if (!data?.apiKey) {
+          throw new Error('API key not found in response');
+        }
+        console.log('API key fetched successfully');
         setApiKey(data.apiKey);
       } catch (err) {
         console.error('Failed to fetch Google Maps API key:', err);
@@ -53,15 +59,26 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
     const initMap = async () => {
       try {
+        console.log('Initializing map with API key:', apiKey ? 'present' : 'missing');
         const loader = new Loader({
           apiKey,
           version: 'weekly',
           libraries: ['places']
         });
 
+        console.log('Loading Google Maps...');
         await loader.load();
+        console.log('Google Maps loaded successfully');
 
-        const map = new google.maps.Map(mapRef.current!, {
+        if (!mapRef.current) {
+          console.error('Map container ref is null');
+          setError('Map container not found');
+          setLoading(false);
+          return;
+        }
+
+        console.log('Creating map instance...');
+        const map = new google.maps.Map(mapRef.current, {
           center: { lat, lng },
           zoom,
           mapTypeControl: false,
@@ -77,6 +94,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
           ]
         });
 
+        console.log('Map instance created successfully');
         mapInstanceRef.current = map;
 
         // Add markers
@@ -98,11 +116,13 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             if (event.latLng) {
               const clickedLat = event.latLng.lat();
               const clickedLng = event.latLng.lng();
+              console.log('Map clicked at:', clickedLat, clickedLng);
               onLocationSelect(clickedLat, clickedLng);
             }
           });
         }
 
+        console.log('Map initialization complete');
         setLoading(false);
       } catch (err) {
         console.error('Error initializing map:', err);
