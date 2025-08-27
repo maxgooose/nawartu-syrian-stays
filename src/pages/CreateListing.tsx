@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign, MessageCircle, Phone } from "lucide-react";
 import LocationSelector from "@/components/LocationSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ImageUpload } from "@/components/ImageUpload";
 
 const AMENITIES = [
   { id: 'wifi', label: 'واي فاي', value: 'wifi' },
@@ -60,22 +61,6 @@ const CreateListing = () => {
       amenities: checked 
         ? [...prev.amenities, amenity]
         : prev.amenities.filter(a => a !== amenity)
-    }));
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    // For now, we'll just store placeholder URLs
-    // In a real app, you'd upload to Supabase Storage
-    const newImages = Array.from(files).map((file, index) => 
-      URL.createObjectURL(file)
-    );
-    
-    setFormData(prev => ({
-      ...prev,
-      images: [...prev.images, ...newImages].slice(0, 10) // Max 10 images
     }));
   };
 
@@ -411,46 +396,13 @@ const CreateListing = () => {
                   <Upload className="h-5 w-5" />
                   صور العقار
                 </h3>
-                <div>
-                  <Label htmlFor="images">رفع الصور (حتى 10 صور)</Label>
-                  <Input
-                    id="images"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="mt-1"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    يُنصح برفع صور عالية الجودة تُظهر العقار بأفضل شكل
-                  </p>
-                </div>
-                
-                {formData.images.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={image}
-                          alt={`صورة ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-md"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-1 right-1 h-6 w-6 p-0"
-                          onClick={() => setFormData(prev => ({
-                            ...prev,
-                            images: prev.images.filter((_, i) => i !== index)
-                          }))}
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <ImageUpload
+                  onImagesUploaded={(urls) => setFormData(prev => ({ ...prev, images: urls }))}
+                  existingImages={formData.images}
+                  maxImages={10}
+                  bucketName="property-images"
+                  folder="listings"
+                />
               </div>
 
               {/* Location Coordinates (Optional) */}
