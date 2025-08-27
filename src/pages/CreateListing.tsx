@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign } from "lucide-react";
+import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign, MessageCircle, Phone } from "lucide-react";
 import LocationSelector from "@/components/LocationSelector";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const AMENITIES = [
   { id: 'wifi', label: 'واي فاي', value: 'wifi' },
@@ -26,6 +28,7 @@ const AMENITIES = [
 ];
 
 const CreateListing = () => {
+  const { language } = useLanguage();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -164,13 +167,70 @@ const CreateListing = () => {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <Home className="h-6 w-6" />
-              إضافة عقار جديد
+              {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Property'}
             </CardTitle>
             <p className="text-muted-foreground">
-              أضف تفاصيل عقارك لبدء استقبال الضيوف
+              {language === 'ar' 
+                ? 'أضف تفاصيل عقارك لبدء استقبال الضيوف' 
+                : 'Add your property details to start hosting guests'
+              }
             </p>
           </CardHeader>
           <CardContent>
+            {/* WhatsApp Contact Option */}
+            <Alert className="mb-6 border-primary/20 bg-primary/5">
+              <MessageCircle className="h-4 w-4" />
+              <AlertDescription>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div>
+                    <p className="font-medium mb-1">
+                      {language === 'ar' 
+                        ? 'تفضل المساعدة المباشرة؟' 
+                        : 'Prefer direct assistance?'
+                      }
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'ar' 
+                        ? 'يمكن لفريقنا إضافة عقارك نيابة عنك - تواصل معنا عبر واتساب' 
+                        : 'Our team can add your property for you - contact us on WhatsApp'
+                      }
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="flex items-center gap-2"
+                    >
+                      <a
+                        href="https://wa.me/19296679792?text=مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        {language === 'ar' ? 'واتساب US' : 'WhatsApp US'}
+                      </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="flex items-center gap-2"
+                    >
+                      <a
+                        href="https://wa.me/963969864741?text=مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Phone className="h-4 w-4" />
+                        {language === 'ar' ? 'واتساب سوريا' : 'WhatsApp Syria'}
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </AlertDescription>
+            </Alert>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Basic Information */}
               <div className="space-y-4">
