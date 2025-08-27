@@ -83,11 +83,6 @@ export const HeroSection = ({
                     className={`${isRTL ? 'pr-8 sm:pr-10 text-right' : 'pl-8 sm:pl-10'} h-10 sm:h-12 text-sm sm:text-base`}
                     min={new Date().toISOString().split('T')[0]}
                   />
-                  {!searchData.checkIn && (
-                    <div className={`absolute top-3 ${isRTL ? 'right-8 sm:right-10 text-right' : 'left-8 sm:left-10'} text-muted-foreground/70 pointer-events-none text-sm sm:text-base z-10`}>
-                      {language === 'ar' ? 'اختر التاريخ' : 'Select date'}
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -108,11 +103,6 @@ export const HeroSection = ({
                     className={`${isRTL ? 'pr-8 sm:pr-10 text-right' : 'pl-8 sm:pl-10'} h-10 sm:h-12 text-sm sm:text-base`}
                     min={searchData.checkIn || new Date().toISOString().split('T')[0]}
                   />
-                  {!searchData.checkOut && (
-                    <div className={`absolute top-3 ${isRTL ? 'right-8 sm:right-10 text-right' : 'left-8 sm:left-10'} text-muted-foreground/70 pointer-events-none text-sm sm:text-base z-10`}>
-                      {language === 'ar' ? 'اختر التاريخ' : 'Select date'}
-                    </div>
-                  )}
                 </div>
               </div>
 
