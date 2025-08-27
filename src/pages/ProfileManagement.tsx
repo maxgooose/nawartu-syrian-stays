@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { PhoneInputComponent } from "@/components/PhoneInput";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -393,13 +394,11 @@ const ProfileManagement = () => {
                         
                         <div>
                           <Label htmlFor="phone">{language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
-                          <Input
-                            id="phone"
-                            type="tel"
+                          <PhoneInputComponent
                             value={profileData.phone}
-                            onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                            className={isRTL ? 'text-right' : 'text-left'}
+                            onChange={(value) => setProfileData({...profileData, phone: value || ''})}
                             placeholder={language === 'ar' ? '+963 xxx xxx xxx' : '+963 xxx xxx xxx'}
+                            defaultCountry="SY"
                           />
                         </div>
                       </div>

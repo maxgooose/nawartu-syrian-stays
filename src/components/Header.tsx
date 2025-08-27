@@ -5,7 +5,7 @@ import { Globe, Menu, X, User, LogOut, Shield } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import newLogo from "/lovable-uploads/224dce06-9efd-402a-93b9-01ef7b9f4add.png";
+
 
 interface HeaderProps {
   language: 'ar' | 'en';
@@ -34,7 +34,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
         <div className="flex items-center justify-between h-16" dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Logo */}
           <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0">
-            <img src={newLogo} alt="Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
+            <img src="/nawartu-logo.png" alt="Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
             <span className="text-lg sm:text-2xl font-bold text-primary tracking-wide">
               {language === 'ar' ? 'نورتوا' : 'Nawartu'}
             </span>

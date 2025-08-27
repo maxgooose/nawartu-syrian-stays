@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Mail, Lock, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { PhoneInputComponent } from '@/components/PhoneInput';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -312,13 +313,12 @@ const Auth = () => {
                 <Label htmlFor="signup-phone">
                   {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
                 </Label>
-                <Input
-                  id="signup-phone"
-                  type="tel"
-                  placeholder={language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
+                <PhoneInputComponent
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(value) => setPhone(value || '')}
+                  placeholder={language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
                   disabled={isLoading}
+                  defaultCountry="SY"
                 />
               </div>
 
@@ -331,7 +331,7 @@ const Auth = () => {
                   <Input
                     id="signup-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter your password'}
+                    placeholder={language === 'ar' ? 'أنشئ كلمة المرور' : 'Create your password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 pr-10"
