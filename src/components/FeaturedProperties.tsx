@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { PropertyCard } from "./PropertyCard";
+import { getPublicImageUrl } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
 interface FeaturedPropertiesProps {
@@ -57,7 +58,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
     currency: 'USD' as const,
     rating: 4.5, // Default rating until we implement reviews
     reviews: 0, // Default reviews count
-    image: listing.images?.[0] || '/placeholder.svg',
+    image: getPublicImageUrl(listing.images?.[0]) || '/placeholder.svg',
     type: language === 'ar' ? 'عقار' : 'Property',
     features: listing.amenities?.slice(0, 3) || []
   });

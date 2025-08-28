@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { getPublicImageUrl } from "@/lib/utils";
 
 interface User {
   id: string;
@@ -436,7 +437,7 @@ const AdminDashboard = () => {
                         <div className="flex gap-4 flex-1">
                           {listing.images?.[0] && (
                             <img 
-                              src={listing.images[0]} 
+                              src={getPublicImageUrl(listing.images[0]) || '/placeholder.svg'} 
                               alt={listing.name}
                               className="w-20 h-20 rounded-lg object-cover"
                             />

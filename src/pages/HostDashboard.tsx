@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Home, Calendar, Eye, Edit, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { getPublicImageUrl } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -49,20 +50,8 @@ const HostDashboard = () => {
   const { toast } = useToast();
   const isRTL = language === 'ar';
 
-  // Helper function to get proper image URL
-  const getImageUrl = (imagePath: string) => {
-    if (!imagePath) return null;
-    
-    // If it's already a full URL, return as is
-    if (imagePath.startsWith('http')) return imagePath;
-    
-    // Get public URL from Supabase storage
-    const { data: { publicUrl } } = supabase.storage
-      .from('property-images')
-      .getPublicUrl(imagePath);
-    
-    return publicUrl;
-  };
+  // Use shared image URL helper
+  const getImageUrl = (imagePath: string) => getPublicImageUrl(imagePath);
 
   useEffect(() => {
     if (authLoading) return;

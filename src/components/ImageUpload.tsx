@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { getPublicImageUrl } from "@/lib/utils";
 
 interface ImageUploadProps {
   onImagesUploaded: (urls: string[]) => void;
@@ -220,7 +221,7 @@ export const ImageUpload = ({
             <div key={index} className="relative group">
               <div className="aspect-square rounded-lg overflow-hidden bg-muted">
                 <img
-                  src={imageUrl}
+                  src={getPublicImageUrl(imageUrl, bucketName) || '/placeholder.svg'}
                   alt={`Upload ${index + 1}`}
                   className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 />

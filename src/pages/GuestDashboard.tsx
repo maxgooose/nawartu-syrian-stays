@@ -13,6 +13,7 @@ import { HostRegistrationButton } from "@/components/HostRegistrationButton";
 import { Search, Filter, MapPin, Calendar, Users, Heart, Star, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { getPublicImageUrl } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -313,7 +314,7 @@ const GuestDashboard = () => {
                     <div className="relative aspect-[4/3] overflow-hidden">
                       {listing.images?.[0] ? (
                         <img 
-                          src={listing.images[0]} 
+                          src={getPublicImageUrl(listing.images[0]) || '/placeholder.svg'} 
                           alt={listing.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -399,7 +400,7 @@ const GuestDashboard = () => {
                         <div className="flex gap-4">
                           {booking.listing.images?.[0] && (
                             <img 
-                              src={booking.listing.images[0]} 
+                              src={getPublicImageUrl(booking.listing.images[0]) || '/placeholder.svg'} 
                               alt={booking.listing.name}
                               className="w-20 h-20 rounded-lg object-cover"
                             />

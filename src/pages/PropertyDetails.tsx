@@ -59,6 +59,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays, addDays } from "date-fns";
 import { ar } from "date-fns/locale";
+import { getPublicImageUrl } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -472,7 +473,7 @@ const PropertyDetails = () => {
                         <CarouselItem key={index}>
                           <div className="aspect-[16/10] relative group">
                             <img 
-                              src={image} 
+                              src={getPublicImageUrl(image) || '/placeholder.svg'} 
                               alt={`${listing.name} - صورة ${index + 1}`}
                               className="w-full h-full object-cover hover-lift cursor-pointer transition-transform duration-300"
                               onClick={() => setCurrentImageIndex(index)}

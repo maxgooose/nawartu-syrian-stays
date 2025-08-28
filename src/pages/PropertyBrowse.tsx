@@ -11,6 +11,7 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { getPublicImageUrl } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -290,7 +291,7 @@ const PropertyBrowse = () => {
                     <div className="relative aspect-[4/3] overflow-hidden">
                       {listing.images?.[0] ? (
                         <img 
-                          src={listing.images[0]} 
+                          src={getPublicImageUrl(listing.images[0]) || '/placeholder.svg'} 
                           alt={listing.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
