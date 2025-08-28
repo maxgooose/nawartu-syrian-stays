@@ -15,6 +15,7 @@ import LocationSelector from "@/components/LocationSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
 import { AMENITIES, getAmenityLabel } from "@/lib/amenities";
+import { getPublicImageUrl } from "@/lib/utils";
 
 const CreateListing = () => {
   const { language } = useLanguage();
@@ -65,6 +66,11 @@ const CreateListing = () => {
     setLoading(true);
 
     try {
+      // Sanitize images: drop any blob: entries and normalize keys to public URLs
+      const sanitizedImages = (formData.images || [])
+        .map((img) => getPublicImageUrl(img) || '')
+        .filter((u) => !!u);
+
       const { error } = await supabase
         .from('listings')
         .insert({
@@ -78,7 +84,7 @@ const CreateListing = () => {
           bedrooms: parseInt(formData.bedrooms),
           bathrooms: parseInt(formData.bathrooms),
           amenities: formData.amenities,
-          images: formData.images,
+          images: sanitizedImages,
 
           status: 'pending'
         });

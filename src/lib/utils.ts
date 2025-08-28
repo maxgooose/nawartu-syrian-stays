@@ -24,6 +24,9 @@ export function getPublicImageUrl(
   // If it's already a full URL, return as is
   if (/^https?:\/\//i.test(trimmed)) return trimmed
 
+  // Blob URLs are not shareable; treat as invalid so callers can fallback
+  if (trimmed.startsWith('blob:')) return null
+
   // Normalize paths that may contain bucket prefix or public path
   let key = trimmed
 

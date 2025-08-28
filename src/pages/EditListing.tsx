@@ -14,6 +14,7 @@ import LocationSelector from "@/components/LocationSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
 import { AMENITIES } from "@/lib/amenities";
+import { getPublicImageUrl } from "@/lib/utils";
 
 const EditListing = () => {
   const { id } = useParams<{ id: string }>();
@@ -114,6 +115,11 @@ const EditListing = () => {
     setSaving(true);
 
     try {
+      // Sanitize images before saving: remove blob: URLs and normalize to public URLs
+      const sanitizedImages = (formData.images || [])
+        .map((img) => getPublicImageUrl(img) || '')
+        .filter((u) => !!u);
+
       const { error } = await supabase
         .from('listings')
         .update({
@@ -126,7 +132,7 @@ const EditListing = () => {
           bedrooms: parseInt(formData.bedrooms),
           bathrooms: parseInt(formData.bathrooms),
           amenities: formData.amenities,
-          images: formData.images,
+          images: sanitizedImages,
 
         })
         .eq('id', id)
