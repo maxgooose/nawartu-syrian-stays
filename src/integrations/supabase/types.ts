@@ -301,13 +301,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "terms_acceptance_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "host_bookings_view"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "terms_acceptance_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -318,39 +311,7 @@ export type Database = {
       }
     }
     Views: {
-      host_bookings_view: {
-        Row: {
-          admin_notes: string | null
-          check_in_date: string | null
-          check_out_date: string | null
-          created_at: string | null
-          guest_email: string | null
-          guest_id: string | null
-          guest_name: string | null
-          id: string | null
-          listing_id: string | null
-          special_requests: string | null
-          status: Database["public"]["Enums"]["booking_status"] | null
-          total_nights: number | null
-          updated_at: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bookings_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bookings_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       can_review_booking: {
@@ -370,6 +331,14 @@ export type Database = {
       }
       request_host_upgrade: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      upgrade_to_host: {
+        Args: { target_user_id: string }
+        Returns: boolean
+      }
+      validate_user_input: {
+        Args: { input_text: string }
         Returns: boolean
       }
     }
