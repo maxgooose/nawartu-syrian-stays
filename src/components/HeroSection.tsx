@@ -153,10 +153,10 @@ export const HeroSection = ({
       </div>
 
       {/* Hero Content - Repositioned to be more visible */}
-      <div className="relative z-10 container mx-auto px-4 text-center pt-32">
+      <div className="relative z-10 container mx-auto px-4 text-center pt-20">
         <div className="max-w-4xl mx-auto animate-slide-up">
           {/* Hero Text */}
-          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${language === 'ar' ? 'mb-12' : 'mb-16'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${language === 'ar' ? 'mb-8' : 'mb-16'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-lg">
               {language === 'ar' ? <>
                   <span className="block">الضيافة السورية</span>
@@ -169,18 +169,6 @@ export const HeroSection = ({
             <p className="text-xl sm:text-2xl md:text-3xl text-white/90 max-w-3xl mx-auto leading-relaxed px-4 drop-shadow-md">
               {language === 'ar' ? 'استأجر أجمل العقارات التراثية والحديثة في سوريا. تجربة إقامة أصيلة وفريدة.' : 'Rent the most beautiful heritage and modern properties in Syria. An authentic and unique stay experience.'}
             </p>
-          </div>
-
-          {/* Stats - Made more subtle */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-            <div className="text-center animate-fade-in-up opacity-80" style={{ animationDelay: '0.2s' }}>
-              <div className="text-2xl font-bold text-white">50+</div>
-              <div className="text-white/70">{language === 'ar' ? 'مدينة' : 'Cities'}</div>
-            </div>
-            <div className="text-center animate-fade-in-up opacity-80" style={{ animationDelay: '0.4s' }}>
-              <div className="text-2xl font-bold text-white">10k+</div>
-              <div className="text-white/70">{language === 'ar' ? 'ضيف سعيد' : 'Happy Guests'}</div>
-            </div>
           </div>
         </div>
       </div>
