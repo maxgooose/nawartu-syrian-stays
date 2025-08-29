@@ -32,7 +32,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
           .from('listings')
           .select('*')
           .eq('status', 'approved')
-          .limit(4);
+          .limit(8);
 
         if (error) {
           console.error('Error fetching listings:', error);
@@ -79,7 +79,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-card rounded-lg animate-pulse">
                 <div className="h-48 bg-muted rounded-t-lg"></div>
                 <div className="p-4 space-y-3">

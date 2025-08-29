@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
-import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft, Navigation } from "lucide-react";
+import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft, Navigation, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { getPublicImageUrl, openInGoogleMaps } from "@/lib/utils";
@@ -44,6 +44,8 @@ const PropertyBrowse = () => {
   const [guestCount, setGuestCount] = useState(searchParams.get('guests') || 'all');
   const [sortBy, setSortBy] = useState('price-low');
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -55,6 +57,7 @@ const PropertyBrowse = () => {
 
   useEffect(() => {
     filterAndSortListings();
+    setCurrentPage(1); // Reset to first page when filters change
   }, [listings, searchQuery, priceRange, guestCount, sortBy]);
 
   const fetchListings = async () => {
@@ -287,8 +290,11 @@ const PropertyBrowse = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredListings.map((listing) => (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredListings
+                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                    .map((listing) => (
                   <Card key={listing.id} className="overflow-hidden hover-lift cursor-pointer group pattern-subtle border border-primary/5 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       {listing.images?.[0] ? (
@@ -371,8 +377,50 @@ const PropertyBrowse = () => {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {Math.ceil(filteredListings.length / itemsPerPage) > 1 && (
+                  <div className="flex justify-center items-center space-x-2 mt-8" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-2"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      {language === 'ar' ? 'السابق' : 'Previous'}
+                    </Button>
+                    
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: Math.ceil(filteredListings.length / itemsPerPage) }, (_, i) => (
+                        <Button
+                          key={i + 1}
+                          variant={currentPage === i + 1 ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setCurrentPage(i + 1)}
+                          className="w-10 h-10"
+                        >
+                          {i + 1}
+                        </Button>
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredListings.length / itemsPerPage)))}
+                      disabled={currentPage === Math.ceil(filteredListings.length / itemsPerPage)}
+                      className="flex items-center gap-2"
+                    >
+                      {language === 'ar' ? 'التالي' : 'Next'}
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
