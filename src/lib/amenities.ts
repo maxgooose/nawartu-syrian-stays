@@ -1,17 +1,17 @@
 // Amenities mapping for consistent display across the application
 export const AMENITIES = [
-  { id: 'wifi', label: 'واي فاي', value: 'wifi' },
-  { id: 'parking', label: 'موقف سيارات', value: 'parking' },
-  { id: 'pool', label: 'مسبح', value: 'pool' },
-  { id: 'gym', label: 'صالة رياضية', value: 'gym' },
-  { id: 'kitchen', label: 'مطبخ مجهز', value: 'kitchen' },
-  { id: 'ac', label: 'تكييف', value: 'airconditioning' },
-  { id: 'balcony', label: 'شرفة', value: 'balcony' },
-  { id: 'garden', label: 'حديقة', value: 'garden' },
-  { id: 'elevator', label: 'مصعد', value: 'elevator' },
-  { id: 'electricfans', label: 'مراوح كهربائية', value: 'electricfans' },
-  { id: 'electricgenerators', label: 'مولدات كهربائية', value: 'electricgenerators' },
-  { id: 'electricbatteries', label: 'بطارية كهرباء', value: 'electricbatteries' },
+  { id: 'wifi', label: 'واي فاي', value: 'WiFi' },
+  { id: 'parking', label: 'موقف سيارات', value: 'Parking' },
+  { id: 'pool', label: 'مسبح', value: 'Pool' },
+  { id: 'gym', label: 'صالة رياضية', value: 'Gym' },
+  { id: 'kitchen', label: 'مطبخ مجهز', value: 'Kitchen' },
+  { id: 'ac', label: 'تكييف', value: 'Air Conditioning' },
+  { id: 'balcony', label: 'شرفة', value: 'Balcony' },
+  { id: 'garden', label: 'حديقة', value: 'Garden' },
+  { id: 'elevator', label: 'مصعد', value: 'Elevator' },
+  { id: 'electricfans', label: 'مراوح كهربائية', value: 'Electric Fans' },
+  { id: 'electricgenerators', label: 'مولدات كهربائية', value: 'Electric Generators' },
+  { id: 'electricbatteries', label: 'بطارية كهرباء', value: 'Electric Batteries' },
 ];
 
 // Amenity labels mapping for proper display

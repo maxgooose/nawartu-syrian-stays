@@ -156,7 +156,7 @@ export const HeroSection = ({
       <div className="relative z-10 container mx-auto px-4 text-center pt-32">
         <div className="max-w-4xl mx-auto animate-slide-up">
           {/* Hero Text */}
-          <div className={`mb-16 ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${language === 'ar' ? 'mb-12' : 'mb-16'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-lg">
               {language === 'ar' ? <>
                   <span className="block">الضيافة السورية</span>
@@ -172,27 +172,16 @@ export const HeroSection = ({
           </div>
 
           {/* Stats - Made more subtle */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
             <div className="text-center animate-fade-in-up opacity-80" style={{ animationDelay: '0.2s' }}>
-              <div className="text-2xl font-bold text-white">500+</div>
-              <div className="text-white/70">{language === 'ar' ? 'عقار' : 'Properties'}</div>
-            </div>
-            <div className="text-center animate-fade-in-up opacity-80" style={{ animationDelay: '0.4s' }}>
               <div className="text-2xl font-bold text-white">50+</div>
               <div className="text-white/70">{language === 'ar' ? 'مدينة' : 'Cities'}</div>
             </div>
-            <div className="text-center animate-fade-in-up opacity-80" style={{ animationDelay: '0.6s' }}>
+            <div className="text-center animate-fade-in-up opacity-80" style={{ animationDelay: '0.4s' }}>
               <div className="text-2xl font-bold text-white">10k+</div>
               <div className="text-white/70">{language === 'ar' ? 'ضيف سعيد' : 'Happy Guests'}</div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse"></div>
         </div>
       </div>
     </section>
