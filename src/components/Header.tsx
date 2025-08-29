@@ -96,7 +96,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-background border shadow-lg z-[60]">
+                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-background border shadow-lg z-[70]">
                   {profile?.role === 'admin' && (
                     <DropdownMenuItem onClick={() => navigate('/admin-dashboard')}>
                       <Shield className="mr-2 h-4 w-4" />
@@ -152,7 +152,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-sm animate-slide-up z-[60]">
+          <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-sm animate-slide-up z-[70]">
             <nav className="flex flex-col space-y-3 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
               <Link 
                 to="/" 
