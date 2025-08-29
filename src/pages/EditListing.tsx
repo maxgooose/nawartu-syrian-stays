@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Home, Save } from "lucide-react";
-import LocationSelector from "@/components/LocationSelector";
+
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
 import { AMENITIES } from "@/lib/amenities";
@@ -225,16 +225,22 @@ const EditListing = () => {
                     />
                   </div>
                   
-                  <div className="md:col-span-2">
-                    <LocationSelector
-                      onLocationSelect={(location) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          location
-                        }));
-                      }}
-                      initialLocation={formData.location}
+                  <div>
+                    <Label htmlFor="location">{language === 'ar' ? 'الموقع *' : 'Location *'}</Label>
+                    <Input
+                      id="location"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      placeholder={language === 'ar' ? 'مثال: دمشق، المالكي، شارع الجلاء' : 'Example: Damascus, Malki, Jalaa Street'}
+                      required
+                      className="mt-1"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {language === 'ar' 
+                        ? 'أدخل العنوان الكامل للعقار بما في ذلك المدينة والحي والشارع' 
+                        : 'Enter the complete address including city, neighborhood, and street'}
+                    </p>
                   </div>
                 </div>
 

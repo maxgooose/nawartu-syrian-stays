@@ -1,4 +1,4 @@
-Airbnb - but better done - and for syria
+Nawartu is Syria’s trusted platform for booking authentic stays and cultural experiences.
 
 
 

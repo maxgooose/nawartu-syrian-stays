@@ -277,9 +277,9 @@ const ProfileManagement = () => {
 
   return (
     <div className="min-h-screen bg-background pattern-geometric-stars" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="container-custom py-6">
+      <div className="container-custom py-4 sm:py-6 px-4 sm:px-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6 sm:mb-8 px-1">
           <Button 
             variant="ghost" 
             onClick={() => navigate(-1)}
@@ -289,20 +289,20 @@ const ProfileManagement = () => {
             {language === 'ar' ? 'العودة' : 'Back'}
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <User className="h-8 w-8 text-primary" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
+              <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               {language === 'ar' ? 'الملف الشخصي' : 'Profile'}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">
               {language === 'ar' ? 'إدارة حسابك والإعدادات' : 'Manage your account and settings'}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Profile Overview Card */}
-          <div className="lg:col-span-1">
-            <Card className="pattern-subtle border border-primary/10 lg:sticky lg:top-6">
+          <div className="lg:col-span-1 order-2 lg:order-1">
+            <Card className="pattern-subtle border border-primary/10 lg:sticky lg:top-6 shadow-sm">
               <CardContent className="p-6 text-center">
                 <div className="relative mb-4">
                   <Avatar className="w-24 h-24 mx-auto">
@@ -355,72 +355,77 @@ const ProfileManagement = () => {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 order-1 lg:order-2">
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-4 sm:mb-8">
-                <TabsTrigger value="profile" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-6 sm:mb-8 h-auto sm:h-10 gap-2 sm:gap-0 p-1 bg-muted/50">
+                <TabsTrigger value="profile" className="flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium rounded-md transition-all hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                   <User className="h-4 w-4" />
-                  {language === 'ar' ? 'المعلومات الشخصية' : 'Personal Info'}
+                  <span className="hidden sm:inline">{language === 'ar' ? 'المعلومات الشخصية' : 'Personal Info'}</span>
+                  <span className="sm:hidden">{language === 'ar' ? 'الملف' : 'Profile'}</span>
                 </TabsTrigger>
-                <TabsTrigger value="security" className="flex items-center gap-2">
+                <TabsTrigger value="security" className="flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium rounded-md transition-all hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                   <Shield className="h-4 w-4" />
-                  {language === 'ar' ? 'الأمان' : 'Security'}
+                  <span className="hidden sm:inline">{language === 'ar' ? 'الأمان' : 'Security'}</span>
+                  <span className="sm:hidden">{language === 'ar' ? 'الأمان' : 'Security'}</span>
                 </TabsTrigger>
-                <TabsTrigger value="settings" className="flex items-center gap-2">
+                <TabsTrigger value="settings" className="flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium rounded-md transition-all hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                   <Settings className="h-4 w-4" />
-                  {language === 'ar' ? 'الإعدادات' : 'Settings'}
+                  <span className="hidden sm:inline">{language === 'ar' ? 'الإعدادات' : 'Settings'}</span>
+                  <span className="sm:hidden">{language === 'ar' ? 'إعدادات' : 'Settings'}</span>
                 </TabsTrigger>
               </TabsList>
 
               {/* Profile Tab */}
-              <TabsContent value="profile">
-                <Card className="pattern-subtle border border-primary/10">
-                  <CardHeader>
-                    <CardTitle>{language === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</CardTitle>
+              <TabsContent value="profile" className="mt-6">
+                <Card className="pattern-subtle border border-primary/10 shadow-sm">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-xl font-semibold">{language === 'ar' ? 'المعلومات الشخصية' : 'Personal Information'}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-4">
                     <form onSubmit={handleProfileUpdate} className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div>
-                          <Label htmlFor="full_name">{language === 'ar' ? 'الاسم الكامل' : 'Full Name'}</Label>
-                          <Input
-                            id="full_name"
-                            value={profileData.full_name}
-                            onChange={(e) => setProfileData({...profileData, full_name: e.target.value})}
-                            className={isRTL ? 'text-right' : 'text-left'}
-                            placeholder={language === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="phone">{language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
-                          <PhoneInputComponent
-                            value={profileData.phone}
-                            onChange={(value) => setProfileData({...profileData, phone: value || ''})}
-                            placeholder={language === 'ar' ? '+963 xxx xxx xxx' : '+963 xxx xxx xxx'}
-                            defaultCountry="SY"
-                          />
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="full_name" className="text-sm font-medium">{language === 'ar' ? 'الاسم الكامل' : 'Full Name'}</Label>
+                            <Input
+                              id="full_name"
+                              value={profileData.full_name}
+                              onChange={(e) => setProfileData({...profileData, full_name: e.target.value})}
+                              className={`h-11 ${isRTL ? 'text-right' : 'text-left'}`}
+                              placeholder={language === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="phone" className="text-sm font-medium">{language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</Label>
+                            <PhoneInputComponent
+                              value={profileData.phone}
+                              onChange={(value) => setProfileData({...profileData, phone: value || ''})}
+                              placeholder={language === 'ar' ? '+963 xxx xxx xxx' : '+963 xxx xxx xxx'}
+                              defaultCountry="SY"
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      <div>
-                        <Label htmlFor="email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-sm font-medium">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
                         <Input
                           id="email"
                           type="email"
                           value={profile.email}
                           disabled
-                                                      className={`${isRTL ? 'text-right' : 'text-left'} bg-muted`}
+                          className={`h-11 ${isRTL ? 'text-right' : 'text-left'} bg-muted/50`}
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground">
                           {language === 'ar' ? 'لا يمكن تغيير البريد الإلكتروني' : 'Email cannot be changed'}
                         </p>
                       </div>
 
-                      <div>
-                        <Label htmlFor="preferred_language">{language === 'ar' ? 'اللغة المفضلة' : 'Preferred Language'}</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="preferred_language" className="text-sm font-medium">{language === 'ar' ? 'اللغة المفضلة' : 'Preferred Language'}</Label>
                         <Select value={profileData.preferred_language} onValueChange={(value) => setProfileData({...profileData, preferred_language: value})}>
-                          <SelectTrigger className={isRTL ? 'text-right' : 'text-left'}>
+                          <SelectTrigger className={`h-11 ${isRTL ? 'text-right' : 'text-left'}`}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -430,9 +435,9 @@ const ProfileManagement = () => {
                         </Select>
                       </div>
 
-                      <div>
-                        <Label htmlFor="role">{language === 'ar' ? 'نوع الحساب' : 'Account Type'}</Label>
-                        <div className="flex items-center gap-2 mt-2">
+                      <div className="space-y-3">
+                        <Label htmlFor="role" className="text-sm font-medium">{language === 'ar' ? 'نوع الحساب' : 'Account Type'}</Label>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                           {getRoleBadge(profile.role)}
                           <span className="text-sm text-muted-foreground">
                             {profile.role === 'admin' && (language === 'ar' ? 'يمكنك إدارة المنصة' : 'You can manage the platform')}
@@ -441,7 +446,7 @@ const ProfileManagement = () => {
                           </span>
                         </div>
                         {profile.role === 'guest' && (
-                          <div className="mt-3">
+                          <div className="pt-2">
                             <HostRegistrationButton 
                               variant="outline" 
                               size="sm"
@@ -454,111 +459,117 @@ const ProfileManagement = () => {
                         )}
                       </div>
 
-                      <Button type="submit" disabled={loading} className="w-full md:w-auto">
-                        <Save className="h-4 w-4 mr-2" />
-                        {loading ? (language === 'ar' ? "جاري الحفظ..." : "Saving...") : (language === 'ar' ? "حفظ التغييرات" : "Save Changes")}
-                      </Button>
+                      <div className="pt-4 border-t border-border/50">
+                        <Button type="submit" disabled={loading} className="w-full sm:w-auto px-8 h-11">
+                          <Save className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                          {loading ? (language === 'ar' ? "جاري الحفظ..." : "Saving...") : (language === 'ar' ? "حفظ التغييرات" : "Save Changes")}
+                        </Button>
+                      </div>
                     </form>
                   </CardContent>
                 </Card>
               </TabsContent>
 
               {/* Security Tab */}
-              <TabsContent value="security">
-                <div className="space-y-6">
+              <TabsContent value="security" className="mt-6">
+                <div className="space-y-8">
                   {/* Change Password */}
-                  <Card className="pattern-subtle border border-primary/10">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                  <Card className="pattern-subtle border border-primary/10 shadow-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center gap-2 text-xl font-semibold">
                         <Key className="h-5 w-5" />
                         {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <form onSubmit={handlePasswordChange} className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
-                        <div>
-                          <Label htmlFor="current_password">{language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}</Label>
+                    <CardContent className="pt-4">
+                      <form onSubmit={handlePasswordChange} className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
+                        <div className="space-y-2">
+                          <Label htmlFor="current_password" className="text-sm font-medium">{language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}</Label>
                           <div className="relative">
                             <Input
                               id="current_password"
                               type={showOldPassword ? "text" : "password"}
                               value={passwordData.currentPassword}
                               onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                              className={`${isRTL ? 'text-right pr-10' : 'text-left pl-10'}`}
+                              className={`h-11 ${isRTL ? 'text-right pr-12' : 'text-left pl-12'}`}
                             />
                             <button
                               type="button"
                               onClick={() => setShowOldPassword(!showOldPassword)}
-                              className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 text-muted-foreground hover:text-foreground`}
+                              className={`absolute ${isRTL ? 'right-3' : 'right-3'} top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors rounded-sm hover:bg-muted/50`}
                             >
                               {showOldPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                         </div>
 
-                        <div>
-                          <Label htmlFor="new_password">{language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}</Label>
+                        <div className="space-y-2">
+                          <Label htmlFor="new_password" className="text-sm font-medium">{language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}</Label>
                           <div className="relative">
                             <Input
                               id="new_password"
                               type={showNewPassword ? "text" : "password"}
                               value={passwordData.newPassword}
                               onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                              className={`${isRTL ? 'text-right pr-10' : 'text-left pl-10'}`}
+                              className={`h-11 ${isRTL ? 'text-right pr-12' : 'text-left pl-12'}`}
                             />
                             <button
                               type="button"
                               onClick={() => setShowNewPassword(!showNewPassword)}
-                              className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 text-muted-foreground hover:text-foreground`}
+                              className={`absolute ${isRTL ? 'right-3' : 'right-3'} top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors rounded-sm hover:bg-muted/50`}
                             >
                               {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                         </div>
 
-                        <div>
-                          <Label htmlFor="confirm_password">{language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}</Label>
+                        <div className="space-y-2">
+                          <Label htmlFor="confirm_password" className="text-sm font-medium">{language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}</Label>
                           <div className="relative">
                             <Input
                               id="confirm_password"
                               type={showConfirmPassword ? "text" : "password"}
                               value={passwordData.confirmPassword}
                               onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                              className={`${isRTL ? 'text-right pr-10' : 'text-left pl-10'}`}
+                              className={`h-11 ${isRTL ? 'text-right pr-12' : 'text-left pl-12'}`}
                             />
                             <button
                               type="button"
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 text-muted-foreground hover:text-foreground`}
+                              className={`absolute ${isRTL ? 'right-3' : 'right-3'} top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors rounded-sm hover:bg-muted/50`}
                             >
                               {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                           </div>
                         </div>
 
-                        <Button type="submit" disabled={passwordLoading}>
-                          <Lock className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
-                          {passwordLoading ? (language === 'ar' ? "جاري التحديث..." : "Updating...") : (language === 'ar' ? "تحديث كلمة المرور" : "Update Password")}
-                        </Button>
+                        <div className="pt-4 border-t border-border/50">
+                          <Button type="submit" disabled={passwordLoading} className="w-full sm:w-auto px-8 h-11">
+                            <Lock className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                            {passwordLoading ? (language === 'ar' ? "جاري التحديث..." : "Updating...") : (language === 'ar' ? "تحديث كلمة المرور" : "Update Password")}
+                          </Button>
+                        </div>
                       </form>
                     </CardContent>
                   </Card>
 
                   {/* Account Deletion */}
-                  <Card className="pattern-subtle border border-destructive/20">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-destructive">
+                  <Card className="pattern-subtle border border-destructive/20 shadow-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center gap-2 text-destructive text-xl font-semibold">
                         <Trash2 className="h-5 w-5" />
                         {language === 'ar' ? 'حذف الحساب' : 'Delete Account'}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-4" dir={isRTL ? 'rtl' : 'ltr'}>
-                        {language === 'ar' 
-                          ? 'حذف الحساب إجراء نهائي ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك نهائياً.'
-                          : 'Deleting your account is a permanent action that cannot be undone. All your data will be permanently deleted.'
-                        }
-                      </p>
+                    <CardContent className="pt-4">
+                      <div className="space-y-4">
+                        <p className="text-muted-foreground text-sm leading-relaxed" dir={isRTL ? 'rtl' : 'ltr'}>
+                          {language === 'ar' 
+                            ? 'حذف الحساب إجراء نهائي ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك نهائياً.'
+                            : 'Deleting your account is a permanent action that cannot be undone. All your data will be permanently deleted.'
+                          }
+                        </p>
+                      </div>
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="destructive">
@@ -612,71 +623,73 @@ const ProfileManagement = () => {
               </TabsContent>
 
               {/* Settings Tab */}
-              <TabsContent value="settings">
-                <Card className="pattern-subtle border border-primary/10">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+              <TabsContent value="settings" className="mt-6">
+                <Card className="pattern-subtle border border-primary/10 shadow-sm">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold">
                       <Bell className="h-5 w-5" />
                       {language === 'ar' ? 'إعدادات الإشعارات' : 'Notification Settings'}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{language === 'ar' ? 'إشعارات البريد الإلكتروني' : 'Email Notifications'}</p>
-                        <p className="text-sm text-muted-foreground">{language === 'ar' ? 'تلقي الإشعارات عبر البريد الإلكتروني' : 'Receive notifications via email'}</p>
+                  <CardContent className="pt-4 space-y-8" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-border/50 bg-background/50">
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm">{language === 'ar' ? 'إشعارات البريد الإلكتروني' : 'Email Notifications'}</p>
+                        <p className="text-xs text-muted-foreground">{language === 'ar' ? 'تلقي الإشعارات عبر البريد الإلكتروني' : 'Receive notifications via email'}</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={settings.emailNotifications}
                         onChange={(e) => setSettings({...settings, emailNotifications: e.target.checked})}
-                        className="toggle"
+                        className="toggle flex-shrink-0"
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{language === 'ar' ? 'إشعارات الرسائل النصية' : 'SMS Notifications'}</p>
-                        <p className="text-sm text-muted-foreground">{language === 'ar' ? 'تلقي الإشعارات عبر الرسائل النصية' : 'Receive notifications via SMS'}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-border/50 bg-background/50">
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm">{language === 'ar' ? 'إشعارات الرسائل النصية' : 'SMS Notifications'}</p>
+                        <p className="text-xs text-muted-foreground">{language === 'ar' ? 'تلقي الإشعارات عبر الرسائل النصية' : 'Receive notifications via SMS'}</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={settings.smsNotifications}
                         onChange={(e) => setSettings({...settings, smsNotifications: e.target.checked})}
-                        className="toggle"
+                        className="toggle flex-shrink-0"
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{language === 'ar' ? 'رسائل تسويقية' : 'Marketing Messages'}</p>
-                        <p className="text-sm text-muted-foreground">{language === 'ar' ? 'تلقي العروض والرسائل التسويقية' : 'Receive offers and marketing messages'}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-border/50 bg-background/50">
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm">{language === 'ar' ? 'رسائل تسويقية' : 'Marketing Messages'}</p>
+                        <p className="text-xs text-muted-foreground">{language === 'ar' ? 'تلقي العروض والرسائل التسويقية' : 'Receive offers and marketing messages'}</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={settings.marketingEmails}
                         onChange={(e) => setSettings({...settings, marketingEmails: e.target.checked})}
-                        className="toggle"
+                        className="toggle flex-shrink-0"
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{language === 'ar' ? 'تذكير الحجوزات' : 'Booking Reminders'}</p>
-                        <p className="text-sm text-muted-foreground">{language === 'ar' ? 'تذكير بمواعيد الحجوزات القادمة' : 'Reminders for upcoming bookings'}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-border/50 bg-background/50">
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm">{language === 'ar' ? 'تذكير الحجوزات' : 'Booking Reminders'}</p>
+                        <p className="text-xs text-muted-foreground">{language === 'ar' ? 'تذكير بمواعيد الحجوزات القادمة' : 'Reminders for upcoming bookings'}</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={settings.bookingReminders}
                         onChange={(e) => setSettings({...settings, bookingReminders: e.target.checked})}
-                        className="toggle"
+                        className="toggle flex-shrink-0"
                       />
                     </div>
 
-                    <Button className="w-full md:w-auto">
-                      <Save className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2'}`} />
-                      {language === 'ar' ? 'حفظ الإعدادات' : 'Save Settings'}
-                    </Button>
+                    <div className="pt-6 border-t border-border/50">
+                      <Button className="w-full sm:w-auto px-8 h-11">
+                        <Save className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                        {language === 'ar' ? 'حفظ الإعدادات' : 'Save Settings'}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>

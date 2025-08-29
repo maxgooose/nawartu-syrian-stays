@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
-import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft } from "lucide-react";
+import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft, Navigation } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { getPublicImageUrl } from "@/lib/utils";
+import { getPublicImageUrl, openInGoogleMaps } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -26,6 +26,8 @@ interface Listing {
   images: string[];
   amenities: string[];
   description: string;
+  latitude?: number | null;
+  longitude?: number | null;
   host: {
     full_name: string;
   };
@@ -343,13 +345,29 @@ const PropertyBrowse = () => {
                             {language === 'ar' ? ' / ليلة' : ' / night'}
                           </span>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => navigate(`/property/${listing.id}`)}
-                        >
-                          {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="p-2"
+                            onClick={() => openInGoogleMaps({
+                              latitude: listing.latitude,
+                              longitude: listing.longitude,
+                              address: listing.location,
+                              propertyName: listing.name
+                            })}
+                            title={language === 'ar' ? 'عرض في خرائط جوجل' : 'View on Google Maps'}
+                          >
+                            <Navigation className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate(`/property/${listing.id}`)}
+                          >
+                            {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

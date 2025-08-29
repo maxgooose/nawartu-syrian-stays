@@ -54,12 +54,14 @@ import {
   ChevronRight,
   MapPinIcon,
   InfoIcon,
-  AlertTriangle
+  AlertTriangle,
+  ExternalLink,
+  Navigation
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays, addDays } from "date-fns";
 import { ar } from "date-fns/locale";
-import { getPublicImageUrl } from "@/lib/utils";
+import { getPublicImageUrl, openInGoogleMaps } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -534,6 +536,22 @@ const PropertyDetails = () => {
                       <MapPin className="h-5 w-5" />
                       <span>{listing.location}</span>
                     </div>
+                    
+                    {/* View on Map Button */}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="mb-4 bg-[#4285f4] hover:bg-[#3367d6] text-white border-[#4285f4] hover:border-[#3367d6]"
+                      onClick={() => openInGoogleMaps({
+                        latitude: listing.latitude,
+                        longitude: listing.longitude,
+                        address: listing.location,
+                        propertyName: listing.name
+                      })}
+                    >
+                      <Navigation className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                      {language === 'ar' ? 'عرض في خرائط جوجل' : 'View on Google Maps'}
+                    </Button>
                   </div>
                   <div className="flex items-center gap-1">
                     <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
@@ -667,15 +685,30 @@ const PropertyDetails = () => {
                       title: listing.name
                     }]}
                   />
-                  {/* Map Overlay Button */}
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    className="absolute bottom-4 right-4"
-                    onClick={() => setShowFullMap(true)}
-                  >
-                    عرض الخريطة الكاملة
-                  </Button>
+                  {/* Map Overlay Buttons */}
+                  <div className="absolute bottom-4 right-4 flex gap-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      onClick={() => setShowFullMap(true)}
+                    >
+                      {language === 'ar' ? 'عرض الخريطة الكاملة' : 'View Full Map'}
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      className="bg-[#4285f4] hover:bg-[#3367d6] text-white shadow-lg"
+                      onClick={() => openInGoogleMaps({
+                        latitude: listing.latitude,
+                        longitude: listing.longitude,
+                        address: listing.location,
+                        propertyName: listing.name
+                      })}
+                    >
+                      <Navigation className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                      {language === 'ar' ? 'عرض في خرائط جوجل' : 'View on Google Maps'}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Nearby Info */}
