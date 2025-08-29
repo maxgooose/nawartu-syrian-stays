@@ -153,7 +153,7 @@ export const HeroSection = ({
       </div>
 
       {/* Hero Content - Repositioned to be more visible */}
-      <div className="relative z-10 container mx-auto px-4 text-center pt-32 sm:pt-52 md:pt-64 lg:pt-72">
+      <div className="relative z-10 container mx-auto px-4 text-center pt-24 sm:pt-32 md:pt-40 lg:pt-48">
         <div className="max-w-4xl mx-auto animate-slide-up">
           {/* Hero Text */}
           <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${language === 'ar' ? 'mb-8' : 'mb-16'}`} dir={isRTL ? 'rtl' : 'ltr'}>
