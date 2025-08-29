@@ -318,10 +318,6 @@ export type Database = {
         Args: { booking_uuid: string }
         Returns: boolean
       }
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
       get_listing_average_rating: {
         Args: { listing_uuid: string }
         Returns: {
