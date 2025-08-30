@@ -11,7 +11,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign, MessageCircle, Phone } from "lucide-react";
-
+import LocationAutocomplete from "@/components/LocationAutocomplete";
+import GoogleMap from "@/components/GoogleMap";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
 import { AMENITIES, getAmenityLabel } from "@/lib/amenities";
@@ -28,6 +29,8 @@ const CreateListing = () => {
     name: '',
     description: '',
     location: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
     price_per_night_usd: '',
     price_per_night_syp: '',
     max_guests: '2',
@@ -78,6 +81,8 @@ const CreateListing = () => {
           name: formData.name,
           description: formData.description,
           location: formData.location,
+          latitude: formData.latitude,
+          longitude: formData.longitude,
           price_per_night_usd: parseFloat(formData.price_per_night_usd),
           price_per_night_syp: formData.price_per_night_syp ? parseFloat(formData.price_per_night_syp) : null,
           max_guests: parseInt(formData.max_guests),
@@ -85,7 +90,6 @@ const CreateListing = () => {
           bathrooms: parseInt(formData.bathrooms),
           amenities: formData.amenities,
           images: sanitizedImages,
-
           status: 'pending'
         });
 
@@ -239,21 +243,63 @@ const CreateListing = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="location">{language === 'ar' ? 'الموقع *' : 'Location *'}</Label>
-                    <Input
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      placeholder={language === 'ar' ? 'مثال: دمشق، المالكي، شارع الجلاء' : 'Example: Damascus, Malki, Jalaa Street'}
-                      required
-                      className="mt-1"
+                    <LocationAutocomplete
+                      onLocationSelect={(location) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          location: location.address,
+                          latitude: location.lat,
+                          longitude: location.lng
+                        }));
+                      }}
+                      defaultValue={formData.location}
+                      placeholder={language === 'ar' ? 'البحث عن الموقع...' : 'Search for location...'}
+                      label={language === 'ar' ? 'الموقع *' : 'Location *'}
+                      language={language as 'ar' | 'en'}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       {language === 'ar' 
-                        ? 'أدخل العنوان الكامل للعقار بما في ذلك المدينة والحي والشارع' 
-                        : 'Enter the complete address including city, neighborhood, and street'}
+                        ? 'ابحث عن العنوان الكامل للعقار وحدد الموقع على الخريطة' 
+                        : 'Search for the complete property address and select location on map'}
                     </p>
+
+                    {/* Map Preview */}
+                    {formData.latitude && formData.longitude && (
+                      <div className="mt-4">
+                        <Label className="text-sm font-medium">
+                          {language === 'ar' ? 'موقع العقار على الخريطة' : 'Property Location on Map'}
+                        </Label>
+                        <div className="mt-2 border rounded-lg overflow-hidden">
+                          <GoogleMap
+                            lat={formData.latitude}
+                            lng={formData.longitude}
+                            zoom={15}
+                            height="200px"
+                            markers={[{
+                              lat: formData.latitude,
+                              lng: formData.longitude,
+                              title: formData.name || 'موقع العقار',
+                              info: formData.location
+                            }]}
+                            enableGeocoding={true}
+                            onLocationSelect={(lat, lng, address) => {
+                              setFormData(prev => ({
+                                ...prev,
+                                latitude: lat,
+                                longitude: lng,
+                                location: address || prev.location
+                              }));
+                            }}
+                            clickable={true}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {language === 'ar' 
+                            ? 'يمكنك النقر على الخريطة لضبط الموقع بدقة أكبر' 
+                            : 'Click on the map to adjust the location more precisely'}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -23,6 +23,7 @@ import ContactUs from "./pages/ContactUs";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import BecomeHost from "./pages/BecomeHost";
 import EditListing from "./pages/EditListing";
+import InteractiveMapView from "./components/InteractiveMapView";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/browse" element={<PropertyBrowse />} />
+            <Route path="/map" element={<InteractiveMapView />} />
             <Route path="/host-dashboard" element={<HostDashboard />} />
             <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/edit-listing/:id" element={<EditListing />} />

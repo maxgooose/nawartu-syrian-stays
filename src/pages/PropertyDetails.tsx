@@ -323,8 +323,12 @@ const PropertyDetails = () => {
                         markers={[{
                           lat: listing.latitude,
                           lng: listing.longitude,
-                          title: listing.name
+                          title: listing.name,
+                          info: listing.description
                         }]}
+                        showNearbyPlaces={true}
+                        showDistanceToMajorCities={true}
+                        enableGeocoding={true}
                       />
                     </div>
                   </div>

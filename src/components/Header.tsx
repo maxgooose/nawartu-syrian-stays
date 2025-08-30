@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Globe, Menu, X, User, LogOut, Shield } from "lucide-react";
+import { Globe, Menu, X, User, LogOut, Shield, MapPin } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,6 +47,9 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
             </Link>
             <Link to="/browse" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
               {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+            </Link>
+            <Link to="/map" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+              {language === 'ar' ? 'الخريطة التفاعلية' : 'Interactive Map'}
             </Link>
             {profile?.role === 'host' && (
               <Link to="/host-dashboard" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
@@ -113,6 +116,10 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                     <User className="mr-2 h-4 w-4" />
                     {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/map')}>
+                    <MapPin className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? 'الخريطة التفاعلية' : 'Interactive Map'}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/profile')}>
                     <User className="mr-2 h-4 w-4" />
                     {language === 'ar' ? 'الملف الشخصي' : 'Profile'}
@@ -167,6 +174,13 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+              </Link>
+              <Link 
+                to="/map" 
+                className="text-foreground hover:text-primary transition-colors py-2 border-b border-border/50"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {language === 'ar' ? 'الخريطة التفاعلية' : 'Interactive Map'}
               </Link>
               {profile?.role === 'host' && (
                 <Link 
