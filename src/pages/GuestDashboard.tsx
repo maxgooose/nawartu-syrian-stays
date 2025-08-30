@@ -461,7 +461,7 @@ const GuestDashboard = () => {
                       <div className="flex items-center justify-between">
                         <div className="text-arabic">
                           <span className="text-sm font-medium text-gray-400">
-                            ${listing.price_per_night}
+                            ${listing.price_per_night_usd}
                           </span>
                           <span className="text-xs text-gray-400"> / ليلة</span>
                         </div>
