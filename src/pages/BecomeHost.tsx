@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useHostUpgrade } from "@/hooks/useHostUpgrade";
 import { Home, Users, DollarSign, Shield, ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const BecomeHost = () => {
   const [motivation, setMotivation] = useState("");
@@ -14,14 +15,16 @@ const BecomeHost = () => {
   const { isLoading, upgradeToHost } = useHostUpgrade();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
 
-    const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user || !profile) {
       toast({
-        title: "Authentication Required",
-        description: "Please log in to become a host.",
+        title: language === 'ar' ? "المصادقة مطلوبة" : "Authentication Required",
+        description: language === 'ar' ? "يرجى تسجيل الدخول لتصبح مضيفاً." : "Please log in to become a host.",
         variant: "destructive",
       });
       navigate("/auth");
@@ -30,8 +33,8 @@ const BecomeHost = () => {
 
     if (profile.role === "host") {
       toast({
-        title: "Already a Host",
-        description: "You are already registered as a host!",
+        title: language === 'ar' ? "أنت مضيف بالفعل" : "Already a Host",
+        description: language === 'ar' ? "أنت مسجل بالفعل كمضيف!" : "You are already registered as a host!",
       });
       navigate("/host-dashboard");
       return;
@@ -47,15 +50,15 @@ const BecomeHost = () => {
         await refreshProfile();
 
         toast({
-          title: "Welcome to Hosting!",
-          description: "You are now a host. Start adding your first property!",
+          title: language === 'ar' ? "مرحباً بك في الاستضافة!" : "Welcome to Hosting!",
+          description: language === 'ar' ? "أنت الآن مضيف. ابدأ بإضافة عقارك الأول!" : "You are now a host. Start adding your first property!",
         });
 
         navigate("/host-dashboard");
       } else {
         // Upgrade failed
         toast({
-          title: "Upgrade Failed",
+          title: language === 'ar' ? "فشل الترقية" : "Upgrade Failed",
           description: result.message,
           variant: "destructive",
         });
@@ -63,8 +66,8 @@ const BecomeHost = () => {
     } catch (error) {
       console.error("Error becoming host:", error);
       toast({
-        title: "Error",
-        description: "Failed to register as host. Please try again.",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "فشل في التسجيل كمضيف. يرجى المحاولة مرة أخرى." : "Failed to register as host. Please try again.",
         variant: "destructive",
       });
     }
@@ -72,15 +75,19 @@ const BecomeHost = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle>Authentication Required</CardTitle>
-            <CardDescription>Please log in to become a host</CardDescription>
+            <CardTitle>
+              {language === 'ar' ? 'المصادقة مطلوبة' : 'Authentication Required'}
+            </CardTitle>
+            <CardDescription>
+              {language === 'ar' ? 'يرجى تسجيل الدخول لتصبح مضيفاً' : 'Please log in to become a host'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate("/auth")} className="w-full">
-              Sign In
+              {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
             </Button>
           </CardContent>
         </Card>
@@ -90,15 +97,19 @@ const BecomeHost = () => {
 
   if (profile?.role === "host") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle>Already a Host!</CardTitle>
-            <CardDescription>You're already registered as a host</CardDescription>
+            <CardTitle>
+              {language === 'ar' ? 'أنت مضيف بالفعل!' : 'Already a Host!'}
+            </CardTitle>
+            <CardDescription>
+              {language === 'ar' ? 'أنت مسجل بالفعل كمضيف' : "You're already registered as a host"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate("/host-dashboard")} className="w-full">
-              Go to Host Dashboard
+              {language === 'ar' ? 'اذهب إلى لوحة المضيف' : 'Go to Host Dashboard'}
             </Button>
           </CardContent>
         </Card>
@@ -107,7 +118,7 @@ const BecomeHost = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-accent/10">
+    <div className="min-h-screen bg-gradient-to-br from-background to-accent/10" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
@@ -118,17 +129,20 @@ const BecomeHost = () => {
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Home
+              {language === 'ar' ? 'العودة للرئيسية' : 'Back to Home'}
             </Button>
           </div>
 
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground mb-4">
-              Become a Host
+              {language === 'ar' ? 'كن مضيفاً' : 'Become a Host'}
             </h1>
             <p className="text-xl text-muted-foreground">
-              Share your space and earn money while helping travelers discover amazing places
+              {language === 'ar' 
+                ? 'شارك مساحتك واكسب المال بينما تساعد المسافرين على اكتشاف أماكن مذهلة'
+                : 'Share your space and earn money while helping travelers discover amazing places'
+              }
             </p>
           </div>
 
@@ -137,9 +151,14 @@ const BecomeHost = () => {
             <Card className="text-center">
               <CardContent className="pt-6">
                 <Home className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">List Your Space</h3>
+                <h3 className="font-semibold mb-2">
+                  {language === 'ar' ? 'أدرج مساحتك' : 'List Your Space'}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  Share your home, apartment, or room with travelers
+                  {language === 'ar' 
+                    ? 'شارك منزلك أو شقتك أو غرفتك مع المسافرين'
+                    : 'Share your home, apartment, or room with travelers'
+                  }
                 </p>
               </CardContent>
             </Card>
@@ -147,9 +166,14 @@ const BecomeHost = () => {
             <Card className="text-center">
               <CardContent className="pt-6">
                 <DollarSign className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Earn Money</h3>
+                <h3 className="font-semibold mb-2">
+                  {language === 'ar' ? 'اكسب المال' : 'Earn Money'}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  Set your own prices and earn from your property
+                  {language === 'ar' 
+                    ? 'حدد أسعارك الخاصة واكسب من عقارك'
+                    : 'Set your own prices and earn from your property'
+                  }
                 </p>
               </CardContent>
             </Card>
@@ -157,9 +181,14 @@ const BecomeHost = () => {
             <Card className="text-center">
               <CardContent className="pt-6">
                 <Users className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Meet People</h3>
+                <h3 className="font-semibold mb-2">
+                  {language === 'ar' ? 'تعرف على أشخاص' : 'Meet People'}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  Connect with travelers from around the world
+                  {language === 'ar' 
+                    ? 'تواصل مع المسافرين من جميع أنحاء العالم'
+                    : 'Connect with travelers from around the world'
+                  }
                 </p>
               </CardContent>
             </Card>
@@ -167,9 +196,14 @@ const BecomeHost = () => {
             <Card className="text-center">
               <CardContent className="pt-6">
                 <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Secure Platform</h3>
+                <h3 className="font-semibold mb-2">
+                  {language === 'ar' ? 'منصة آمنة' : 'Secure Platform'}
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  Protected payments and verified guests
+                  {language === 'ar' 
+                    ? 'مدفوعات محمية وضيوف موثقون'
+                    : 'Protected payments and verified guests'
+                  }
                 </p>
               </CardContent>
             </Card>
@@ -178,21 +212,32 @@ const BecomeHost = () => {
           {/* Registration Form */}
           <Card className="max-w-2xl mx-auto">
             <CardHeader>
-              <CardTitle>Ready to Get Started?</CardTitle>
+              <CardTitle>
+                {language === 'ar' ? 'مستعد للبدء؟' : 'Ready to Get Started?'}
+              </CardTitle>
               <CardDescription>
-                Join our community of hosts and start sharing your space today
+                {language === 'ar' 
+                  ? 'انضم إلى مجتمع المضيفين لدينا وابدأ بمشاركة مساحتك اليوم'
+                  : 'Join our community of hosts and start sharing your space today'
+                }
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Why do you want to become a host? (Optional)
+                    {language === 'ar' 
+                      ? 'لماذا تريد أن تصبح مضيفاً؟ (اختياري)'
+                      : 'Why do you want to become a host? (Optional)'
+                    }
                   </label>
                   <Textarea
                     value={motivation}
                     onChange={(e) => setMotivation(e.target.value)}
-                    placeholder="Tell us what motivates you to share your space..."
+                    placeholder={language === 'ar' 
+                      ? 'أخبرنا ما الذي يحفزك لمشاركة مساحتك...'
+                      : 'Tell us what motivates you to share your space...'
+                    }
                     rows={4}
                   />
                 </div>
@@ -204,14 +249,17 @@ const BecomeHost = () => {
                     onClick={() => navigate("/")}
                     className="flex-1"
                   >
-                    Cancel
+                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
                   </Button>
                   <Button
                     type="submit"
                     disabled={isLoading}
                     className="flex-1"
                   >
-                    {isLoading ? "Processing..." : "Become a Host"}
+                    {isLoading 
+                      ? (language === 'ar' ? "جاري المعالجة..." : "Processing...") 
+                      : (language === 'ar' ? "كن مضيفاً" : "Become a Host")
+                    }
                   </Button>
                 </div>
               </form>
@@ -221,13 +269,13 @@ const BecomeHost = () => {
           {/* Additional Info */}
           <div className="mt-12 text-center">
             <p className="text-muted-foreground">
-              By becoming a host, you agree to our{" "}
+              {language === 'ar' ? 'بأن تصبح مضيفاً، فإنك توافق على' : 'By becoming a host, you agree to our'}{" "}
               <a href="/terms" className="text-primary hover:underline">
-                Terms of Service
+                {language === 'ar' ? 'شروط الخدمة' : 'Terms of Service'}
               </a>{" "}
-              and{" "}
+              {language === 'ar' ? 'و' : 'and'}{" "}
               <a href="/guidelines" className="text-primary hover:underline">
-                Property Guidelines
+                {language === 'ar' ? 'إرشادات العقارات' : 'Property Guidelines'}
               </a>
             </p>
           </div>

@@ -5,9 +5,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const TermsOfService = () => {
   const { language, handleLanguageChange } = useLanguage();
+  const isRTL = language === 'ar';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir={isRTL ? 'rtl' : 'ltr'}>
       <Header language={language} onLanguageChange={handleLanguageChange} />
       <main className="container-custom py-8">
         <div className="max-w-4xl mx-auto">
@@ -102,52 +103,73 @@ const TermsOfService = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-primary mb-4">5. Host Responsibilities</h2>
+              <h2 className="text-2xl font-semibold text-primary mb-4">
+                {language === 'ar' ? '5. مسؤوليات المضيف' : '5. Host Responsibilities'}
+              </h2>
               <ul className="list-disc ml-6 text-foreground space-y-2">
-                <li>Provide accurate and updated property details.</li>
-                <li>Maintain cleanliness, safety, and legal compliance.</li>
-                <li>Respond promptly to inquiries and booking confirmations.</li>
+                <li>{language === 'ar' ? 'تقديم تفاصيل العقار بدقة وتحديثها.' : 'Provide accurate and updated property details.'}</li>
+                <li>{language === 'ar' ? 'الحفاظ على النظافة والأمان والامتثال القانوني.' : 'Maintain cleanliness, safety, and legal compliance.'}</li>
+                <li>{language === 'ar' ? 'الرد بسرعة على الاستفسارات وتأكيدات الحجز.' : 'Respond promptly to inquiries and booking confirmations.'}</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-primary mb-4">6. Guest Responsibilities</h2>
+              <h2 className="text-2xl font-semibold text-primary mb-4">
+                {language === 'ar' ? '6. مسؤوليات الضيف' : '6. Guest Responsibilities'}
+              </h2>
               <ul className="list-disc ml-6 text-foreground space-y-2">
-                <li>Follow house rules and respect the property and neighbors.</li>
-                <li>Avoid damage, illegal activities, or unauthorized use.</li>
+                <li>{language === 'ar' ? 'اتباع قواعد المنزل واحترام العقار والجيران.' : 'Follow house rules and respect the property and neighbors.'}</li>
+                <li>{language === 'ar' ? 'تجنب الأضرار أو الأنشطة غير القانونية أو الاستخدام غير المصرح به.' : 'Avoid damage, illegal activities, or unauthorized use.'}</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-primary mb-4">7. Liability & Insurance</h2>
+              <h2 className="text-2xl font-semibold text-primary mb-4">
+                {language === 'ar' ? '7. المسؤولية والتأمين' : '7. Liability & Insurance'}
+              </h2>
               <p className="text-foreground leading-relaxed">
-                Nawartu is not liable for accidents, damages, or disputes during stays.
-                We recommend both hosts and guests have personal or property insurance.
+                {language === 'ar' 
+                  ? 'نوارتو غير مسؤولة عن الحوادث أو الأضرار أو النزاعات أثناء الإقامة. نوصي بأن يكون لدى كل من المضيفين والضيوف تأمين شخصي أو على الممتلكات.'
+                  : 'Nawartu is not liable for accidents, damages, or disputes during stays. We recommend both hosts and guests have personal or property insurance.'
+                }
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-primary mb-4">8. Data & Privacy</h2>
+              <h2 className="text-2xl font-semibold text-primary mb-4">
+                {language === 'ar' ? '8. البيانات والخصوصية' : '8. Data & Privacy'}
+              </h2>
               <p className="text-foreground leading-relaxed">
-                User data is stored and processed securely and in compliance with Syrian laws.
-                Users may request account deletion at any time; essential data may be retained for legal purposes.
+                {language === 'ar' 
+                  ? 'يتم تخزين ومعالجة بيانات المستخدم بأمان ووفقاً للقوانين السورية. يمكن للمستخدمين طلب حذف الحساب في أي وقت؛ قد يتم الاحتفاظ بالبيانات الأساسية لأغراض قانونية.'
+                  : 'User data is stored and processed securely and in compliance with Syrian laws. Users may request account deletion at any time; essential data may be retained for legal purposes.'
+                }
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-primary mb-4">9. Account Suspension or Termination</h2>
-              <p className="text-foreground leading-relaxed mb-4">Accounts may be suspended or removed for:</p>
+              <h2 className="text-2xl font-semibold text-primary mb-4">
+                {language === 'ar' ? '9. تعليق أو إنهاء الحساب' : '9. Account Suspension or Termination'}
+              </h2>
+              <p className="text-foreground leading-relaxed mb-4">
+                {language === 'ar' ? 'قد يتم تعليق أو إزالة الحسابات لـ:' : 'Accounts may be suspended or removed for:'}
+              </p>
               <ul className="list-disc ml-6 text-foreground space-y-2">
-                <li>Breaching policies</li>
-                <li>Fraudulent or harmful activities</li>
-                <li>Legal or regulatory requests</li>
+                <li>{language === 'ar' ? 'خرق السياسات' : 'Breaching policies'}</li>
+                <li>{language === 'ar' ? 'الأنشطة الاحتيالية أو الضارة' : 'Fraudulent or harmful activities'}</li>
+                <li>{language === 'ar' ? 'الطلبات القانونية أو التنظيمية' : 'Legal or regulatory requests'}</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-primary mb-4">10. Governing Law</h2>
+              <h2 className="text-2xl font-semibold text-primary mb-4">
+                {language === 'ar' ? '10. القانون الحاكم' : '10. Governing Law'}
+              </h2>
               <p className="text-foreground leading-relaxed">
-                These terms are governed by the laws of the Syrian Arab Republic.
+                {language === 'ar' 
+                  ? 'تخضع هذه الشروط لقوانين الجمهورية العربية السورية.'
+                  : 'These terms are governed by the laws of the Syrian Arab Republic.'
+                }
               </p>
             </section>
           </div>

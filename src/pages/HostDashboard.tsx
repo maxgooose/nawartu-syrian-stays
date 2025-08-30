@@ -100,8 +100,8 @@ const HostDashboard = () => {
       setBookings(bookingsData || []);
     } catch (error: any) {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ في تحميل البيانات",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "حدث خطأ في تحميل البيانات" : "Error loading data",
         variant: "destructive",
       });
     } finally {
@@ -120,12 +120,12 @@ const HostDashboard = () => {
     } as const;
     
     const labels = {
-      pending: 'قيد المراجعة',
-      approved: 'مُعتمد',
-      rejected: 'مرفوض',
-      confirmed: 'مؤكد',
-      cancelled: 'ملغى',
-      completed: 'مكتمل'
+      pending: language === 'ar' ? 'قيد المراجعة' : 'Pending',
+      approved: language === 'ar' ? 'مُعتمد' : 'Approved',
+      rejected: language === 'ar' ? 'مرفوض' : 'Rejected',
+      confirmed: language === 'ar' ? 'مؤكد' : 'Confirmed',
+      cancelled: language === 'ar' ? 'ملغى' : 'Cancelled',
+      completed: language === 'ar' ? 'مكتمل' : 'Completed'
     };
 
     return (
@@ -137,7 +137,7 @@ const HostDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p>{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
@@ -248,7 +248,7 @@ const HostDashboard = () => {
                           onClick={() => navigate(`/property/${listing.id}`)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          {language === 'ar' ? 'عرض' : 'View'}
+                          {language === 'ar' ? 'احجز' : 'Book'}
                         </Button>
                         <Button 
                           variant="outline" 

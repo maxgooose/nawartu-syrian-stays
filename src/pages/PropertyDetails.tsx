@@ -29,11 +29,13 @@ import {
   Coffee,
   Shield,
   Tv,
-  Wind
+  Wind,
+  ArrowLeft
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays, addDays } from "date-fns";
 import { getPublicImageUrl } from "@/lib/utils";
+import CardDetails from "@/components/CardDetails";
 
 interface Listing {
   id: string;
@@ -78,8 +80,11 @@ const PropertyDetails = () => {
   const [guests, setGuests] = useState('2');
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'cash'>('stripe');
   const [specialRequests, setSpecialRequests] = useState('');
+  const [showCardDetails, setShowCardDetails] = useState(false);
+  const [currentBookingId, setCurrentBookingId] = useState<string>('');
 
   const { language } = useLanguage();
+  const isRTL = language === 'ar';
 
   useEffect(() => {
     if (id) {
@@ -103,11 +108,11 @@ const PropertyDetails = () => {
       setListing(data);
     } catch (error: any) {
       toast({
-        title: "خطأ",
-        description: "لم يتم العثور على العقار",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "لم يتم العثور على العقار" : "Property not found",
         variant: "destructive",
       });
-      navigate('/guest-dashboard');
+      navigate('/');
     } finally {
       setLoading(false);
     }
@@ -132,8 +137,8 @@ const PropertyDetails = () => {
 
     if (!checkInDate || !checkOutDate) {
       toast({
-        title: "خطأ",
-        description: "يرجى اختيار تواريخ الإقامة",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "يرجى اختيار تواريخ الإقامة" : "Please select check-in and check-out dates",
         variant: "destructive",
       });
       return;
@@ -142,8 +147,8 @@ const PropertyDetails = () => {
     const nights = calculateTotalNights();
     if (nights <= 0) {
       toast({
-        title: "خطأ",
-        description: "تاريخ المغادرة يجب أن يكون بعد تاريخ الوصول",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "تاريخ المغادرة يجب أن يكون بعد تاريخ الوصول" : "Check-out date must be after check-in date",
         variant: "destructive",
       });
       return;
@@ -170,52 +175,80 @@ const PropertyDetails = () => {
 
       if (error) throw error;
 
-      if (paymentMethod === 'stripe') {
-        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-stripe-checkout', {
+      // Send booking confirmation email immediately
+      try {
+        await supabase.functions.invoke('send-booking-confirmation', {
           body: {
-            bookingId: bookingData.id,
-            totalAmount: calculateTotalAmount(),
+            guestEmail: profile.email,
+            guestName: profile.full_name || profile.email,
             listingName: listing.name,
-            nights: nights
+            listingLocation: listing.location,
+            checkInDate: format(checkInDate, 'yyyy-MM-dd'),
+            checkOutDate: format(checkOutDate, 'yyyy-MM-dd'),
+            totalNights: nights,
+            totalAmount: calculateTotalAmount(),
+            paymentMethod: paymentMethod,
+            bookingId: bookingData.id
           }
         });
-
-        if (checkoutError) throw checkoutError;
-        window.open(checkoutData.url, '_blank');
-        
-        toast({
-          title: "تم إنشاء الحجز",
-          description: "تم فتح صفحة الدفع في نافذة جديدة.",
-        });
-      } else {
-        toast({
-          title: "تم بنجاح",
-          description: "تم إرسال طلب الحجز. سيتم التواصل معك قريباً.",
-        });
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Don't fail the booking if email fails
       }
 
-      setCheckInDate(undefined);
-      setCheckOutDate(undefined);
-      setGuests('2');
-      setSpecialRequests('');
+      if (paymentMethod === 'stripe') {
+        // Show card details form instead of redirecting to Stripe
+        setCurrentBookingId(bookingData.id);
+        setShowCardDetails(true);
+        setBookingLoading(false);
+      } else {
+        toast({
+          title: language === 'ar' ? "تم بنجاح" : "Success",
+          description: language === 'ar' ? "تم إرسال طلب الحجز. سيتم التواصل معك قريباً." : "Booking request sent. We'll contact you soon.",
+        });
+
+        setCheckInDate(undefined);
+        setCheckOutDate(undefined);
+        setGuests('2');
+        setSpecialRequests('');
+        setBookingLoading(false);
+      }
 
     } catch (error: any) {
       toast({
-        title: "خطأ",
-        description: error.message || "حدث خطأ في إرسال طلب الحجز",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: error.message || (language === 'ar' ? "حدث خطأ في إرسال طلب الحجز" : "Error sending booking request"),
         variant: "destructive",
       });
-    } finally {
       setBookingLoading(false);
     }
   };
 
+  const handleCardPaymentSuccess = (paymentIntentId: string) => {
+    // Reset form
+    setCheckInDate(undefined);
+    setCheckOutDate(undefined);
+    setGuests('2');
+    setSpecialRequests('');
+    setShowCardDetails(false);
+    setCurrentBookingId('');
+    
+    // Navigate to success page or show success message
+    navigate(`/payment-success?booking_id=${currentBookingId}`);
+  };
+
+  const handleCardPaymentClose = () => {
+    setShowCardDetails(false);
+    setCurrentBookingId('');
+    setBookingLoading(false);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>جاري التحميل...</p>
+          <p>{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
         </div>
       </div>
     );
@@ -223,11 +256,11 @@ const PropertyDetails = () => {
 
   if (!listing) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
         <Card className="text-center p-8">
-          <p>لم يتم العثور على العقار</p>
-          <Button onClick={() => navigate('/guest-dashboard')} className="mt-4">
-            العودة للرئيسية
+          <p>{language === 'ar' ? 'لم يتم العثور على العقار' : 'Property not found'}</p>
+          <Button onClick={() => navigate('/')} className="mt-4">
+            {language === 'ar' ? 'العودة للرئيسية' : 'Back to Home'}
           </Button>
         </Card>
       </div>
@@ -235,16 +268,26 @@ const PropertyDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pattern-geometric-stars" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-custom py-6">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/guest-dashboard')}
-          className="mb-6 flex items-center gap-2"
-        >
-          <ArrowRight className="h-4 w-4" />
-          العودة للتصفح
-        </Button>
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              // Try to go back in history, fallback to homepage
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate('/');
+              }
+            }}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {language === 'ar' ? 'العودة' : 'Go Back'}
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Property Details */}
@@ -260,7 +303,9 @@ const PropertyDetails = () => {
                   />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground">لا توجد صور</p>
+                    <p className="text-muted-foreground">
+                      {language === 'ar' ? 'لا توجد صور' : 'No images available'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -279,15 +324,15 @@ const PropertyDetails = () => {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
-                    <span>{listing.max_guests} ضيوف</span>
+                    <span>{listing.max_guests} {language === 'ar' ? 'ضيوف' : 'guests'}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Bed className="h-4 w-4" />
-                    <span>{listing.bedrooms} غرف نوم</span>
+                    <span>{listing.bedrooms} {language === 'ar' ? 'غرف نوم' : 'bedrooms'}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Bath className="h-4 w-4" />
-                    <span>{listing.bathrooms} حمامات</span>
+                    <span>{listing.bathrooms} {language === 'ar' ? 'حمامات' : 'bathrooms'}</span>
                   </div>
                 </div>
 
@@ -296,14 +341,25 @@ const PropertyDetails = () => {
                 {/* Amenities */}
                 {listing.amenities && listing.amenities.length > 0 && (
                   <div>
-                    <h3 className="font-semibold mb-2">المرافق</h3>
+                    <h3 className="font-semibold mb-2">
+                      {language === 'ar' ? 'المرافق' : 'Amenities'}
+                    </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {listing.amenities.map((amenity, index) => {
                         const IconComponent = amenityIcons[amenity] || Shield;
+                        const amenityLabels: Record<string, { ar: string; en: string }> = {
+                          wifi: { ar: 'واي فاي', en: 'WiFi' },
+                          parking: { ar: 'موقف سيارات', en: 'Parking' },
+                          air_conditioning: { ar: 'مكيف هواء', en: 'Air Conditioning' },
+                          kitchen: { ar: 'مطبخ', en: 'Kitchen' },
+                          tv: { ar: 'تلفاز', en: 'TV' },
+                          security: { ar: 'أمان', en: 'Security' }
+                        };
+                        const label = amenityLabels[amenity] || { ar: amenity.replace(/_/g, ' '), en: amenity.replace(/_/g, ' ') };
                         return (
                           <div key={index} className="flex items-center gap-2">
                             <IconComponent className="h-4 w-4" />
-                            <span className="text-sm">{amenity.replace(/_/g, ' ')}</span>
+                            <span className="text-sm">{language === 'ar' ? label.ar : label.en}</span>
                           </div>
                         );
                       })}
@@ -314,7 +370,9 @@ const PropertyDetails = () => {
                 {/* Map */}
                 {listing.latitude && listing.longitude && (
                   <div>
-                    <h3 className="font-semibold mb-2">الموقع</h3>
+                    <h3 className="font-semibold mb-2">
+                      {language === 'ar' ? 'الموقع' : 'Location'}
+                    </h3>
                     <div className="h-64 rounded-lg overflow-hidden">
                       <GoogleMap
                         lat={listing.latitude}
@@ -346,18 +404,20 @@ const PropertyDetails = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>${listing.price_per_night_usd}</span>
-                  <span className="text-sm font-normal">/ ليلة</span>
+                  <span className="text-sm font-normal">
+                    / {language === 'ar' ? 'ليلة' : 'night'}
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Check-in Date */}
                 <div>
-                  <Label>تاريخ الوصول</Label>
+                  <Label>{language === 'ar' ? 'تاريخ الوصول' : 'Check-in Date'}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-start">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkInDate ? format(checkInDate, 'PPP') : "اختر التاريخ"}
+                        {checkInDate ? format(checkInDate, 'PPP') : (language === 'ar' ? "اختر التاريخ" : "Select Date")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -374,12 +434,12 @@ const PropertyDetails = () => {
 
                 {/* Check-out Date */}
                 <div>
-                  <Label>تاريخ المغادرة</Label>
+                  <Label>{language === 'ar' ? 'تاريخ المغادرة' : 'Check-out Date'}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-start">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkOutDate ? format(checkOutDate, 'PPP') : "اختر التاريخ"}
+                        {checkOutDate ? format(checkOutDate, 'PPP') : (language === 'ar' ? "اختر التاريخ" : "Select Date")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -396,7 +456,7 @@ const PropertyDetails = () => {
 
                 {/* Guests */}
                 <div>
-                  <Label>عدد الضيوف</Label>
+                  <Label>{language === 'ar' ? 'عدد الضيوف' : 'Number of Guests'}</Label>
                   <Select value={guests} onValueChange={setGuests}>
                     <SelectTrigger>
                       <SelectValue />
@@ -404,7 +464,7 @@ const PropertyDetails = () => {
                     <SelectContent>
                       {Array.from({ length: listing.max_guests }, (_, i) => (
                         <SelectItem key={i + 1} value={(i + 1).toString()}>
-                          {i + 1} {i + 1 === 1 ? 'ضيف' : 'ضيوف'}
+                          {i + 1} {i + 1 === 1 ? (language === 'ar' ? 'ضيف' : 'guest') : (language === 'ar' ? 'ضيوف' : 'guests')}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -413,7 +473,7 @@ const PropertyDetails = () => {
 
                 {/* Payment Method */}
                 <div>
-                  <Label>طريقة الدفع</Label>
+                  <Label>{language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}</Label>
                   <Select value={paymentMethod} onValueChange={(value: 'stripe' | 'cash') => setPaymentMethod(value)}>
                     <SelectTrigger>
                       <SelectValue />
@@ -422,26 +482,51 @@ const PropertyDetails = () => {
                       <SelectItem value="stripe">
                         <div className="flex items-center gap-2">
                           <CreditCard className="h-4 w-4" />
-                          <span>كرت ائتماني</span>
+                          <span>{language === 'ar' ? 'كرت ائتماني' : 'Credit Card'}</span>
                         </div>
                       </SelectItem>
                       <SelectItem value="cash">
                         <div className="flex items-center gap-2">
                           <Banknote className="h-4 w-4" />
-                          <span>نقداً</span>
+                          <span>{language === 'ar' ? 'نقداً' : 'Cash'}</span>
                         </div>
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                  
+                  {/* Payment method info */}
+                  {paymentMethod === 'stripe' && (
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <CreditCard className="h-4 w-4 text-blue-600 mt-0.5" />
+                        <div className="text-sm text-blue-800">
+                          <p className="font-medium">{language === 'ar' ? 'الدفع الفوري' : 'Instant Payment'}</p>
+                          <p className="text-xs">{language === 'ar' ? 'سيتم خصم المبلغ فوراً من بطاقتك' : 'Amount will be charged immediately from your card'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {paymentMethod === 'cash' && (
+                    <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <Banknote className="h-4 w-4 text-amber-600 mt-0.5" />
+                        <div className="text-sm text-amber-800">
+                          <p className="font-medium">{language === 'ar' ? 'الدفع عند الوصول' : 'Pay on Arrival'}</p>
+                          <p className="text-xs">{language === 'ar' ? 'سيتم التواصل معك لتأكيد الحجز' : 'We will contact you to confirm the booking'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Special Requests */}
                 <div>
-                  <Label>طلبات خاصة (اختياري)</Label>
+                  <Label>{language === 'ar' ? 'طلبات خاصة (اختياري)' : 'Special Requests (Optional)'}</Label>
                   <Textarea
                     value={specialRequests}
                     onChange={(e) => setSpecialRequests(e.target.value)}
-                    placeholder="أدخل أي طلبات خاصة..."
+                    placeholder={language === 'ar' ? "أدخل أي طلبات خاصة..." : "Enter any special requests..."}
                     rows={3}
                   />
                 </div>
@@ -450,7 +535,9 @@ const PropertyDetails = () => {
                 {checkInDate && checkOutDate && (
                   <div className="pt-4 border-t">
                     <div className="flex justify-between text-lg font-semibold">
-                      <span>المجموع ({calculateTotalNights()} ليالي)</span>
+                      <span>
+                        {language === 'ar' ? 'المجموع' : 'Total'} ({calculateTotalNights()} {language === 'ar' ? 'ليالي' : 'nights'})
+                      </span>
                       <span>${calculateTotalAmount()}</span>
                     </div>
                   </div>
@@ -463,12 +550,23 @@ const PropertyDetails = () => {
                   className="w-full"
                   size="lg"
                 >
-                  {bookingLoading ? "جاري الحجز..." : "احجز الآن"}
+                  {bookingLoading ? (language === 'ar' ? "جاري الحجز..." : "Booking...") : (language === 'ar' ? "احجز الآن" : "Book Now")}
                 </Button>
               </CardContent>
             </Card>
           </div>
         </div>
+
+        {/* Card Details Modal */}
+        <CardDetails
+          isOpen={showCardDetails}
+          onClose={handleCardPaymentClose}
+          onSuccess={handleCardPaymentSuccess}
+          amount={calculateTotalAmount()}
+          bookingId={currentBookingId}
+          listingName={listing?.name || ''}
+          nights={calculateTotalNights()}
+        />
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Calendar, MapPin, Users, CreditCard, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookingDetails {
   id: string;
@@ -25,6 +26,8 @@ const PaymentSuccess = () => {
   const { toast } = useToast();
   const [booking, setBooking] = useState<BookingDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
 
   const bookingId = searchParams.get('booking_id');
 
@@ -60,15 +63,19 @@ const PaymentSuccess = () => {
       }
 
       toast({
-        title: "تم الدفع بنجاح",
-        description: "تم تأكيد حجزك وسيتواصل معك فريقنا قريباً",
+        title: language === 'ar' ? "تم الدفع بنجاح" : "Payment Successful",
+        description: language === 'ar' 
+          ? "تم تأكيد حجزك وسيتواصل معك فريقنا قريباً"
+          : "Your booking has been confirmed and our team will contact you soon",
       });
 
     } catch (error: any) {
       console.error('Error fetching booking details:', error);
       toast({
-        title: "خطأ",
-        description: "لم يتم العثور على تفاصيل الحجز",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' 
+          ? "لم يتم العثور على تفاصيل الحجز"
+          : "Booking details not found",
         variant: "destructive",
       });
       navigate('/guest-dashboard');
@@ -79,10 +86,10 @@ const PaymentSuccess = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center pattern-subtle">
+      <div className="min-h-screen flex items-center justify-center pattern-subtle" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>جاري التحميل...</p>
+          <p>{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
         </div>
       </div>
     );
@@ -90,11 +97,11 @@ const PaymentSuccess = () => {
 
   if (!booking) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
         <Card className="text-center p-8">
-          <p>لم يتم العثور على تفاصيل الحجز</p>
+          <p>{language === 'ar' ? 'لم يتم العثور على تفاصيل الحجز' : 'Booking details not found'}</p>
           <Button onClick={() => navigate('/guest-dashboard')} className="mt-4">
-            العودة للحجوزات
+            {language === 'ar' ? 'العودة للحجوزات' : 'Back to Bookings'}
           </Button>
         </Card>
       </div>
@@ -102,7 +109,7 @@ const PaymentSuccess = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pattern-subtle">
+    <div className="min-h-screen bg-background pattern-subtle" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-custom py-12">
         <div className="max-w-2xl mx-auto">
           {/* Back Button */}
@@ -113,7 +120,7 @@ const PaymentSuccess = () => {
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
-              العودة للحجوزات
+              {language === 'ar' ? 'العودة للحجوزات' : 'Back to Bookings'}
             </Button>
           </div>
 
@@ -123,21 +130,24 @@ const PaymentSuccess = () => {
               <CheckCircle className="h-10 w-10 text-green-600" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              تم الدفع بنجاح!
+              {language === 'ar' ? 'تم الدفع بنجاح!' : 'Payment Successful!'}
             </h1>
             <p className="text-muted-foreground">
-              تم تأكيد حجزك وسيتواصل معك فريقنا قريباً لتأكيد التفاصيل النهائية
+              {language === 'ar' 
+                ? 'تم تأكيد حجزك وسيتواصل معك فريقنا قريباً لتأكيد التفاصيل النهائية'
+                : 'Your booking has been confirmed and our team will contact you soon to finalize the details'
+              }
             </p>
           </div>
 
           {/* Booking Details Card */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="text-xl text-center" dir="rtl">
-                تفاصيل حجزك
+              <CardTitle className="text-xl text-center">
+                {language === 'ar' ? 'تفاصيل حجزك' : 'Your Booking Details'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4" dir="rtl">
+            <CardContent className="space-y-4">
               {/* Property Info */}
               <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
                 <MapPin className="h-5 w-5 text-primary" />
@@ -152,18 +162,22 @@ const PaymentSuccess = () => {
                 <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <Calendar className="h-5 w-5 text-green-600" />
                   <div>
-                    <p className="text-sm text-muted-foreground">تاريخ الوصول</p>
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'ar' ? 'تاريخ الوصول' : 'Check-in Date'}
+                    </p>
                     <p className="font-semibold">
-                      {new Date(booking.check_in_date).toLocaleDateString('ar-SA')}
+                      {new Date(booking.check_in_date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                   <Calendar className="h-5 w-5 text-red-600" />
                   <div>
-                    <p className="text-sm text-muted-foreground">تاريخ المغادرة</p>
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'ar' ? 'تاريخ المغادرة' : 'Check-out Date'}
+                    </p>
                     <p className="font-semibold">
-                      {new Date(booking.check_out_date).toLocaleDateString('ar-SA')}
+                      {new Date(booking.check_out_date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                     </p>
                   </div>
                 </div>
@@ -174,14 +188,20 @@ const PaymentSuccess = () => {
                 <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <Users className="h-5 w-5 text-blue-600" />
                   <div>
-                    <p className="text-sm text-muted-foreground">عدد الليالي</p>
-                    <p className="font-semibold">{booking.total_nights} ليلة</p>
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'ar' ? 'عدد الليالي' : 'Number of Nights'}
+                    </p>
+                    <p className="font-semibold">
+                      {booking.total_nights} {language === 'ar' ? 'ليلة' : 'nights'}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                   <CreditCard className="h-5 w-5 text-purple-600" />
                   <div>
-                    <p className="text-sm text-muted-foreground">المبلغ المدفوع</p>
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'ar' ? 'المبلغ المدفوع' : 'Amount Paid'}
+                    </p>
                     <p className="font-semibold">${booking.total_amount_usd}</p>
                   </div>
                 </div>
@@ -189,7 +209,9 @@ const PaymentSuccess = () => {
 
               {/* Booking Reference */}
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                <p className="text-sm text-muted-foreground mb-1">رقم الحجز</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  {language === 'ar' ? 'رقم الحجز' : 'Booking Reference'}
+                </p>
                 <p className="font-mono text-lg font-semibold text-primary">{booking.id}</p>
               </div>
             </CardContent>
@@ -198,20 +220,25 @@ const PaymentSuccess = () => {
           {/* Next Steps */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="text-lg" dir="rtl">
-                الخطوات التالية
+              <CardTitle className="text-lg">
+                {language === 'ar' ? 'الخطوات التالية' : 'Next Steps'}
               </CardTitle>
             </CardHeader>
-            <CardContent dir="rtl">
+            <CardContent>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">
                     1
                   </div>
                   <div>
-                    <h4 className="font-semibold">تأكيد من فريقنا</h4>
+                    <h4 className="font-semibold">
+                      {language === 'ar' ? 'تأكيد من فريقنا' : 'Confirmation from Our Team'}
+                    </h4>
                     <p className="text-sm text-muted-foreground">
-                      سيتواصل معك فريق نوارتو خلال 24 ساعة لتأكيد تفاصيل الحجز
+                      {language === 'ar' 
+                        ? 'سيتواصل معك فريق نوارتو خلال 24 ساعة لتأكيد تفاصيل الحجز'
+                        : 'Our Nawartu team will contact you within 24 hours to confirm booking details'
+                      }
                     </p>
                   </div>
                 </div>
@@ -220,9 +247,14 @@ const PaymentSuccess = () => {
                     2
                   </div>
                   <div>
-                    <h4 className="font-semibold">معلومات الوصول</h4>
+                    <h4 className="font-semibold">
+                      {language === 'ar' ? 'معلومات الوصول' : 'Access Information'}
+                    </h4>
                     <p className="text-sm text-muted-foreground">
-                      ستصلك تعليمات الوصول وتفاصيل الاتصال قبل موعد الإقامة
+                      {language === 'ar' 
+                        ? 'ستصلك تعليمات الوصول وتفاصيل الاتصال قبل موعد الإقامة'
+                        : 'You will receive access instructions and contact details before your stay'
+                      }
                     </p>
                   </div>
                 </div>
@@ -231,9 +263,14 @@ const PaymentSuccess = () => {
                     3
                   </div>
                   <div>
-                    <h4 className="font-semibold">الاستمتاع بإقامتك</h4>
+                    <h4 className="font-semibold">
+                      {language === 'ar' ? 'الاستمتاع بإقامتك' : 'Enjoy Your Stay'}
+                    </h4>
                     <p className="text-sm text-muted-foreground">
-                      نتمنى لك إقامة مريحة وممتعة في عقارنا
+                      {language === 'ar' 
+                        ? 'نتمنى لك إقامة مريحة وممتعة في عقارنا'
+                        : 'We hope you have a comfortable and enjoyable stay at our property'
+                      }
                     </p>
                   </div>
                 </div>
@@ -247,23 +284,27 @@ const PaymentSuccess = () => {
               onClick={() => navigate('/guest-dashboard')}
               className="flex-1"
             >
-              مراجعة حجوزاتي
+              {language === 'ar' ? 'مراجعة حجوزاتي' : 'Review My Bookings'}
             </Button>
             <Button 
               variant="outline"
-              onClick={() => navigate('/property-browse')}
+              onClick={() => navigate('/browse')}
               className="flex-1"
             >
-              تصفح المزيد من العقارات
+              {language === 'ar' ? 'تصفح المزيد من العقارات' : 'Browse More Properties'}
             </Button>
           </div>
 
           {/* Contact Info */}
           <div className="mt-8 text-center text-sm text-muted-foreground">
             <p>
-              هل لديك أسئلة حول حجزك؟ 
-              <Button variant="link" className="text-primary p-0 ml-1">
-                تواصل معنا
+              {language === 'ar' ? 'هل لديك أسئلة حول حجزك؟' : 'Have questions about your booking?'}
+              <Button 
+                variant="link" 
+                className="text-primary p-0 ml-1"
+                onClick={() => navigate('/contact')}
+              >
+                {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}
               </Button>
             </p>
           </div>

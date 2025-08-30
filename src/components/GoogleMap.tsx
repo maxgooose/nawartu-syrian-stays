@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface GoogleMapProps {
   lat?: number;
@@ -75,6 +76,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const [nearbyPlaces, setNearbyPlaces] = useState<NearbyPlace[]>([]);
   const [cityDistances, setCityDistances] = useState<CityDistance[]>([]);
 
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
+
   // Cache for geocoding results
   const geocodeCache = useRef<Map<string, google.maps.GeocoderResult[]>>(new Map());
   const placesCache = useRef<Map<string, NearbyPlace[]>>(new Map());
@@ -89,10 +93,10 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       setApiKey(data.apiKey);
     } catch (err) {
       console.error('Failed to fetch Google Maps API key:', err);
-      setError('Failed to load map configuration');
+      setError(language === 'ar' ? 'فشل في تحميل إعدادات الخريطة' : 'Failed to load map configuration');
       setLoading(false);
     }
-  }, []);
+  }, [language]);
 
   const reverseGeocode = useCallback(async (lat: number, lng: number): Promise<string> => {
     if (!geocoderRef.current) return '';
@@ -199,34 +203,35 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
               if (status === 'OK' && result) {
                 resolve(result);
               } else {
-                reject(new Error(`Directions request failed: ${status}`));
+                reject(new Error(`Failed to calculate route to ${city.name}`));
               }
             }
           );
         });
 
-        const route = result.routes[0];
-        if (route && route.legs[0]) {
+        if (result.routes && result.routes.length > 0) {
+          const route = result.routes[0];
+          const leg = route.legs[0];
+          
           distances.push({
             city: city.name,
-            distance: route.legs[0].distance?.text || '',
-            duration: route.legs[0].duration?.text || ''
+            distance: leg.distance?.text || '',
+            duration: leg.duration?.text || ''
           });
         }
       } catch (error) {
-        console.error(`Error calculating distance to ${city.name}:`, error);
+        console.warn(`Could not calculate distance to ${city.name}:`, error);
       }
     }
-
+    
     setCityDistances(distances);
   }, []);
 
   useEffect(() => {
-    fetchApiKey();
-  }, [fetchApiKey]);
-
-  useEffect(() => {
-    if (!apiKey || !mapRef.current) return;
+    if (!apiKey) {
+      fetchApiKey();
+      return;
+    }
 
     const initMap = async () => {
       try {
@@ -236,63 +241,63 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
           libraries: ['places', 'geometry']
         });
 
-        await loader.load();
-
-        if (!mapRef.current) {
-          setError('Map container not found');
-          setLoading(false);
-          return;
-        }
+        const google = await loader.load();
+        
+        if (!mapRef.current) return;
 
         const map = new google.maps.Map(mapRef.current, {
           center: { lat, lng },
           zoom,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
           mapTypeControl: true,
-          streetViewControl: true,
+          streetViewControl: false,
           fullscreenControl: true,
           zoomControl: true,
-          gestureHandling: 'greedy',
           styles: [
             {
-              featureType: 'poi.business',
+              featureType: 'poi',
+              elementType: 'labels',
               stylers: [{ visibility: 'off' }]
             }
           ]
         });
 
         mapInstanceRef.current = map;
+        geocoderRef.current = new google.maps.Geocoder();
+        placesServiceRef.current = new google.maps.places.PlacesService(map);
+        directionsServiceRef.current = new google.maps.DirectionsService();
 
-        // Initialize services
-        if (enableGeocoding) {
-          geocoderRef.current = new google.maps.Geocoder();
-        }
-        
-        if (showNearbyPlaces) {
-          placesServiceRef.current = new google.maps.places.PlacesService(map);
+        // Add main marker
+        if (lat && lng) {
+          new google.maps.Marker({
+            position: { lat, lng },
+            map,
+            title: 'Selected Location',
+            icon: {
+              url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+              scaledSize: new google.maps.Size(32, 32)
+            }
+          });
         }
 
-        if (showDistanceToMajorCities) {
-          directionsServiceRef.current = new google.maps.DirectionsService();
-        }
-
-        // Add property markers
+        // Add custom markers
         markers.forEach(marker => {
           const mapMarker = new google.maps.Marker({
             position: { lat: marker.lat, lng: marker.lng },
             map,
             title: marker.title,
-            icon: marker.icon || {
-              url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-              scaledSize: new google.maps.Size(40, 40)
-            }
+            icon: marker.icon ? {
+              url: marker.icon,
+              scaledSize: new google.maps.Size(32, 32)
+            } : undefined
           });
 
           if (marker.info) {
             const infoWindow = new google.maps.InfoWindow({
               content: `
-                <div style="max-width: 250px;">
-                  <h3 style="margin: 0 0 10px 0;">${marker.title}</h3>
-                  <p style="margin: 0;">${marker.info}</p>
+                <div style="max-width: 200px;">
+                  <h4 style="margin: 0 0 5px 0; font-size: 14px;">${marker.title || 'Location'}</h4>
+                  <p style="margin: 0; font-size: 12px; color: #666;">${marker.info}</p>
                 </div>
               `
             });
@@ -336,19 +341,20 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         setLoading(false);
       } catch (err) {
         console.error('Error initializing map:', err);
-        setError('Failed to load map');
+        setError(language === 'ar' ? 'فشل في تحميل الخريطة' : 'Failed to load map');
         setLoading(false);
       }
     };
 
     initMap();
-  }, [apiKey, lat, lng, zoom, markers, onLocationSelect, clickable, showNearbyPlaces, showDistanceToMajorCities, enableGeocoding, reverseGeocode, searchNearbyPlaces, calculateDistancesToCities]);
+  }, [apiKey, lat, lng, zoom, markers, onLocationSelect, clickable, showNearbyPlaces, showDistanceToMajorCities, enableGeocoding, reverseGeocode, searchNearbyPlaces, calculateDistancesToCities, language]);
 
   if (error) {
     return (
       <div 
         className="flex items-center justify-center bg-muted rounded-lg border"
         style={{ height }}
+        dir={isRTL ? 'rtl' : 'ltr'}
       >
         <div className="text-center p-4">
           <p className="text-muted-foreground">{error}</p>
@@ -362,17 +368,20 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       <div 
         className="flex items-center justify-center bg-muted rounded-lg border"
         style={{ height }}
+        dir={isRTL ? 'rtl' : 'ltr'}
       >
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading interactive map...</p>
+          <p className="text-sm text-muted-foreground">
+            {language === 'ar' ? 'جاري تحميل الخريطة التفاعلية...' : 'Loading interactive map...'}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className="relative" dir={isRTL ? 'rtl' : 'ltr'}>
       <div 
         ref={mapRef} 
         className="w-full rounded-lg border"
@@ -382,7 +391,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       {/* Nearby Places Panel */}
       {showNearbyPlaces && nearbyPlaces.length > 0 && (
         <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs max-h-60 overflow-y-auto">
-          <h4 className="font-semibold mb-2 text-sm">الأماكن القريبة</h4>
+          <h4 className="font-semibold mb-2 text-sm">
+            {language === 'ar' ? 'الأماكن القريبة' : 'Nearby Places'}
+          </h4>
           <div className="space-y-2">
             {nearbyPlaces.slice(0, 5).map((place, index) => (
               <div key={index} className="text-xs border-b pb-1">
@@ -400,7 +411,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       {/* Distance to Cities Panel */}
       {showDistanceToMajorCities && cityDistances.length > 0 && (
         <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs">
-          <h4 className="font-semibold mb-2 text-sm">المسافات للمدن الرئيسية</h4>
+          <h4 className="font-semibold mb-2 text-sm">
+            {language === 'ar' ? 'المسافات للمدن الرئيسية' : 'Distance to Major Cities'}
+          </h4>
           <div className="space-y-1">
             {cityDistances.slice(0, 4).map((city, index) => (
               <div key={index} className="flex justify-between text-xs">

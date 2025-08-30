@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Review {
   id: string;
@@ -34,6 +35,8 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
   const [reviewCount, setReviewCount] = useState(0);
   const { toast } = useToast();
   const { profile } = useAuth();
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
 
   useEffect(() => {
     fetchReviews();
@@ -103,8 +106,8 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
   const handleHostResponse = async (reviewId: string) => {
     if (!response.trim()) {
       toast({
-        title: "Response Required",
-        description: "Please enter a response before submitting.",
+        title: language === 'ar' ? "مطلوب رد" : "Response Required",
+        description: language === 'ar' ? "يرجى إدخال رد قبل الإرسال." : "Please enter a response before submitting.",
         variant: "destructive",
       });
       return;
@@ -119,8 +122,8 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
       if (error) throw error;
 
       toast({
-        title: "Response Submitted",
-        description: "Your response has been added to the review.",
+        title: language === 'ar' ? "تم إرسال الرد" : "Response Submitted",
+        description: language === 'ar' ? "تم إضافة ردك إلى التقييم." : "Your response has been added to the review.",
       });
 
       setRespondingTo(null);
@@ -128,8 +131,8 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
       fetchReviews();
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to submit response. Please try again.",
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "فشل في إرسال الرد. يرجى المحاولة مرة أخرى." : "Failed to submit response. Please try again.",
         variant: "destructive",
       });
     }
@@ -148,7 +151,7 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
         {[1, 2, 3].map((i) => (
           <Card key={i} className="animate-pulse">
             <CardContent className="p-6">
@@ -164,21 +167,24 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Average Rating Summary */}
       {averageRating && reviewCount > 0 && (
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
               <div className="text-4xl font-bold text-primary">
                 {averageRating}
               </div>
               <div>
-                <div className="flex items-center space-x-1 mb-1">
+                <div className="flex items-center space-x-1 mb-1 rtl:space-x-reverse">
                   {renderStars(Math.round(averageRating))}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Based on {reviewCount} review{reviewCount !== 1 ? 's' : ''}
+                  {language === 'ar' 
+                    ? `بناءً على ${reviewCount} ${reviewCount === 1 ? 'تقييم' : 'تقييم'}`
+                    : `Based on ${reviewCount} review${reviewCount !== 1 ? 's' : ''}`
+                  }
                 </p>
               </div>
             </div>
@@ -191,7 +197,9 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
         <Card>
           <CardContent className="p-6 text-center">
             <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">No reviews yet.</p>
+            <p className="text-muted-foreground">
+              {language === 'ar' ? 'لا توجد تقييمات بعد.' : 'No reviews yet.'}
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -200,7 +208,7 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
             <Card key={review.id}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
                     <Avatar>
                       <AvatarFallback>
                         {review.profiles.full_name?.charAt(0)?.toUpperCase() || 'G'}
@@ -208,18 +216,18 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
                     </Avatar>
                     <div>
                       <h4 className="font-semibold">{review.title}</h4>
-                      <div className="flex items-center space-x-2">
-                        <div className="flex space-x-1">
+                      <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                        <div className="flex space-x-1 rtl:space-x-reverse">
                           {renderStars(review.rating)}
                         </div>
                         <span className="text-sm text-muted-foreground">
-                          by {review.profiles.full_name || 'Guest'}
+                          {language === 'ar' ? 'بواسطة' : 'by'} {review.profiles.full_name || (language === 'ar' ? 'ضيف' : 'Guest')}
                         </span>
                       </div>
                     </div>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {new Date(review.created_at).toLocaleDateString()}
+                    {new Date(review.created_at).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                   </span>
                 </div>
               </CardHeader>
@@ -229,7 +237,9 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
                 {/* Host Response */}
                 {review.host_response && (
                   <div className="bg-secondary/20 p-4 rounded-lg">
-                    <h5 className="font-medium text-sm mb-2">Host Response:</h5>
+                    <h5 className="font-medium text-sm mb-2">
+                      {language === 'ar' ? 'رد المضيف:' : 'Host Response:'}
+                    </h5>
                     <p className="text-sm text-foreground">{review.host_response}</p>
                   </div>
                 )}
@@ -242,15 +252,15 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
                         <Textarea
                           value={response}
                           onChange={(e) => setResponse(e.target.value)}
-                          placeholder="Write your response..."
+                          placeholder={language === 'ar' ? "اكتب ردك..." : "Write your response..."}
                           className="min-h-[80px]"
                         />
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2 rtl:space-x-reverse">
                           <Button 
                             size="sm" 
                             onClick={() => handleHostResponse(review.id)}
                           >
-                            Submit Response
+                            {language === 'ar' ? 'إرسال الرد' : 'Submit Response'}
                           </Button>
                           <Button 
                             size="sm" 
@@ -260,7 +270,7 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
                               setResponse("");
                             }}
                           >
-                            Cancel
+                            {language === 'ar' ? 'إلغاء' : 'Cancel'}
                           </Button>
                         </div>
                       </div>
@@ -270,7 +280,7 @@ export const ReviewsList = ({ listingId, isHost = false }: ReviewsListProps) => 
                         variant="outline"
                         onClick={() => setRespondingTo(review.id)}
                       >
-                        Respond to Review
+                        {language === 'ar' ? 'الرد على التقييم' : 'Respond to Review'}
                       </Button>
                     )}
                   </div>

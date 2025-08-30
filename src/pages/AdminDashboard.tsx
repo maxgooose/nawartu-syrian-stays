@@ -571,7 +571,7 @@ const AdminDashboard = () => {
                             onClick={() => navigate(`/property/${listing.id}`)}
                           >
                             <Eye className="h-4 w-4 mr-1" />
-                            {t('عرض', 'View')}
+                            {t('احجز', 'Book')}
                           </Button>
                         </div>
                       )}

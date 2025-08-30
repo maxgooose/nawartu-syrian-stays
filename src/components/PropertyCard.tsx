@@ -116,7 +116,7 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
             onClick={() => navigate(`/property/${property.id}`)}
             className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
           >
-            {language === 'ar' ? 'عرض' : 'View'}
+            {language === 'ar' ? 'احجز' : 'Book'}
           </Button>
         </div>
       </CardContent>

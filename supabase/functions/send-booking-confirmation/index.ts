@@ -59,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
             <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">مرحباً ${guestName}!</h2>
             
             <p style="color: #666; line-height: 1.6; font-size: 16px; margin-bottom: 20px;">
-              شكراً لك على حجزك في منصة نوارتو. لقد تم استلام طلب حجزك بنجاح ونحن نراجعه حالياً.
+              شكراً لك على اختيارك منصة نوارتو لحجز إقامتك. لقد تم استلام طلب حجزك بنجاح ونحن نقوم بمعالجته حالياً.
             </p>
             
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -76,7 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             ${paymentMethod === 'cash' ? `
               <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; border-right: 4px solid #ffc107; margin: 20px 0;">
-                <h3 style="color: #856404; margin-bottom: 10px; font-size: 16px;">حجز نقدي:</h3>
+                <h3 style="color: #856404; margin-bottom: 10px; font-size: 16px;">معلومات الحجز النقدي:</h3>
                 <ul style="color: #856404; line-height: 1.6; margin: 0; padding-right: 20px;">
                   <li>سيتم حجز الأيام الثلاثة الأولى فقط</li>
                   <li>سيتواصل معك فريقنا خلال 24 ساعة لتأكيد الحجز</li>
@@ -85,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
             ` : `
               <div style="background-color: #d1ecf1; padding: 20px; border-radius: 8px; border-right: 4px solid #17a2b8; margin: 20px 0;">
-                <h3 style="color: #0c5460; margin-bottom: 10px; font-size: 16px;">حجز بالبطاقة الائتمانية:</h3>
+                <h3 style="color: #0c5460; margin-bottom: 10px; font-size: 16px;">معلومات الدفع بالبطاقة الائتمانية:</h3>
                 <ul style="color: #0c5460; line-height: 1.6; margin: 0; padding-right: 20px;">
                   <li>تم حجز جميع الأيام المحددة</li>
                   <li>سيتم تأكيد الدفع خلال دقائق</li>
@@ -97,10 +97,19 @@ const handler = async (req: Request): Promise<Response> => {
             <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; border-right: 4px solid #2196f3; margin: 20px 0;">
               <h3 style="color: #1565c0; margin-bottom: 10px; font-size: 16px;">الخطوات التالية:</h3>
               <ul style="color: #666; line-height: 1.6; margin: 0; padding-right: 20px;">
-                <li>سيراجع فريقنا طلب حجزك خلال 24 ساعة</li>
-                <li>ستصلك رسالة تأكيد نهائية عبر البريد الإلكتروني أو الهاتف</li>
-                <li>يمكنك مراجعة حجزك في لوحة التحكم الخاصة بك</li>
+                <li>سيراجع فريقنا المختص طلب حجزك خلال 24 ساعة عمل</li>
+                <li>ستصلك رسالة تأكيد نهائية عبر البريد الإلكتروني أو الهاتف من أحد أعضاء فريقنا</li>
+                <li>يمكنك مراجعة حالة حجزك في لوحة التحكم الخاصة بك</li>
               </ul>
+            </div>
+            
+            <div style="background-color: #f3e5f5; padding: 20px; border-radius: 8px; border-right: 4px solid #9c27b0; margin: 20px 0;">
+              <h3 style="color: #4a148c; margin-bottom: 10px; font-size: 16px;">معلومات مهمة:</h3>
+              <p style="color: #4a148c; line-height: 1.6; margin: 0;">
+                <strong>يرجى العلم:</strong> هذه الرسالة هي تأكيد استلام طلب الحجز فقط. 
+                ستصلك رسالة تأكيد ثانية من أحد أعضاء فريقنا بعد مراجعة الطلب وتأكيد التوفر. 
+                هذه العملية تضمن جودة الخدمة وتأكيد جميع التفاصيل.
+              </p>
             </div>
             
             <div style="text-align: center; margin: 30px 0;">
@@ -111,7 +120,13 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <p style="color: #999; font-size: 14px; line-height: 1.5; margin-top: 30px;">
-              إذا كانت لديك أي أسئلة حول حجزك، لا تتردد في التواصل معنا. نحن متشوقون لاستضافتك!
+              إذا كانت لديك أي أسئلة حول حجزك، لا تتردد في التواصل معنا عبر البريد الإلكتروني أو الهاتف. 
+              نحن متشوقون لاستضافتك وتقديم تجربة إقامة مميزة!
+            </p>
+            
+            <p style="color: #999; font-size: 14px; line-height: 1.5; margin-top: 20px;">
+              مع أطيب التحيات،<br>
+              فريق نوارتو
             </p>
           </div>
           
