@@ -1,3 +1,4 @@
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { supabase } from "@/integrations/supabase/client"
@@ -14,7 +15,8 @@ export function cn(...inputs: ClassValue[]) {
 // - Public path strings "/storage/v1/object/public/property-images/userId/..."
 export function getPublicImageUrl(
   imagePath?: string | null,
-  bucketName: string = 'property-images'
+  bucketName: string = 'property-images',
+  options?: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' | 'fill' }
 ): string | null {
   if (!imagePath) return null
 
@@ -47,7 +49,20 @@ export function getPublicImageUrl(
   }
 
   const { data } = supabase.storage.from(bucketName).getPublicUrl(key)
-  return data.publicUrl || null
+  let url = data.publicUrl
+  if (!url) return null
+  if (options) {
+    url = url.replace('/object/public/', '/render/image/public/')
+    const params = new URLSearchParams()
+    if (options.width) params.append('width', options.width.toString())
+    if (options.height) params.append('height', options.height.toString())
+    if (options.quality) params.append('quality', options.quality.toString())
+    if (options.resize) params.append('resize', options.resize)
+    if (params.toString()) {
+      url += `?${params.toString()}`
+    }
+  }
+  return url
 }
 
 /**
@@ -147,3 +162,23 @@ export function openInGoogleMaps({
     window.open(`https://www.google.com/maps/search/${fallbackQuery}`, '_blank');
   }
 }
+
+// Favorites functionality
+export const getFavorites = (): string[] => {
+  const favorites = localStorage.getItem('favorites');
+  return favorites ? JSON.parse(favorites) : [];
+};
+
+export const toggleFavorite = (propertyId: string) => {
+  const favorites = getFavorites();
+  const index = favorites.indexOf(propertyId);
+  if (index !== -1) {
+    // Remove the property from favorites
+    const newFavorites = [...favorites];
+    newFavorites.splice(index, 1);
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+  } else {
+    // Add the property to favorites
+    localStorage.setItem('favorites', JSON.stringify([...favorites, propertyId]));
+  }
+};

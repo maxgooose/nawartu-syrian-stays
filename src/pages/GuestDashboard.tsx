@@ -13,7 +13,7 @@ import { HostRegistrationButton } from "@/components/HostRegistrationButton";
 import { Search, Filter, MapPin, Calendar, Users, Heart, Star, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { getPublicImageUrl } from "@/lib/utils";
+import { getPublicImageUrl, toggleFavorite, getFavorites } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -50,6 +50,18 @@ interface Booking {
 
 const GuestDashboard = () => {
   const { user, profile } = useAuth();
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  // Initialize favorites
+  useEffect(() => {
+    setFavorites(getFavorites());
+  }, []);
+
+  const handleFavoriteToggle = (propertyId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when clicking heart
+    toggleFavorite(propertyId);
+    setFavorites(getFavorites()); // Update local state
+  };
   const [listings, setListings] = useState<Listing[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
@@ -222,10 +234,14 @@ const GuestDashboard = () => {
         </div>
 
         <Tabs defaultValue="browse" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="browse" className="flex items-center gap-2">
               <Search className="h-4 w-4" />
               تصفح العقارات ({filteredListings.length})
+            </TabsTrigger>
+            <TabsTrigger value="favorites" className="flex items-center gap-2">
+              <Heart className="h-4 w-4" />
+              المفضلة ({favorites.length})
             </TabsTrigger>
             <TabsTrigger value="bookings" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
@@ -326,9 +342,10 @@ const GuestDashboard = () => {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={(e) => handleFavoriteToggle(listing.id, e)}
                         className="absolute top-3 right-3 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
                       >
-                        <Heart className="h-4 w-4" />
+                        <Heart className={`h-4 w-4 ${favorites.includes(listing.id) ? 'fill-red-500 text-red-500' : ''}`} />
                       </Button>
                     </div>
 
@@ -370,6 +387,91 @@ const GuestDashboard = () => {
                           onClick={() => navigate(`/property/${listing.id}`)}
                         >
                           عرض التفاصيل
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="favorites" className="space-y-4">
+            {favorites.length === 0 ? (
+              <Card className="text-center py-12">
+                <CardContent>
+                  <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">لا توجد عقارات مفضلة بعد</h3>
+                  <p className="text-muted-foreground mb-4">ابدأ بإضافة عقارات إلى المفضلة!</p>
+                  <Button onClick={() => navigate('/browse')}>
+                    تصفح العقارات
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {listings.filter(listing => favorites.includes(listing.id)).map((listing) => (
+                  <Card key={listing.id} className="overflow-hidden hover-lift cursor-pointer group pattern-subtle border border-primary/5 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up">
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      {listing.images?.[0] ? (
+                        <img 
+                          src={getPublicImageUrl(listing.images[0]) || '/placeholder.svg'} 
+                          alt={listing.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <MapPin className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => handleFavoriteToggle(listing.id, e)}
+                        className="absolute top-3 right-3 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
+                      >
+                        <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                      </Button>
+                    </div>
+
+                    <CardContent className="p-4" dir="rtl">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-lg text-foreground line-clamp-1 text-arabic">
+                          {listing.name}
+                        </h3>
+                        <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium">4.8</span>
+                          <span className="text-sm text-muted-foreground">(12)</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-1 rtl:space-x-reverse text-muted-foreground mb-3">
+                        <MapPin className="h-4 w-4" />
+                        <span className="text-sm">{listing.location}</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2 rtl:space-x-reverse mb-3">
+                        <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                          <Users className="h-4 w-4" />
+                          <span className="text-sm">{listing.max_guests} ضيوف</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="text-arabic">
+                          <span className="text-sm font-medium text-gray-400">
+                            ${listing.price_per_night}
+                          </span>
+                          <span className="text-xs text-gray-400"> / ليلة</span>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => navigate(`/property/${listing.id}`)}
+                          className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                        >
+                          عرض
                         </Button>
                       </div>
                     </CardContent>

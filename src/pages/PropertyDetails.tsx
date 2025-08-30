@@ -61,7 +61,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays, addDays } from "date-fns";
 import { ar } from "date-fns/locale";
-import { getPublicImageUrl, openInGoogleMaps } from "@/lib/utils";
+import { getPublicImageUrl, openInGoogleMaps, toggleFavorite, getFavorites } from "@/lib/utils";
 
 interface Listing {
   id: string;
@@ -177,6 +177,21 @@ const PropertyDetails = () => {
       fetchListing();
     }
   }, [id]);
+
+  // Initialize favorite state from localStorage
+  useEffect(() => {
+    if (id) {
+      const favorites = getFavorites();
+      setIsFavorited(favorites.includes(id));
+    }
+  }, [id]);
+
+  const handleFavoriteToggle = () => {
+    if (id) {
+      toggleFavorite(id);
+      setIsFavorited(!isFavorited);
+    }
+  };
 
   const fetchListing = async () => {
     try {
@@ -475,8 +490,9 @@ const PropertyDetails = () => {
                         <CarouselItem key={index}>
                           <div className="aspect-[16/10] relative group">
                             <img 
-                              src={getPublicImageUrl(image) || '/placeholder.svg'} 
+                              src={getPublicImageUrl(image, 'property-images', { width: 1024, quality: 80 }) || '/placeholder.svg'} 
                               alt={`${listing.name} - صورة ${index + 1}`}
+                              loading="lazy"
                               className="w-full h-full object-cover hover-lift cursor-pointer transition-transform duration-300"
                               onClick={() => setCurrentImageIndex(index)}
                             />
@@ -516,9 +532,10 @@ const PropertyDetails = () => {
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={handleFavoriteToggle}
                     className="bg-background/80 hover:bg-background text-foreground rounded-full p-2 backdrop-blur-sm"
                   >
-                    <Heart className="h-4 w-4" />
+                    <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
                   </Button>
                 </div>
               </div>
@@ -545,8 +562,7 @@ const PropertyDetails = () => {
                       onClick={() => openInGoogleMaps({
                         latitude: listing.latitude,
                         longitude: listing.longitude,
-                        address: listing.location,
-                        propertyName: listing.name
+                        address: listing.location
                       })}
                     >
                       <Navigation className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
@@ -637,20 +653,20 @@ const PropertyDetails = () => {
                   <h3 className="text-lg font-semibold mb-3">المضيف</h3>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                      {listing.host.avatar_url ? (
+                      {listing.host?.avatar_url ? (
                         <img 
                           src={listing.host.avatar_url} 
-                          alt={listing.host.full_name}
+                          alt={listing.host?.full_name || 'Host'}
                           className="w-full h-full rounded-full object-cover"
                         />
                       ) : (
                         <span className="text-primary font-semibold">
-                          {listing.host.full_name?.charAt(0) || 'M'}
+                          {listing.host?.full_name?.charAt(0) || 'H'}
                         </span>
                       )}
                     </div>
                     <div>
-                      <p className="font-medium">{listing.host.full_name}</p>
+                      <p className="font-medium">{listing.host?.full_name || 'Unknown Host'}</p>
                       <p className="text-sm text-muted-foreground">مضيف منذ 2023</p>
                     </div>
                   </div>
@@ -701,8 +717,7 @@ const PropertyDetails = () => {
                       onClick={() => openInGoogleMaps({
                         latitude: listing.latitude,
                         longitude: listing.longitude,
-                        address: listing.location,
-                        propertyName: listing.name
+                        address: listing.location
                       })}
                     >
                       <Navigation className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />

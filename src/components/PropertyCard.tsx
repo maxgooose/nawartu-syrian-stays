@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { Heart, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { getAmenityLabel } from "@/lib/amenities";
+import { toggleFavorite, getFavorites } from "@/lib/utils";
 
 interface PropertyCardProps {
   property: {
@@ -23,6 +25,19 @@ interface PropertyCardProps {
 export const PropertyCard = ({ property, language }: PropertyCardProps) => {
   const isRTL = language === 'ar';
   const navigate = useNavigate();
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  // Initialize favorite state
+  useEffect(() => {
+    const favorites = getFavorites();
+    setIsFavorited(favorites.includes(property.id));
+  }, [property.id]);
+
+  const handleFavoriteToggle = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when clicking heart
+    toggleFavorite(property.id);
+    setIsFavorited(!isFavorited);
+  };
 
   const formatPrice = (price: number, currency: 'USD' | 'SYP') => {
     if (currency === 'USD') {
@@ -43,9 +58,10 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
         <Button
           variant="ghost"
           size="sm"
+          onClick={handleFavoriteToggle}
           className="absolute top-3 right-3 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
         <div className="absolute bottom-3 left-3 bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
           {language === 'ar' ? property.type : property.type}
