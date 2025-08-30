@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ReviewsList } from "@/components/ReviewsList";
 import { StarRating } from "@/components/StarRating";
 import GoogleMap from "@/components/GoogleMap";
+import { PropertyImageGallery } from "@/components/PropertyImageGallery";
 import { 
   ArrowRight, 
   MapPin, 
@@ -293,23 +294,10 @@ const PropertyDetails = () => {
           {/* Property Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Photo Gallery */}
-            <Card className="overflow-hidden">
-              <div className="aspect-[16/10]">
-                {listing.images && listing.images.length > 0 ? (
-                  <img 
-                    src={getPublicImageUrl(listing.images[0], 'property-images', { width: 800, quality: 80 }) || '/placeholder.svg'} 
-                    alt={listing.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground">
-                      {language === 'ar' ? 'لا توجد صور' : 'No images available'}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </Card>
+            <PropertyImageGallery 
+              images={listing.images || []}
+              propertyName={listing.name}
+            />
 
             {/* Property Info */}
             <Card>
