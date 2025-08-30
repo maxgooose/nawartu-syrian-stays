@@ -29,7 +29,7 @@ export const HeroSection = ({
     window.location.href = `/browse?${params.toString()}`;
   };
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center bg-no-repeat" style={{
+    <section className="relative min-h-screen flex items-start overflow-hidden bg-cover bg-center bg-no-repeat" style={{
       backgroundImage: `url(${heroImage})`
     }}>
       {/* Subtle overlay for better text readability - reduced opacity to show more of the hero image */}
@@ -153,7 +153,7 @@ export const HeroSection = ({
       </div>
 
       {/* Hero Content - Repositioned to be more visible */}
-      <div className="relative z-10 container mx-auto px-4 text-center pt-20 sm:pt-24 md:pt-28 lg:pt-32">
+      <div className="relative z-10 container mx-auto px-4 text-center pt-32 sm:pt-40 md:pt-48 lg:pt-56">
         <div className="max-w-4xl mx-auto animate-slide-up">
           {/* Hero Text */}
           <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${language === 'ar' ? 'mb-8' : 'mb-16'}`} dir={isRTL ? 'rtl' : 'ltr'}>
