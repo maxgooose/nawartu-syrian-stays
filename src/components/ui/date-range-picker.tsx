@@ -17,6 +17,7 @@ interface DateRangePickerProps {
   className?: string;
   placeholder?: string;
   variant?: 'default' | 'hero';
+  autoOpen?: boolean;
 }
 
 export function DateRangePicker({
@@ -26,11 +27,19 @@ export function DateRangePicker({
   disabled = false,
   className,
   placeholder,
-  variant = 'default'
+  variant = 'default',
+  autoOpen = false
 }: DateRangePickerProps) {
   const isRTL = language === 'ar';
   const locale = language === 'ar' ? ar : enUS;
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(autoOpen);
+  
+  // Auto-open effect
+  React.useEffect(() => {
+    if (autoOpen) {
+      setIsOpen(true);
+    }
+  }, [autoOpen]);
   
   // Calculate nights between dates
   const nights = dateRange?.from && dateRange?.to 
@@ -159,7 +168,7 @@ export function DateRangePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-auto p-0" 
+          className="w-auto p-0 bg-white border border-gray-200 shadow-xl z-50" 
           align="start"
           side={isRTL ? "left" : "right"}
         >
