@@ -169,8 +169,9 @@ export function DateRangePicker({
         </PopoverTrigger>
         <PopoverContent 
           className="w-auto p-0 bg-white border border-gray-200 shadow-xl z-50" 
-          align="start"
-          side={isRTL ? "left" : "right"}
+          align="center"
+          side="bottom"
+          sideOffset={4}
         >
           <Calendar
             initialFocus

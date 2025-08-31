@@ -331,14 +331,16 @@ export const HeroSection = ({
             {/* When Panel - Calendar */}
             {activeSection === 'when' && (
               <div className="p-6">
-                <DateRangePicker
-                  dateRange={searchData.dateRange}
-                  onDateRangeChange={handleDateRangeChange}
-                  language={language}
-                  placeholder={language === 'ar' ? 'اختر التواريخ' : 'Select dates'}
-                  variant="default"
-                  autoOpen={true}
-                />
+                <div className="w-full flex justify-center">
+                  <DateRangePicker
+                    dateRange={searchData.dateRange}
+                    onDateRangeChange={handleDateRangeChange}
+                    language={language}
+                    placeholder={language === 'ar' ? 'اختر التواريخ' : 'Select dates'}
+                    variant="default"
+                    autoOpen={true}
+                  />
+                </div>
                 {searchData.dateRange?.from && searchData.dateRange?.to && (
                   <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
                     <div className="text-sm text-green-800">
