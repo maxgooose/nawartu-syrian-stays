@@ -25,15 +25,15 @@ const PropertyGuidelines = () => {
           </div>
 
           <h1 className="text-4xl font-bold text-primary mb-8">
-            {language === 'ar' ? 'نوارتو - إرشادات إدراج العقارات' : 'Nawartu – Property Listing Guidelines'}
+            {language === 'ar' ? 'نوارتو - إرشادات إدراج العقارات' : 'Nawartu – Listing Guidelines'}
           </h1>
           
           <div className="prose prose-lg max-w-none space-y-8">
             <section>
               <p className="text-foreground leading-relaxed text-lg">
                 {language === 'ar'
-                  ? 'لضمان تجربة آمنة وموثوقة للضيوف والمضيفين، يجب أن تتبع جميع إدراجات العقارات في نوارتو هذه الإرشادات:'
-                  : 'To ensure a safe and trustworthy experience for guests and hosts, all property listings on Nawartu must follow these guidelines:'
+                  ? 'لضمان تجربة آمنة وموثوقة للضيوف والمضيفين، يجب أن تتبع جميع إدراجات العقارات في نورتوا هذه الإرشادات:'
+                  : 'To ensure a safe and trustworthy experience for guests and hosts, all listings on Nawartu must follow these guidelines:'
                 }
               </p>
             </section>
@@ -43,7 +43,7 @@ const PropertyGuidelines = () => {
                 {language === 'ar' ? '1. معلومات دقيقة' : '1. Accurate Information'}
               </h2>
               <ul className="list-disc ml-6 text-foreground space-y-2">
-                <li>{language === 'ar' ? 'تقديم تفاصيل كاملة وصادقة حول العقار (النوع، الحجم، المرافق).' : 'Provide complete and truthful details about the property (type, size, amenities).'}</li>
+                <li>{language === 'ar' ? 'تقديم تفاصيل كاملة وصادقة حول العقار (النوع، الحجم، المرافق).' : 'Provide complete and truthful details about the listing (type, size, amenities).'}</li>
                 <li>{language === 'ar' ? 'تضمين صور واضحة وعالية الجودة لجميع المناطق الرئيسية.' : 'Include clear, high-quality photos of all key areas.'}</li>
                 <li>{language === 'ar' ? 'تحديث التوفر والتسعير والوصف بانتظام.' : 'Update availability, pricing, and description regularly.'}</li>
               </ul>
@@ -54,7 +54,7 @@ const PropertyGuidelines = () => {
                 {language === 'ar' ? '2. الامتثال القانوني' : '2. Legal Compliance'}
               </h2>
               <ul className="list-disc ml-6 text-foreground space-y-2">
-                <li>{language === 'ar' ? 'ضمان امتثال العقار للقوانين واللوائح المحلية.' : 'Ensure the property complies with local laws and regulations.'}</li>
+                <li>{language === 'ar' ? 'ضمان امتثال العقار للقوانين واللوائح المحلية.' : 'Ensure the listing complies with local laws and regulations.'}</li>
                 <li>{language === 'ar' ? 'المضيفون مسؤولون عن التصاريح الضرورية والضرائب والتأمين.' : 'Hosts are responsible for necessary permits, taxes, and insurance.'}</li>
               </ul>
             </section>
@@ -125,7 +125,7 @@ const PropertyGuidelines = () => {
               <p className="text-foreground font-medium">
                 <strong>{language === 'ar' ? 'ملاحظة:' : 'Note:'}</strong> 
                 {language === 'ar'
-                  ? 'هذه الإرشادات تساعد في الحفاظ على الجودة والثقة التي بني عليها نوارتو. جميع الإدراجات تخضع للمراجعة والموافقة قبل أن تصبح متاحة على المنصة.'
+                  ? 'هذه الإرشادات تساعد في الحفاظ على الجودة والثقة التي بني عليها نورتوا. جميع الإدراجات تخضع للمراجعة والموافقة قبل أن تصبح متاحة على المنصة.'
                   : 'These guidelines help maintain the quality and trust that Nawartu is built on. All listings are subject to review and approval before going live on the platform.'
                 }
               </p>

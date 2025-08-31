@@ -112,13 +112,13 @@ const ContactUs = () => {
                             {language === 'ar' ? 'واتساب' : 'WhatsApp Support'}
                           </h3>
                           <a
-                            href="https://wa.me/19296679792"
+                            href="https://wa.me/963969864741"
                             className="text-primary hover:underline"
                             target="_blank"
                             rel="noopener noreferrer"
                             dir="ltr"
                           >
-                            +1 (929) 667-9792
+                            +963 969 864 741
                           </a>
                         </div>
                       </div>

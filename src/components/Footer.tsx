@@ -39,27 +39,27 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
       href: '/privacy' 
     },
     { 
-      label: language === 'ar' ? 'إرشادات العقارات' : 'Property Guidelines', 
+      label: language === 'ar' ? 'إرشادات العقارات' : 'Listing Guidelines', 
       href: '/guidelines' 
     }
   ];
 
   return (
-    <footer className="bg-muted/30 border-t" dir={isRTL ? 'rtl' : 'ltr'}>
+    <footer className={`bg-muted/30 border-t ${isRTL ? 'footer-arabic-responsive' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-custom py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 ${isRTL ? 'rtl' : 'ltr'}`}>
           {/* Company Info */}
-          <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
+          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${isRTL ? 'text-right' : 'text-left'}`}>
             <h3 className="font-bold text-lg mb-4 text-foreground">
               {language === 'ar' ? 'نورتوا' : 'Nawartu'}
             </h3>
-            <p className="text-muted-foreground text-sm mb-4">
+            <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
               {language === 'ar' 
                 ? 'الضيافة السورية عأصولها - منصة تأجير العقارات الأولى في سوريا'
-                : 'Syrian hospitality done right - Syria\'s premier property rental platform'
+                : 'Syrian hospitality done right - Syria\'s premier listing rental platform'
               }
             </p>
-            <div className="flex gap-2">
+            <div className={`flex gap-2 ${isRTL ? 'justify-end' : 'justify-start'}`}>
               <button
                 onClick={() => onLanguageChange('ar')}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
@@ -84,7 +84,7 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
           </div>
 
           {/* Quick Links */}
-          <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
+          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${isRTL ? 'text-right' : 'text-left'}`}>
             <h4 className="font-semibold mb-4 text-foreground">
               {language === 'ar' ? 'روابط سريعة' : 'Quick Links'}
             </h4>
@@ -93,7 +93,7 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
                 <li key={index}>
                   <Link 
                     to={link.href} 
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm block"
                   >
                     {link.label}
                   </Link>
@@ -103,7 +103,7 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
           </div>
 
           {/* Legal */}
-          <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
+          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${isRTL ? 'text-right' : 'text-left'}`}>
             <h4 className="font-semibold mb-4 text-foreground">
               {language === 'ar' ? 'قانوني' : 'Legal'}
             </h4>
@@ -112,7 +112,7 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
                 <li key={index}>
                   <Link 
                     to={link.href} 
-                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm block"
                   >
                     {link.label}
                   </Link>
@@ -122,57 +122,55 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
           </div>
 
           {/* Contact Info */}
-          <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
+          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${isRTL ? 'text-right' : 'text-left'}`}>
             <h4 className="font-semibold mb-4 text-foreground">
               {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}
             </h4>
             <div className="space-y-3 text-sm text-muted-foreground">
-              <div>
+              <div className={isRTL ? 'text-right' : 'text-left'}>
                 <p className="font-medium text-foreground mb-1">
                   {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                 </p>
                 <a 
                   href="mailto:info@nawartu.com" 
-                  className="text-primary hover:underline"
+                  className="text-primary hover:underline block"
                 >
                   info@nawartu.com
                 </a>
               </div>
               
-              <div>
+              <div className={isRTL ? 'text-right' : 'text-left'}>
                 <p className="font-medium text-foreground mb-1">
                   {language === 'ar' ? 'واتساب' : 'WhatsApp'}
                 </p>
                 <a
-                  href="https://wa.me/19296679792"
-                  className="text-primary hover:underline flex items-center gap-1"
+                  href="https://wa.me/963969864741"
+                  className={isRTL ? "text-primary hover:underline flex items-center gap-1 justify-end" : "text-primary hover:underline flex items-center gap-1"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  dir="ltr"
                 >
                   <MessageCircle className="h-3 w-3" />
-                  +1 (929) 667-9792
+                  <span className="inline-block">+963 969 864 741</span>
                 </a>
               </div>
               
-              <div>
+              <div className={isRTL ? 'text-right' : 'text-left'}>
                 <p className="font-medium text-foreground mb-1">
                   {language === 'ar' ? 'سوريا' : 'Syria'}
                 </p>
                 <a
                   href="tel:+963969864741"
-                  className="text-primary hover:underline"
-                  dir="ltr"
+                  className="text-primary hover:underline block"
                 >
                   +963 969 864 741
                 </a>
               </div>
 
-              <div>
+              <div className={isRTL ? 'text-right' : 'text-left'}>
                 <p className="font-medium text-foreground mb-2">
                   {language === 'ar' ? 'تابعونا' : 'Follow Us'}
                 </p>
-                <div className="flex gap-3">
+                <div className={`flex gap-3 ${isRTL ? 'justify-end' : 'justify-start'}`}>
                   <a 
                     href="https://instagram.com/nawartuofficial" 
                     target="_blank"

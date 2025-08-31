@@ -26,7 +26,7 @@ const PrivacyPolicy = () => {
           </div>
 
           <h1 className="text-4xl font-bold text-primary mb-8">
-            {language === 'ar' ? 'نوارتو - سياسة الخصوصية' : 'Nawartu – Privacy Policy'}
+            {language === 'ar' ? 'نورتوا - سياسة الخصوصية' : 'Nawartu – Privacy Policy'}
           </h1>
           
           <div className="prose prose-lg max-w-none space-y-8">
@@ -36,7 +36,7 @@ const PrivacyPolicy = () => {
               </h2>
               <p className="text-foreground leading-relaxed">
                 {language === 'ar'
-                  ? 'في نوارتو، خصوصيتك مهمة. تشرح هذه السياسة كيف نجمع ونستخدم ونحمي معلوماتك الشخصية عند استخدام منصتنا.'
+                  ? 'في نورتوا، خصوصيتك مهمة. تشرح هذه السياسة كيف نجمع ونستخدم ونحمي معلوماتك الشخصية عند استخدام منصتنا.'
                   : 'At Nawartu, your privacy is important. This policy explains how we collect, use, and protect your personal information when using our platform.'
                 }
               </p>
@@ -53,7 +53,7 @@ const PrivacyPolicy = () => {
                 </li>
                 <li>
                   <strong>{language === 'ar' ? 'معلومات الحجز:' : 'Booking Information:'}</strong> 
-                  {language === 'ar' ? ' تفاصيل العقار، تواريخ الوصول والمغادرة، معلومات الدفع.' : ' Property details, check-in/check-out dates, payment info.'}
+                  {language === 'ar' ? ' تفاصيل العقار، تواريخ الوصول والمغادرة، معلومات الدفع.' : ' Listing details, check-in/check-out dates, payment info.'}
                 </li>
                 <li>
                   <strong>{language === 'ar' ? 'بيانات الاستخدام:' : 'Usage Data:'}</strong> 
@@ -129,7 +129,7 @@ const PrivacyPolicy = () => {
               </h2>
               <p className="text-foreground leading-relaxed">
                 {language === 'ar'
-                  ? 'يستخدم نوارتو ملفات تعريف الارتباط لتحسين الوظائف وتجربة المستخدم. يمكن للمستخدمين إدارة أو تعطيل ملفات تعريف الارتباط عبر أجهزتهم أو متصفحهم.'
+                  ? 'يستخدم نورتوا ملفات تعريف الارتباط لتحسين الوظائف وتجربة المستخدم. يمكن للمستخدمين إدارة أو تعطيل ملفات تعريف الارتباط عبر أجهزتهم أو متصفحهم.'
                   : 'Nawartu uses cookies to improve functionality and user experience. Users can manage or disable cookies via their device or browser.'
                 }
               </p>

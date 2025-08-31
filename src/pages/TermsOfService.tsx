@@ -25,7 +25,7 @@ const TermsOfService = () => {
           </div>
 
           <h1 className="text-4xl font-bold text-primary mb-8">
-            {language === 'ar' ? 'نوارتو - الشروط والسياسات' : 'Nawartu – Terms & Policies'}
+            {language === 'ar' ? 'نورتوا - الشروط والسياسات' : 'Nawartu – Terms & Policies'}
           </h1>
           
           <div className="prose prose-lg max-w-none space-y-8">
@@ -35,7 +35,7 @@ const TermsOfService = () => {
               </h2>
               <p className="text-foreground leading-relaxed">
                 {language === 'ar' 
-                  ? 'نوارتو هي منصة رقمية تربط بين:'
+                  ? 'نورتوا هي منصة رقمية تربط بين:'
                   : 'Nawartu is a digital platform connecting:'
                 }
               </p>
@@ -91,8 +91,8 @@ const TermsOfService = () => {
               <ul className="list-disc ml-6 text-foreground space-y-2">
                 <li><strong>{language === 'ar' ? '14+ يوم قبل الوصول:' : '14+ days before check-in:'}</strong> {language === 'ar' ? 'استرداد كامل.' : 'Full refund.'}</li>
                 <li><strong>{language === 'ar' ? '5-13 يوم:' : '5–13 days:'}</strong> {language === 'ar' ? 'استرداد 50%.' : '50% refund.'}</li>
-                <li><strong>{language === 'ar' ? '48 ساعة-4 أيام:' : '48 hours–4 days:'}</strong> {language === 'ar' ? 'استرداد 25%.' : '25% refund.'}</li>
-                <li><strong>{language === 'ar' ? '&lt;48 ساعة أو عدم الحضور:' : '&lt;48 hours or no-show:'}</strong> {language === 'ar' ? 'لا يوجد استرداد.' : 'No refund.'}</li>
+                <li><strong>{language === 'ar' ? '2-4 أيام:' : '2–4 days:'}</strong> {language === 'ar' ? 'استرداد 25%.' : '25% refund.'}</li>
+                <li><strong>{language === 'ar' ? '&lt;2 يوم أو عدم الحضور:' : '&lt;2 days or no-show:'}</strong> {language === 'ar' ? 'لا يوجد استرداد.' : 'No refund.'}</li>
               </ul>
               <p className="text-foreground leading-relaxed mt-4">
                 {language === 'ar' 
@@ -107,7 +107,7 @@ const TermsOfService = () => {
                 {language === 'ar' ? '5. مسؤوليات المضيف' : '5. Host Responsibilities'}
               </h2>
               <ul className="list-disc ml-6 text-foreground space-y-2">
-                <li>{language === 'ar' ? 'تقديم تفاصيل العقار بدقة وتحديثها.' : 'Provide accurate and updated property details.'}</li>
+                <li>{language === 'ar' ? 'تقديم تفاصيل العقار بدقة وتحديثها.' : 'Provide accurate and updated listing details.'}</li>
                 <li>{language === 'ar' ? 'الحفاظ على النظافة والأمان والامتثال القانوني.' : 'Maintain cleanliness, safety, and legal compliance.'}</li>
                 <li>{language === 'ar' ? 'الرد بسرعة على الاستفسارات وتأكيدات الحجز.' : 'Respond promptly to inquiries and booking confirmations.'}</li>
               </ul>
@@ -118,7 +118,7 @@ const TermsOfService = () => {
                 {language === 'ar' ? '6. مسؤوليات الضيف' : '6. Guest Responsibilities'}
               </h2>
               <ul className="list-disc ml-6 text-foreground space-y-2">
-                <li>{language === 'ar' ? 'اتباع قواعد المنزل واحترام العقار والجيران.' : 'Follow house rules and respect the property and neighbors.'}</li>
+                <li>{language === 'ar' ? 'اتباع قواعد المنزل واحترام العقار والجيران.' : 'Follow house rules and respect the listing and neighbors.'}</li>
                 <li>{language === 'ar' ? 'تجنب الأضرار أو الأنشطة غير القانونية أو الاستخدام غير المصرح به.' : 'Avoid damage, illegal activities, or unauthorized use.'}</li>
               </ul>
             </section>
@@ -129,8 +129,8 @@ const TermsOfService = () => {
               </h2>
               <p className="text-foreground leading-relaxed">
                 {language === 'ar' 
-                  ? 'نوارتو غير مسؤولة عن الحوادث أو الأضرار أو النزاعات أثناء الإقامة. نوصي بأن يكون لدى كل من المضيفين والضيوف تأمين شخصي أو على الممتلكات.'
-                  : 'Nawartu is not liable for accidents, damages, or disputes during stays. We recommend both hosts and guests have personal or property insurance.'
+                  ? 'نورتوا غير مسؤولة عن الحوادث أو الأضرار أو النزاعات أثناء الإقامة. نوصي بأن يكون لدى كل من المضيفين والضيوف تأمين شخصي أو على الممتلكات.'
+                  : 'Nawartu is not liable for accidents, damages, or disputes during stays. We recommend both hosts and guests have personal or listing insurance.'
                 }
               </p>
             </section>

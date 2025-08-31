@@ -11,11 +11,11 @@ export function cn(...inputs: ClassValue[]) {
 // Accepts:
 // - Full http(s) URLs (returned as-is)
 // - Bucket-relative keys like "userId/listings/file.jpg"
-// - Keys accidentally saved with bucket prefix "property-images/userId/..."
-// - Public path strings "/storage/v1/object/public/property-images/userId/..."
+// - Keys accidentally saved with bucket prefix "listing-images/userId/..."
+// - Public path strings "/storage/v1/object/public/listing-images/userId/..."
 export function getPublicImageUrl(
   imagePath?: string | null,
-  bucketName: string = 'property-images',
+  bucketName: string = 'listing-images',
   options?: { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' | 'fill' }
 ): string | null {
   if (!imagePath) return null

@@ -72,7 +72,7 @@ const Auth = () => {
           // User was created and logged in immediately
           toast({
             title: language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully',
-            description: language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu',
+            description: language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu',
           });
           navigate('/');
         }
@@ -94,7 +94,7 @@ const Auth = () => {
         if (data?.session) {
           toast({
             title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Successfully signed in',
-            description: language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu',
+            description: language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu',
           });
           navigate('/');
         }
@@ -185,7 +185,7 @@ const Auth = () => {
               <img src="/nawartu-logo.png" alt="Nawartu" className="w-10 h-10" />
             </div>
           <CardTitle className="text-2xl font-arabic">
-            {language === 'ar' ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu'}
+            {language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu'}
           </CardTitle>
           <CardDescription>
             {language === 'ar' ? 'منصة الإقامة السورية' : 'Syrian Hospitality Platform'}

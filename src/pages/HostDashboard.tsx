@@ -172,7 +172,7 @@ const HostDashboard = () => {
           </div>
           <Button onClick={() => navigate('/create-listing')} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Property'}
+            {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Listing'}
           </Button>
         </div>
 
@@ -197,10 +197,10 @@ const HostDashboard = () => {
                     {language === 'ar' ? 'لا توجد عقارات بعد' : 'No properties yet'}
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    {language === 'ar' ? 'ابدأ بإضافة عقارك الأول' : 'Start by adding your first property'}
+                    {language === 'ar' ? 'ابدأ بإضافة عقارك الأول' : 'Start by adding your first listing'}
                   </p>
                   <Button onClick={() => navigate('/create-listing')}>
-                    {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Property'}
+                    {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Listing'}
                   </Button>
                 </CardContent>
               </Card>

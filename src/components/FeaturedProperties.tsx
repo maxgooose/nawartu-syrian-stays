@@ -59,7 +59,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
     rating: 4.5, // Default rating until we implement reviews
     reviews: 0, // Default reviews count
     image: getPublicImageUrl(listing.images?.[0]) || '/placeholder.svg',
-    type: language === 'ar' ? 'عقار' : 'Property',
+    type: language === 'ar' ? 'عقار' : 'Listing',
     features: listing.amenities?.slice(0, 3) || []
   });
 
@@ -104,12 +104,12 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
       <div className="container-custom relative z-10">
         <div className={`text-center mb-12 ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {language === 'ar' ? 'عقارات مميزة' : 'Featured Properties'}
+            {language === 'ar' ? 'عقارات مميزة' : 'Featured Listings'}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             {language === 'ar' 
               ? 'اكتشف أجمل العقارات المختارة بعناية في أفضل المواقع السورية'
-              : 'Discover the most beautiful carefully selected properties in the best Syrian locations'
+              : 'Discover the most beautiful carefully selected listings in the best Syrian locations'
             }
           </p>
         </div>
@@ -129,7 +129,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
             onClick={() => window.location.href = '/browse'}
             className="text-primary hover:text-primary/80 font-semibold transition-colors"
           >
-            {language === 'ar' ? 'عرض جميع العقارات ←' : 'View All Properties →'}
+            {language === 'ar' ? 'عرض جميع العقارات ←' : 'View All Listings →'}
           </button>
         </div>
       </div>

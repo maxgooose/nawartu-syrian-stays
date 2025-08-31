@@ -51,7 +51,7 @@ const BecomeHost = () => {
 
         toast({
           title: language === 'ar' ? "مرحباً بك في الاستضافة!" : "Welcome to Hosting!",
-          description: language === 'ar' ? "أنت الآن مضيف. ابدأ بإضافة عقارك الأول!" : "You are now a host. Start adding your first property!",
+          description: language === 'ar' ? "أنت الآن مضيف. ابدأ بإضافة عقارك الأول!" : "You are now a host. Start adding your first listing!",
         });
 
         navigate("/host-dashboard");
@@ -172,7 +172,7 @@ const BecomeHost = () => {
                 <p className="text-sm text-muted-foreground">
                   {language === 'ar' 
                     ? 'حدد أسعارك الخاصة واكسب من عقارك'
-                    : 'Set your own prices and earn from your property'
+                    : 'Set your own prices and earn from your listing'
                   }
                 </p>
               </CardContent>
@@ -275,7 +275,7 @@ const BecomeHost = () => {
               </a>{" "}
               {language === 'ar' ? 'و' : 'and'}{" "}
               <a href="/guidelines" className="text-primary hover:underline">
-                {language === 'ar' ? 'إرشادات العقارات' : 'Property Guidelines'}
+                {language === 'ar' ? 'إرشادات العقارات' : 'Listing Guidelines'}
               </a>
             </p>
           </div>

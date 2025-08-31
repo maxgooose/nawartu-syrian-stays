@@ -7,8 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { GuestSelector } from '@/components/GuestSelector';
 import { MapPin, Filter, Search, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Listing {
   id: string;
@@ -30,12 +32,17 @@ interface Listing {
 
 interface MapFilters {
   priceRange: [number, number];
-  guests: number;
+  guests: {
+    adults: number;
+    children: number;
+    infants: number;
+  };
   amenities: string[];
 }
 
 const InteractiveMapView: React.FC = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +51,11 @@ const InteractiveMapView: React.FC = () => {
   const [zoom, setZoom] = useState(10);
   const [filters, setFilters] = useState<MapFilters>({
     priceRange: [0, 1000],
-    guests: 1,
+    guests: {
+      adults: 1,
+      children: 0,
+      infants: 0
+    },
     amenities: []
   });
 
@@ -76,8 +87,8 @@ const InteractiveMapView: React.FC = () => {
       const priceMatches = listing.price_per_night_usd >= filters.priceRange[0] && 
                            listing.price_per_night_usd <= filters.priceRange[1];
       
-      // Guests filter
-      const guestsMatch = listing.max_guests >= filters.guests;
+      // Guests filter (only adults count toward max_guests)
+      const guestsMatch = listing.max_guests >= filters.guests.adults;
       
       // Amenities filter
       const amenitiesMatch = filters.amenities.length === 0 || 
@@ -181,22 +192,13 @@ const InteractiveMapView: React.FC = () => {
 
                 {/* Guests Filter */}
                 <div>
-                  <Label className="text-sm font-medium">عدد الضيوف</Label>
-                  <Select 
-                    value={filters.guests.toString()} 
-                    onValueChange={(value) => setFilters(prev => ({ ...prev, guests: parseInt(value) }))}
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                        <SelectItem key={num} value={num.toString()}>
-                          {num} {num === 1 ? 'ضيف' : 'ضيوف'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <GuestSelector
+                    value={filters.guests}
+                    onChange={(guests) => setFilters(prev => ({ ...prev, guests }))}
+                    maxGuests={16}
+                    variant="dropdown"
+                    placeholder={language === 'ar' ? 'اختر عدد الضيوف' : 'Select guests'}
+                  />
                 </div>
 
                 {/* Common Amenities Filter */}
@@ -227,7 +229,11 @@ const InteractiveMapView: React.FC = () => {
                 </div>
 
                 <Button 
-                  onClick={() => setFilters({ priceRange: [0, 1000], guests: 1, amenities: [] })}
+                  onClick={() => setFilters({ 
+                    priceRange: [0, 1000], 
+                    guests: { adults: 1, children: 0, infants: 0 }, 
+                    amenities: [] 
+                  })}
                   variant="outline" 
                   className="w-full"
                 >
@@ -251,7 +257,7 @@ const InteractiveMapView: React.FC = () => {
             </Card>
           </div>
 
-          {/* Map and Selected Property */}
+          {/* Map and Selected Listing */}
           <div className="lg:col-span-3 space-y-4">
             {/* Map */}
             <Card>
@@ -269,7 +275,7 @@ const InteractiveMapView: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Selected Property Details */}
+            {/* Selected Listing Details */}
             {selectedListing && (
               <Card>
                 <CardHeader>

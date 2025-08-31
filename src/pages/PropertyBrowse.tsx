@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
+import { GuestSelector } from "@/components/GuestSelector";
 import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft, Navigation, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -54,6 +55,11 @@ const PropertyBrowse = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || '');
   const [priceRange, setPriceRange] = useState('all');
   const [guestCount, setGuestCount] = useState(searchParams.get('guests') || 'all');
+  const [guestDetails, setGuestDetails] = useState({
+    adults: parseInt(searchParams.get('guests') || '2') || 2,
+    children: 0,
+    infants: 0
+  });
   const [sortBy, setSortBy] = useState('price-low');
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,7 +76,7 @@ const PropertyBrowse = () => {
   useEffect(() => {
     filterAndSortListings();
     setCurrentPage(1); // Reset to first page when filters change
-  }, [listings, searchQuery, priceRange, guestCount, sortBy]);
+  }, [listings, searchQuery, priceRange, guestCount, guestDetails, sortBy]);
 
   const fetchListings = async () => {
     try {
@@ -119,6 +125,13 @@ const PropertyBrowse = () => {
     if (guestCount !== 'all') {
       filtered = filtered.filter(listing =>
         listing.max_guests >= parseInt(guestCount)
+      );
+    }
+    
+    // Guest details filter (only adults count toward max_guests)
+    if (guestDetails.adults > 0) {
+      filtered = filtered.filter(listing =>
+        listing.max_guests >= guestDetails.adults
       );
     }
 
@@ -208,7 +221,7 @@ const PropertyBrowse = () => {
             <div className="relative">
               <Search className={`absolute top-3 h-4 w-4 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
               <Input
-                placeholder={language === 'ar' ? "ابحث عن عقار أو موقع..." : "Search property or location..."}
+                placeholder={language === 'ar' ? "ابحث عن عقار أو موقع..." : "Search listing or location..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`${isRTL ? 'pr-10 text-right' : 'pl-10'} h-11`}
@@ -229,19 +242,16 @@ const PropertyBrowse = () => {
               </SelectContent>
             </Select>
 
-            {/* Guest Count */}
-            <Select value={guestCount} onValueChange={setGuestCount}>
-              <SelectTrigger className={`h-11 ${isRTL ? 'text-right' : ''}`}>
-                <SelectValue placeholder={language === 'ar' ? "عدد الضيوف" : "Guest Count"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{language === 'ar' ? 'أي عدد' : 'Any Number'}</SelectItem>
-                <SelectItem value="1">{language === 'ar' ? 'ضيف واحد' : '1 Guest'}</SelectItem>
-                <SelectItem value="2">{language === 'ar' ? 'ضيفان' : '2 Guests'}</SelectItem>
-                <SelectItem value="4">{language === 'ar' ? '4 ضيوف' : '4 Guests'}</SelectItem>
-                <SelectItem value="6">{language === 'ar' ? '6+ ضيوف' : '6+ Guests'}</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Guest Details */}
+            <div className="col-span-2">
+              <GuestSelector
+                value={guestDetails}
+                onChange={setGuestDetails}
+                maxGuests={16}
+                variant="dropdown"
+                placeholder={language === 'ar' ? 'اختر عدد الضيوف' : 'Select guests'}
+              />
+            </div>
 
             {/* Sort */}
             <Select value={sortBy} onValueChange={setSortBy}>
@@ -288,6 +298,7 @@ const PropertyBrowse = () => {
                         setSearchQuery('');
                         setPriceRange('all');
                         setGuestCount('all');
+                        setGuestDetails({ adults: 2, children: 0, infants: 0 });
                         setSortBy('price-low');
                       }}
                     >

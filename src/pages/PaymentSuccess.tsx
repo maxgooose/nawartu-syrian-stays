@@ -148,7 +148,7 @@ const PaymentSuccess = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Property Info */}
+              {/* Listing Info */}
               <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
                 <MapPin className="h-5 w-5 text-primary" />
                 <div>
@@ -236,7 +236,7 @@ const PaymentSuccess = () => {
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       {language === 'ar' 
-                        ? 'سيتواصل معك فريق نوارتو خلال 24 ساعة لتأكيد تفاصيل الحجز'
+                        ? 'سيتواصل معك فريق نورتوا خلال 24 ساعة لتأكيد تفاصيل الحجز'
                         : 'Our Nawartu team will contact you within 24 hours to confirm booking details'
                       }
                     </p>
@@ -269,7 +269,7 @@ const PaymentSuccess = () => {
                     <p className="text-sm text-muted-foreground">
                       {language === 'ar' 
                         ? 'نتمنى لك إقامة مريحة وممتعة في عقارنا'
-                        : 'We hope you have a comfortable and enjoyable stay at our property'
+                        : 'We hope you have a comfortable and enjoyable stay at our listing'
                       }
                     </p>
                   </div>

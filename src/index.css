@@ -218,6 +218,34 @@
   [dir="ltr"] {
     direction: ltr;
   }
+
+  /* Enhanced RTL Grid Support */
+  [dir="rtl"] .grid {
+    direction: rtl;
+  }
+
+  [dir="rtl"] .grid > * {
+    text-align: right;
+  }
+
+  /* Arabic Number Alignment */
+  [dir="rtl"] a[dir="ltr"] {
+    display: inline-block;
+    text-align: left;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  /* Consistent Baseline for Mixed Content */
+  [dir="rtl"] .space-y-3 > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  [dir="rtl"] .space-y-3 > div a[dir="ltr"] {
+    align-self: flex-start;
+  }
 }
 
 @layer components {
@@ -322,5 +350,40 @@
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Responsive Arabic Footer Utilities */
+  .footer-arabic-responsive {
+    @apply text-right;
+  }
+
+  .footer-arabic-responsive .grid {
+    @apply gap-6 sm:gap-8;
+  }
+
+  .footer-arabic-responsive .space-y-3 > div {
+    @apply items-end;
+  }
+
+  .footer-arabic-responsive .space-y-3 > div a[dir="ltr"] {
+    @apply self-start;
+  }
+
+  /* Mobile RTL Optimization */
+  @media (max-width: 768px) {
+    [dir="rtl"] .grid {
+      @apply gap-6;
+    }
+    
+    [dir="rtl"] .space-y-3 > div {
+      @apply items-end;
+    }
+  }
+
+  /* Tablet RTL Optimization */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    [dir="rtl"] .grid {
+      @apply gap-7;
+    }
   }
 }

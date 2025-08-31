@@ -417,7 +417,7 @@ const CardDetails = ({
                 type="tel"
                 value={cardData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder={language === 'ar' ? '+963 123 456 789' : '+1 234 567 8900'}
+                placeholder={language === 'ar' ? '+963 123 456 789' : '+963 123 456 789'}
                 className={errors.phone ? 'border-red-500' : ''}
               />
               {errors.phone && (

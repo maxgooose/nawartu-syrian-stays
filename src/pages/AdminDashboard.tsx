@@ -482,7 +482,7 @@ const AdminDashboard = () => {
                             </DialogTrigger>
                             <DialogContent className="pattern-subtle" dir={isRTL ? 'rtl' : 'ltr'}>
                               <DialogHeader>
-                                <DialogTitle>{t('موافقة على العقار', 'Approve Property')}</DialogTitle>
+                                <DialogTitle>{t('موافقة على العقار', 'Approve Listing')}</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
@@ -528,7 +528,7 @@ const AdminDashboard = () => {
                             </DialogTrigger>
                             <DialogContent className="pattern-subtle" dir={isRTL ? 'rtl' : 'ltr'}>
                               <DialogHeader>
-                                <DialogTitle>{t('رفض العقار', 'Reject Property')}</DialogTitle>
+                                <DialogTitle>{t('رفض العقار', 'Reject Listing')}</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
@@ -536,7 +536,7 @@ const AdminDashboard = () => {
                                   <Textarea
                                     value={adminNotes}
                                     onChange={(e) => setAdminNotes(e.target.value)}
-                                    placeholder={t('اشرح سبب رفض العقار...', 'Explain why the property is being rejected...')}
+                                    placeholder={t('اشرح سبب رفض العقار...', 'Explain why the listing is being rejected...')}
                                     className={isRTL ? "text-right" : ""}
                                     required
                                   />

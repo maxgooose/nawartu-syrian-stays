@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
 import { HostRegistrationButton } from "@/components/HostRegistrationButton";
+import { GuestSelector } from "@/components/GuestSelector";
 import { Search, Filter, MapPin, Calendar, Users, Heart, Star, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -69,6 +70,11 @@ const GuestDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState('all');
   const [guestCount, setGuestCount] = useState('all');
+  const [guestDetails, setGuestDetails] = useState({
+    adults: 2,
+    children: 0,
+    infants: 0
+  });
   const [sortBy, setSortBy] = useState('price-low');
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -86,7 +92,7 @@ const GuestDashboard = () => {
 
   useEffect(() => {
     filterAndSortListings();
-  }, [listings, searchQuery, priceRange, guestCount, sortBy]);
+  }, [listings, searchQuery, priceRange, guestCount, guestDetails, sortBy]);
 
   const fetchData = async () => {
     try {
@@ -151,6 +157,13 @@ const GuestDashboard = () => {
     if (guestCount !== 'all') {
       filtered = filtered.filter(listing =>
         listing.max_guests >= parseInt(guestCount)
+      );
+    }
+    
+    // Guest details filter (only adults count toward max_guests)
+    if (guestDetails.adults > 0) {
+      filtered = filtered.filter(listing =>
+        listing.max_guests >= guestDetails.adults
       );
     }
 
@@ -268,7 +281,7 @@ const GuestDashboard = () => {
                   <div className="relative">
                     <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`} />
                     <Input
-                      placeholder={language === 'ar' ? 'ابحث عن عقار أو موقع...' : 'Search for property or location...'}
+                      placeholder={language === 'ar' ? 'ابحث عن عقار أو موقع...' : 'Search for listing or location...'}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className={isRTL ? 'pr-10 text-right' : 'pl-10 text-left'}
@@ -289,19 +302,16 @@ const GuestDashboard = () => {
                     </SelectContent>
                   </Select>
 
-                  {/* Guest Count */}
-                  <Select value={guestCount} onValueChange={setGuestCount}>
-                    <SelectTrigger className={isRTL ? 'text-right' : 'text-left'}>
-                      <SelectValue placeholder={language === 'ar' ? 'عدد الضيوف' : 'Guest Count'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{language === 'ar' ? 'أي عدد' : 'Any number'}</SelectItem>
-                      <SelectItem value="1">{language === 'ar' ? 'ضيف واحد' : '1 guest'}</SelectItem>
-                      <SelectItem value="2">{language === 'ar' ? 'ضيفان' : '2 guests'}</SelectItem>
-                      <SelectItem value="4">{language === 'ar' ? '4 ضيوف' : '4 guests'}</SelectItem>
-                      <SelectItem value="6">{language === 'ar' ? '6+ ضيوف' : '6+ guests'}</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {/* Guest Details */}
+                  <div className="col-span-2">
+                    <GuestSelector
+                      value={guestDetails}
+                      onChange={setGuestDetails}
+                      maxGuests={16}
+                      variant="dropdown"
+                      placeholder={language === 'ar' ? 'اختر عدد الضيوف' : 'Select guests'}
+                    />
+                  </div>
 
                   {/* Sort */}
                   <Select value={sortBy} onValueChange={setSortBy}>
@@ -514,7 +524,7 @@ const GuestDashboard = () => {
                     {language === 'ar' ? 'لا توجد حجوزات بعد' : 'No bookings yet'}
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    {language === 'ar' ? 'ابدأ بحجز عقارك الأول!' : 'Start by booking your first property!'}
+                    {language === 'ar' ? 'ابدأ بحجز عقارك الأول!' : 'Start by booking your first listing!'}
                   </p>
                   <Button onClick={() => navigate('/browse')}>
                     {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}

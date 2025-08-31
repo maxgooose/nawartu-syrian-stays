@@ -47,11 +47,11 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Nawartu <info@nawartu.com>",
       to: [guestEmail],
-      subject: "تأكيد استلام طلب الحجز - نوارتو",
+      subject: "تأكيد استلام طلب الحجز - نورتوا",
       html: `
         <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">نوارتو</h1>
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">نورتوا</h1>
             <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">منصة الضيافة الأولى</p>
           </div>
           
@@ -59,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
             <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">مرحباً ${guestName}!</h2>
             
             <p style="color: #666; line-height: 1.6; font-size: 16px; margin-bottom: 20px;">
-              شكراً لك على اختيارك منصة نوارتو لحجز إقامتك. لقد تم استلام طلب حجزك بنجاح ونحن نقوم بمعالجته حالياً.
+              شكراً لك على اختيارك منصة نورتوا لحجز إقامتك. لقد تم استلام طلب حجزك بنجاح ونحن نقوم بمعالجته حالياً.
             </p>
             
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -126,13 +126,13 @@ const handler = async (req: Request): Promise<Response> => {
             
             <p style="color: #999; font-size: 14px; line-height: 1.5; margin-top: 20px;">
               مع أطيب التحيات،<br>
-              فريق نوارتو
+              فريق نورتوا
             </p>
           </div>
           
           <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e9ecef;">
             <p style="color: #666; margin: 0; font-size: 14px;">
-              © ${new Date().getFullYear()} نوارتو - منصة الضيافة الأولى
+              © ${new Date().getFullYear()} نورتوا - منصة الضيافة الأولى
             </p>
           </div>
         </div>

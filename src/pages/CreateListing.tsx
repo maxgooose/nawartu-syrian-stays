@@ -17,6 +17,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
 import { AMENITIES, getAmenityLabel } from "@/lib/amenities";
 import { getPublicImageUrl } from "@/lib/utils";
+import SyrianGovernorateDropdown from "@/components/SyrianGovernorateDropdown";
+import { SyrianGovernorate } from "@/lib/syrianGovernorates";
 
 const CreateListing = () => {
   const { language } = useLanguage();
@@ -31,6 +33,7 @@ const CreateListing = () => {
     location: '',
     latitude: null as number | null,
     longitude: null as number | null,
+    governorate: null as SyrianGovernorate | null,
     price_per_night_usd: '',
     price_per_night_syp: '',
     max_guests: '2',
@@ -60,7 +63,7 @@ const CreateListing = () => {
     if (!user || profile?.role !== 'host') {
       toast({
         title: language === 'ar' ? "خطأ" : "Error",
-        description: language === 'ar' ? "يجب أن تكون مضيفاً لإضافة عقار" : "You must be a host to add a property",
+        description: language === 'ar' ? "يجب أن تكون مضيفاً لإضافة عقار" : "You must be a host to add a listing",
         variant: "destructive",
       });
       return;
@@ -113,14 +116,14 @@ const CreateListing = () => {
 
       toast({
         title: language === 'ar' ? "تم بنجاح" : "Success",
-        description: language === 'ar' ? "تم إضافة العقار بنجاح وهو قيد المراجعة. تم إرسال تأكيد على بريدك الإلكتروني." : "Property added successfully and is under review. A confirmation has been sent to your email.",
+        description: language === 'ar' ? "تم إضافة العقار بنجاح وهو قيد المراجعة. تم إرسال تأكيد على بريدك الإلكتروني." : "Listing added successfully and is under review. A confirmation has been sent to your email.",
       });
 
       navigate('/host-dashboard');
     } catch (error: any) {
       toast({
         title: language === 'ar' ? "خطأ" : "Error",
-        description: error.message || (language === 'ar' ? "حدث خطأ في إضافة العقار" : "An error occurred while adding the property"),
+        description: error.message || (language === 'ar' ? "حدث خطأ في إضافة العقار" : "An error occurred while adding the listing"),
         variant: "destructive",
       });
     } finally {
@@ -147,12 +150,12 @@ const CreateListing = () => {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <Home className="h-6 w-6" />
-              {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Property'}
+              {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Listing'}
             </CardTitle>
             <p className="text-muted-foreground">
               {language === 'ar' 
                 ? 'أضف تفاصيل عقارك لبدء استقبال الضيوف' 
-                : 'Add your property details to start hosting guests'
+                : 'Add your listing details to start hosting guests'
               }
             </p>
           </CardHeader>
@@ -172,31 +175,12 @@ const CreateListing = () => {
                     <p className="text-sm text-muted-foreground">
                       {language === 'ar' 
                         ? 'يمكن لفريقنا إضافة عقارك نيابة عنك - تواصل معنا عبر واتساب' 
-                        : 'Our team can add your property for you - contact us on WhatsApp'
+                        : 'Our team can add your listing for you - contact us on WhatsApp'
                       }
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 w-full max-w-full overflow-hidden">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      asChild
-                      className="flex items-center justify-center gap-2 w-full sm:flex-1 min-w-0 text-sm"
-                    >
-                      <a
-                        href={`https://wa.me/19296679792?text=${encodeURIComponent(
-                          language === 'ar' 
-                            ? 'مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا'
-                            : 'Hello, I would like help adding my property to the Nawartu platform'
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 w-full"
-                      >
-                        <MessageCircle className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{language === 'ar' ? 'واتساب US' : 'WhatsApp US'}</span>
-                      </a>
-                    </Button>
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -207,14 +191,14 @@ const CreateListing = () => {
                         href={`https://wa.me/963969864741?text=${encodeURIComponent(
                           language === 'ar' 
                             ? 'مرحباً، أرغب في المساعدة لإضافة عقاري إلى منصة نورتوا'
-                            : 'Hello, I would like help adding my property to the Nawartu platform'
+                            : 'Hello, I would like help adding my listing to the Nawartu platform'
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 w-full"
                       >
                         <Phone className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{language === 'ar' ? 'واتساب سوريا' : 'WhatsApp Syria'}</span>
+                        <span className="truncate">{language === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
                       </a>
                     </Button>
                   </div>
@@ -231,7 +215,7 @@ const CreateListing = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">{language === 'ar' ? 'اسم العقار *' : 'Property Name *'}</Label>
+                    <Label htmlFor="name">{language === 'ar' ? 'اسم العقار *' : 'Listing Name *'}</Label>
                     <Input
                       id="name"
                       name="name"
@@ -243,31 +227,51 @@ const CreateListing = () => {
                   </div>
                   
                   <div>
-                    <LocationAutocomplete
-                      onLocationSelect={(location) => {
+                    <SyrianGovernorateDropdown
+                      onGovernorateSelect={(governorate) => {
                         setFormData(prev => ({
                           ...prev,
-                          location: location.address,
-                          latitude: location.lat,
-                          longitude: location.lng
+                          governorate: governorate,
+                          latitude: governorate.latitude,
+                          longitude: governorate.longitude,
+                          location: `${governorate.nameAr}, ${governorate.majorCities[0]}`
                         }));
                       }}
-                      defaultValue={formData.location}
-                      placeholder={language === 'ar' ? 'البحث عن الموقع...' : 'Search for location...'}
-                      label={language === 'ar' ? 'الموقع *' : 'Location *'}
-                      language={language as 'ar' | 'en'}
+                      selectedGovernorate={formData.governorate}
+                      label={language === 'ar' ? 'المحافظة *' : 'Governorate *'}
+                      placeholder={language === 'ar' ? 'اختر محافظة العقار...' : 'Select property governorate...'}
+                      adaptToHostLocation={false}
+                      required={true}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       {language === 'ar' 
-                        ? 'ابحث عن العنوان الكامل للعقار وحدد الموقع على الخريطة' 
-                        : 'Search for the complete property address and select location on map'}
+                        ? 'اختر المحافظة التي يقع فيها العقار' 
+                        : 'Select the governorate where the property is located'}
                     </p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="location">{language === 'ar' ? 'العنوان التفصيلي *' : 'Detailed Address *'}</Label>
+                    <Input
+                      id="location"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      placeholder={language === 'ar' ? 'مثال: المالكي، شارع الجلاء، رقم 15' : 'Example: Malki, Jalaa Street, No. 15'}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {language === 'ar' 
+                        ? 'أدخل العنوان التفصيلي للعقار' 
+                        : 'Enter the detailed address of the property'}
+                    </p>
+                  </div>
 
                     {/* Map Preview */}
                     {formData.latitude && formData.longitude && (
                       <div className="mt-4">
                         <Label className="text-sm font-medium">
-                          {language === 'ar' ? 'موقع العقار على الخريطة' : 'Property Location on Map'}
+                          {language === 'ar' ? 'موقع العقار على الخريطة' : 'Listing Location on Map'}
                         </Label>
                         <div className="mt-2 border rounded-lg overflow-hidden">
                           <GoogleMap
@@ -301,7 +305,6 @@ const CreateListing = () => {
                       </div>
                     )}
                   </div>
-                </div>
 
                 <div>
                   <Label htmlFor="description">{language === 'ar' ? 'الوصف *' : 'Description *'}</Label>
@@ -310,18 +313,18 @@ const CreateListing = () => {
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    placeholder={language === 'ar' ? 'اكتب وصفاً جذاباً لعقارك...' : 'Write an attractive description of your property...'}
+                    placeholder={language === 'ar' ? 'اكتب وصفاً جذاباً لعقارك...' : 'Write an attractive description of your listing...'}
                     rows={4}
                     required
                   />
                 </div>
               </div>
 
-              {/* Property Details */}
+              {/* Listing Details */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  {language === 'ar' ? 'تفاصيل العقار' : 'Property Details'}
+                  {language === 'ar' ? 'تفاصيل العقار' : 'Listing Details'}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -443,13 +446,13 @@ const CreateListing = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Upload className="h-5 w-5" />
-                  {language === 'ar' ? 'صور العقار' : 'Property Images'}
+                  {language === 'ar' ? 'صور العقار' : 'Listing Images'}
                 </h3>
                 <ImageUpload
                   onImagesUploaded={(urls) => setFormData(prev => ({ ...prev, images: urls }))}
                   existingImages={formData.images}
                   maxImages={10}
-                  bucketName="property-images"
+                  bucketName="listing-images"
                   folder="listings"
                 />
               </div>
@@ -466,7 +469,7 @@ const CreateListing = () => {
                 <Button type="submit" disabled={loading} className="flex-1">
                   {loading 
                     ? (language === 'ar' ? "جاري الحفظ..." : "Saving...") 
-                    : (language === 'ar' ? "إضافة العقار" : "Add Property")
+                    : (language === 'ar' ? "إضافة العقار" : "Add Listing")
                   }
                 </Button>
               </div>

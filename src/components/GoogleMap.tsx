@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SYRIAN_GOVERNORATES } from '@/lib/syrianGovernorates';
 
 interface GoogleMapProps {
   lat?: number;
@@ -42,15 +43,12 @@ interface CityDistance {
   duration: string;
 }
 
-// Major Syrian cities coordinates
-const MAJOR_SYRIAN_CITIES = [
-  { name: 'دمشق', lat: 33.5138, lng: 36.2765 },
-  { name: 'حلب', lat: 36.2021, lng: 37.1343 },
-  { name: 'حمص', lat: 34.7394, lng: 36.7163 },
-  { name: 'حماة', lat: 35.1519, lng: 36.7500 },
-  { name: 'اللاذقية', lat: 35.5376, lng: 35.7800 },
-  { name: 'طرطوس', lat: 34.8899, lng: 35.8847 }
-];
+// Major Syrian cities coordinates (using governorate data)
+const MAJOR_SYRIAN_CITIES = SYRIAN_GOVERNORATES.map(gov => ({
+  name: gov.nameAr,
+  lat: gov.latitude,
+  lng: gov.longitude
+}));
 
 const GoogleMap: React.FC<GoogleMapProps> = ({
   lat = 33.5138, // Damascus default

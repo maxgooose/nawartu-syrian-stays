@@ -130,7 +130,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
       <Card className={cn("overflow-hidden", className)}>
         <div className="aspect-[16/10] relative group">
           <img
-            src={getPublicImageUrl(images[0], 'property-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
+            src={getPublicImageUrl(images[0], 'listing-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
             alt={propertyName}
             className="w-full h-full object-cover"
           />
@@ -157,7 +157,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                   <X className="h-5 w-5" />
                 </Button>
                 <img
-                  src={getPublicImageUrl(images[0], 'property-images', { width: 1200, quality: 90 }) || '/placeholder.svg'}
+                  src={getPublicImageUrl(images[0], 'listing-images', { width: 1200, quality: 90 }) || '/placeholder.svg'}
                   alt={propertyName}
                   className="max-w-full max-h-full object-contain"
                 />
@@ -196,7 +196,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                   onTouchEnd={onTouchEnd}
                 >
                   <img
-                    src={getPublicImageUrl(image, 'property-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
+                    src={getPublicImageUrl(image, 'listing-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
                     alt={`${propertyName} - Image ${index + 1}`}
                     className="w-full h-full object-cover"
                     loading={index === 0 ? "eager" : "lazy"}
@@ -266,7 +266,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
               {/* Fullscreen Image Display */}
               <div className="w-full h-full flex items-center justify-center p-3 md:p-4">
                 <img
-                  src={getPublicImageUrl(images[currentImageIndex], 'property-images', { width: 1200, quality: 90 }) || '/placeholder.svg'}
+                  src={getPublicImageUrl(images[currentImageIndex], 'listing-images', { width: 1200, quality: 90 }) || '/placeholder.svg'}
                   alt={`${propertyName} - Image ${currentImageIndex + 1}`}
                   className="max-w-full max-h-full object-contain"
                 />
@@ -318,7 +318,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                       aria-label={`${language === 'ar' ? 'انتقل إلى الصورة' : 'Go to image'} ${index + 1}`}
                     >
                       <img
-                        src={getPublicImageUrl(image, 'property-images', { width: 100, quality: 60 }) || '/placeholder.svg'}
+                        src={getPublicImageUrl(image, 'listing-images', { width: 100, quality: 60 }) || '/placeholder.svg'}
                         alt={`Thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
                       />

@@ -15,6 +15,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
 import { AMENITIES } from "@/lib/amenities";
 import { getPublicImageUrl } from "@/lib/utils";
+import SyrianGovernorateDropdown from "@/components/SyrianGovernorateDropdown";
+import { SyrianGovernorate } from "@/lib/syrianGovernorates";
 
 const EditListing = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +31,7 @@ const EditListing = () => {
     name: '',
     description: '',
     location: '',
+    governorate: null as SyrianGovernorate | null,
     price_per_night_usd: '',
     price_per_night_syp: '',
     max_guests: '2',
@@ -36,7 +39,6 @@ const EditListing = () => {
     bathrooms: '1',
     amenities: [] as string[],
     images: [] as string[],
-
   });
 
   useEffect(() => {
@@ -64,7 +66,7 @@ const EditListing = () => {
       if (!data) {
         toast({
           title: language === 'ar' ? "خطأ" : "Error",
-          description: language === 'ar' ? "العقار غير موجود" : "Property not found",
+          description: language === 'ar' ? "العقار غير موجود" : "Listing not found",
           variant: "destructive",
         });
         navigate('/host-dashboard');
@@ -75,6 +77,7 @@ const EditListing = () => {
         name: data.name || '',
         description: data.description || '',
         location: data.location || '',
+        governorate: null, // Will be populated based on location or coordinates
         price_per_night_usd: data.price_per_night_usd?.toString() || '',
         price_per_night_syp: data.price_per_night_syp?.toString() || '',
         max_guests: data.max_guests?.toString() || '2',
@@ -82,7 +85,6 @@ const EditListing = () => {
         bathrooms: data.bathrooms?.toString() || '1',
         amenities: data.amenities || [],
         images: data.images || [],
-
       });
     } catch (error: any) {
       toast({
@@ -142,16 +144,14 @@ const EditListing = () => {
 
       toast({
         title: language === 'ar' ? "تم بنجاح" : "Success",
-        description: language === 'ar' 
-          ? "تم تحديث العقار بنجاح" 
-          : "Property updated successfully",
+        description: "Listing updated successfully",
       });
 
       navigate('/host-dashboard');
     } catch (error: any) {
       toast({
         title: language === 'ar' ? "خطأ" : "Error",
-        description: error.message || "Failed to update property",
+        description: error.message || "Failed to update listing",
         variant: "destructive",
       });
     } finally {
@@ -189,12 +189,12 @@ const EditListing = () => {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <Home className="h-6 w-6" />
-              {language === 'ar' ? 'تعديل العقار' : 'Edit Property'}
+              {language === 'ar' ? 'تعديل العقار' : 'Edit Listing'}
             </CardTitle>
             <p className="text-muted-foreground">
               {language === 'ar' 
                 ? 'قم بتحديث تفاصيل عقارك' 
-                : 'Update your property details'
+                : 'Update your listing details'
               }
             </p>
           </CardHeader>
@@ -210,7 +210,7 @@ const EditListing = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="name">
-                      {language === 'ar' ? 'اسم العقار *' : 'Property Name *'}
+                      {language === 'ar' ? 'اسم العقار *' : 'Listing Name *'}
                     </Label>
                     <Input
                       id="name"
@@ -226,20 +226,41 @@ const EditListing = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="location">{language === 'ar' ? 'الموقع *' : 'Location *'}</Label>
+                    <SyrianGovernorateDropdown
+                      onGovernorateSelect={(governorate) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          governorate: governorate,
+                          location: `${governorate.nameAr}, ${governorate.majorCities[0]}`
+                        }));
+                      }}
+                      selectedGovernorate={formData.governorate}
+                      label={language === 'ar' ? 'المحافظة *' : 'Governorate *'}
+                      placeholder={language === 'ar' ? 'اختر محافظة العقار...' : 'Select property governorate...'}
+                      required={true}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {language === 'ar' 
+                        ? 'اختر المحافظة التي يقع فيها العقار' 
+                        : 'Select the governorate where the property is located'}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="location">{language === 'ar' ? 'العنوان التفصيلي *' : 'Detailed Address *'}</Label>
                     <Input
                       id="location"
                       name="location"
                       value={formData.location}
                       onChange={handleInputChange}
-                      placeholder={language === 'ar' ? 'مثال: دمشق، المالكي، شارع الجلاء' : 'Example: Damascus, Malki, Jalaa Street'}
+                      placeholder={language === 'ar' ? 'مثال: المالكي، شارع الجلاء، رقم 15' : 'Example: Malki, Jalaa Street, No. 15'}
                       required
                       className="mt-1"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       {language === 'ar' 
-                        ? 'أدخل العنوان الكامل للعقار بما في ذلك المدينة والحي والشارع' 
-                        : 'Enter the complete address including city, neighborhood, and street'}
+                        ? 'أدخل العنوان التفصيلي للعقار' 
+                        : 'Enter the detailed address of the property'}
                     </p>
                   </div>
                 </div>
@@ -254,8 +275,8 @@ const EditListing = () => {
                     value={formData.description}
                     onChange={handleInputChange}
                     placeholder={language === 'ar'
-                      ? "اكتب وصفاً مفصلاً عن عقارك..."
-                      : "Write a detailed description of your property..."
+                      ? "اكتب وصفاً مفصلاً لعقارك..."
+                      : "Write a detailed description of your listing..."
                     }
                     rows={5}
                     required
@@ -263,10 +284,10 @@ const EditListing = () => {
                 </div>
               </div>
 
-              {/* Property Details */}
+              {/* Listing Details */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">
-                  {language === 'ar' ? 'تفاصيل العقار' : 'Property Details'}
+                  {language === 'ar' ? 'تفاصيل العقار' : 'Listing Details'}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -381,10 +402,10 @@ const EditListing = () => {
                 </div>
               </div>
 
-              {/* Images */}
+              {/* Listing Images */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">
-                  {language === 'ar' ? 'صور العقار' : 'Property Images'}
+                  {language === 'ar' ? 'صور العقار' : 'Listing Images'}
                 </h3>
                 
                 <ImageUpload

@@ -49,7 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
     let htmlContent: string;
     
     if (email_action_type === 'signup') {
-      subject = isArabic ? 'مرحباً بك في نوارتو - تأكيد الحساب' : 'Welcome to Nawartu - Confirm Your Account';
+      subject = isArabic ? 'مرحباً بك في نورتوا - تأكيد الحساب' : 'Welcome to Nawartu - Confirm Your Account';
       
       const confirmUrl = `${site_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect_to}`;
       
@@ -67,7 +67,7 @@ const handler = async (req: Request): Promise<Response> => {
               <span style="color: white; font-size: 32px; font-weight: bold;">N</span>
             </div>
             <h1 style="color: #8B4513; margin: 0; font-size: 28px;">
-              ${isArabic ? 'مرحباً بك في نوارتو' : 'Welcome to Nawartu'}
+              ${isArabic ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu'}
             </h1>
             <p style="color: #666; margin: 10px 0 0; font-size: 16px;">
               ${isArabic ? 'منصة الإقامة السورية' : 'Syrian Hospitality Platform'}
@@ -80,7 +80,7 @@ const handler = async (req: Request): Promise<Response> => {
             </h2>
             <p style="font-size: 16px; margin-bottom: 25px;">
               ${isArabic 
-                ? 'شكراً لك على انضمامك إلى نوارتو، منصة الإقامة السورية الأصيلة. لإكمال عملية التسجيل، يرجى تأكيد عنوان بريدك الإلكتروني.'
+                ? 'شكراً لك على انضمامك إلى نورتوا، منصة الإقامة السورية الأصيلة. لإكمال عملية التسجيل، يرجى تأكيد عنوان بريدك الإلكتروني.'
                 : 'Thank you for joining Nawartu, the authentic Syrian hospitality platform. To complete your registration, please confirm your email address.'
               }
             </p>
@@ -112,14 +112,14 @@ const handler = async (req: Request): Promise<Response> => {
             </p>
             <p style="margin-top: 20px;">
               ${isArabic ? 'مع أطيب التحيات،' : 'Best regards,'}<br>
-              <strong>${isArabic ? 'فريق نوارتو' : 'The Nawartu Team'}</strong>
+              <strong>${isArabic ? 'فريق نورتوا' : 'The Nawartu Team'}</strong>
             </p>
           </div>
         </body>
         </html>
       `;
     } else if (email_action_type === 'recovery') {
-      subject = isArabic ? 'إعادة تعيين كلمة المرور - نوارتو' : 'Reset Your Password - Nawartu';
+      subject = isArabic ? 'إعادة تعيين كلمة المرور - نورتوا' : 'Reset Your Password - Nawartu';
       
       const resetUrl = `${site_url}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect_to}`;
       
@@ -147,7 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
             </h2>
             <p style="font-size: 16px; margin-bottom: 25px;">
               ${isArabic 
-                ? 'تلقينا طلباً لإعادة تعيين كلمة المرور لحسابك في نوارتو. انقر على الزر أدناه لإنشاء كلمة مرور جديدة.'
+                ? 'تلقينا طلباً لإعادة تعيين كلمة المرور لحسابك في نورتوا. انقر على الزر أدناه لإنشاء كلمة مرور جديدة.'
                 : 'We received a request to reset the password for your Nawartu account. Click the button below to create a new password.'
               }
             </p>
@@ -176,7 +176,7 @@ const handler = async (req: Request): Promise<Response> => {
             </p>
             <p style="margin-top: 20px;">
               ${isArabic ? 'مع أطيب التحيات،' : 'Best regards,'}<br>
-              <strong>${isArabic ? 'فريق نوارتو' : 'The Nawartu Team'}</strong>
+              <strong>${isArabic ? 'فريق نورتوا' : 'The Nawartu Team'}</strong>
             </p>
           </div>
         </body>
@@ -184,10 +184,10 @@ const handler = async (req: Request): Promise<Response> => {
       `;
     } else {
       // Default for other email types
-      subject = isArabic ? 'رسالة من نوارتو' : 'Message from Nawartu';
+      subject = isArabic ? 'رسالة من نورتوا' : 'Message from Nawartu';
       htmlContent = `
-        <h1>${isArabic ? 'مرحباً من نوارتو' : 'Hello from Nawartu'}</h1>
-        <p>${isArabic ? 'تم إرسال هذا البريد الإلكتروني من نوارتو.' : 'This email was sent from Nawartu.'}</p>
+        <h1>${isArabic ? 'مرحباً من نورتوا' : 'Hello from Nawartu'}</h1>
+        <p>${isArabic ? 'تم إرسال هذا البريد الإلكتروني من نورتوا.' : 'This email was sent from Nawartu.'}</p>
       `;
     }
 

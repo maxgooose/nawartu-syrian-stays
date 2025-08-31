@@ -37,7 +37,7 @@ export const AuthCallback = () => {
           // Give some time for the profile creation trigger to complete
           setTimeout(() => {
             toast({
-              title: language === 'ar' ? 'مرحباً بك في نوارتو!' : 'Welcome to Nawartu!',
+              title: language === 'ar' ? 'مرحباً بك في نورتوا!' : 'Welcome to Nawartu!',
               description: language === 'ar' 
                 ? 'تم تأكيد حسابك بنجاح.'
                 : 'Your account has been confirmed successfully.',

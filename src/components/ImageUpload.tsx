@@ -18,7 +18,7 @@ export const ImageUpload = ({
   onImagesUploaded, 
   existingImages = [], 
   maxImages = 10,
-  bucketName = "property-images",
+  bucketName = "listing-images",
   folder = "listings"
 }: ImageUploadProps) => {
   const [images, setImages] = useState<string[]>(existingImages);
