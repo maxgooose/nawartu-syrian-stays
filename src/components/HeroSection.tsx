@@ -331,9 +331,6 @@ export const HeroSection = ({
             {/* When Panel - Calendar */}
             {activeSection === 'when' && (
               <div className="p-6">
-                <div className="text-lg font-semibold text-gray-800 mb-4">
-                  {language === 'ar' ? 'متى تريد الإقامة؟' : 'When do you want to stay?'}
-                </div>
                 <DateRangePicker
                   dateRange={searchData.dateRange}
                   onDateRangeChange={handleDateRangeChange}
