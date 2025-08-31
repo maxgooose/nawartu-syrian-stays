@@ -175,9 +175,11 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
         {/* Main Carousel */}
         <Carousel
           className="w-full"
-          onSelect={(api) => {
+          setApi={(api) => {
             if (api) {
-              setCurrentImageIndex(api.selectedScrollSnap());
+              api.on("select", () => {
+                setCurrentImageIndex(api.selectedScrollSnap());
+              });
             }
           }}
           opts={{

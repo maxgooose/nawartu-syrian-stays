@@ -38,22 +38,24 @@ export function DateRangePicker({
     : 0;
 
   // Handle date selection with sequential guidance
-  const handleDateSelect = (selectedDate: Date | undefined) => {
-    if (!selectedDate) return;
+  const handleDateSelect = (range: DateRange | undefined) => {
+    if (!range) {
+      onDateRangeChange(undefined);
+      return;
+    }
 
-    if (!dateRange?.from) {
-      // First date selected - set as check-in
-      onDateRangeChange({ from: selectedDate, to: undefined });
-      // Keep popover open to guide user to select check-out
-    } else if (!dateRange?.to) {
-      // Second date selected - validate and complete range
-      if (selectedDate <= dateRange.from) {
-        // Invalid selection - check-out must be after check-in
-        return;
-      }
-      onDateRangeChange({ from: dateRange.from, to: selectedDate });
-      // Close popover after successful selection
+    if (!range.from) {
+      onDateRangeChange(undefined);
+      return;
+    }
+
+    // If we have both dates, complete the selection
+    if (range.from && range.to) {
+      onDateRangeChange(range);
       setIsOpen(false);
+    } else {
+      // Only start date is selected, keep popover open for end date
+      onDateRangeChange(range);
     }
   };
 
@@ -63,36 +65,6 @@ export function DateRangePicker({
     onDateRangeChange(undefined);
   };
 
-  // Custom day renderer for better visual feedback
-  const renderDay = (day: Date, modifiers: any) => {
-    const isSelected = dateRange?.from && dateRange?.to && 
-      (isAfter(day, startOfDay(dateRange.from)) || isSameDay(day, dateRange.from)) &&
-      (isBefore(day, startOfDay(dateRange.to)) || isSameDay(day, dateRange.to));
-    
-    const isStart = dateRange?.from && isSameDay(day, dateRange.from);
-    const isEnd = dateRange?.to && isSameDay(day, dateRange.to);
-    const isAfterCheckIn = dateRange?.from && day > dateRange.from;
-    
-    return (
-      <div
-        className={cn(
-          "relative w-full h-full flex items-center justify-center",
-          isSelected && "bg-primary/10",
-          isStart && "bg-primary text-primary-foreground rounded-l-md",
-          isEnd && "bg-primary text-primary-foreground rounded-r-md",
-          isStart && isEnd && "rounded-md",
-          // Highlight dates after check-in to guide user
-          dateRange?.from && !dateRange?.to && isAfterCheckIn && "bg-blue-50 hover:bg-blue-100 cursor-pointer"
-        )}
-      >
-        {day.getDate()}
-        {/* Visual indicator for next step */}
-        {dateRange?.from && !dateRange?.to && isAfterCheckIn && (
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-        )}
-      </div>
-    );
-  };
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -213,22 +185,31 @@ export function DateRangePicker({
               nav_button_next: "absolute right-1",
               table: "w-full border-collapse space-y-1",
               head_row: "flex",
-              head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+              head_cell: "text-muted-foreground rounded-md w-10 font-normal text-[0.8rem]",
               row: "flex w-full mt-2",
-              cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-              day: cn(
-                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+              cell: cn(
+                "h-10 w-10 text-center text-sm p-0 relative",
+                "[&:has([aria-selected].day-range-end)]:rounded-r-lg",
+                "[&:has([aria-selected].day-range-start)]:rounded-l-lg",
+                "[&:has([aria-selected])]:bg-primary/10",
+                "first:[&:has([aria-selected])]:rounded-l-lg",
+                "last:[&:has([aria-selected])]:rounded-r-lg",
+                "focus-within:relative focus-within:z-20"
               ),
-              day_range_end: "day-range-end",
-              day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-              day_today: "bg-accent text-accent-foreground",
-              day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-              day_disabled: "text-muted-foreground opacity-50",
-              day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+              day: cn(
+                "h-10 w-10 p-0 font-normal rounded-lg transition-all duration-200",
+                "hover:bg-primary/20 hover:scale-105",
+                "focus:bg-primary focus:text-primary-foreground",
+                "aria-selected:opacity-100"
+              ),
+              day_range_end: "bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg font-semibold",
+              day_range_start: "bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg font-semibold",
+              day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg font-semibold",
+              day_today: "bg-accent text-accent-foreground font-semibold border-2 border-primary/30",
+              day_outside: "text-muted-foreground opacity-30 hover:opacity-50",
+              day_disabled: "text-muted-foreground opacity-30 cursor-not-allowed hover:bg-transparent",
+              day_range_middle: "bg-primary/15 text-primary hover:bg-primary/25 rounded-none",
               day_hidden: "invisible",
-            }}
-            components={{
-              Day: ({ date, ...props }) => renderDay(date, props),
             }}
           />
           
