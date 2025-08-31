@@ -228,10 +228,24 @@ export const HeroSection = ({
                 
                 {/* Search Input */}
                 <div className="mb-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={searchData.location}
+                      onChange={(e) => setSearchData(prev => ({ ...prev, location: e.target.value }))}
+                      placeholder={language === 'ar' ? 'ابحث عن وجهة...' : 'Search destinations...'}
+                      className="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                {/* Governorate Dropdown */}
+                <div className="mb-4">
                   <SyrianGovernorateDropdown
                     onGovernorateSelect={handleGovernorateSelect}
                     selectedGovernorate={searchData.governorate}
-                    placeholder={language === 'ar' ? 'اختر المحافظة...' : 'Select governorate...'}
+                    placeholder={language === 'ar' ? 'أو اختر من المحافظات...' : 'Or select from governorates...'}
                     showSearch={true}
                     className="h-12"
                   />
