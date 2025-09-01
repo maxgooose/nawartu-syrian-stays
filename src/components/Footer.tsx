@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, MessageCircle, Globe } from "lucide-react";
+import { Instagram, MessageCircle, Languages } from "lucide-react";
 import { TikTokIcon } from "@/components/ui/icons";
 
 interface FooterProps {
@@ -194,7 +194,7 @@ export const Footer = ({ language, onLanguageChange }: FooterProps) => {
                     language === 'en' ? 'text-gray-900 font-medium' : 'text-gray-600'
                   }`}
                 >
-                  <Globe className="h-4 w-4" />
+                  <Languages className="h-4 w-4" />
                   English (US)
                 </button>
                 <span className="text-gray-400">|</span>

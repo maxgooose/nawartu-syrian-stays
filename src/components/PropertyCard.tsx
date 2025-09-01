@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import { Heart, Star, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Heart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getAmenityLabel } from "@/lib/amenities";
 import { toggleFavorite, getFavorites } from "@/lib/utils";
 
 interface PropertyCardProps {
@@ -26,6 +23,7 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
   const isRTL = language === 'ar';
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
+  const guestFavorite = property.rating >= 4.8;
 
   // Initialize favorite state
   useEffect(() => {
@@ -48,78 +46,76 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden hover-lift cursor-pointer group pattern-subtle border border-primary/5 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up">
-      <div className="relative aspect-[4/3] overflow-hidden">
+    <div 
+      onClick={() => navigate(`/property/${property.id}`)}
+      className="cursor-pointer group"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
+      {/* Image Container - Airbnb Style */}
+      <div className="relative aspect-square mb-3 overflow-hidden rounded-xl">
         <img 
           src={property.image} 
           alt={property.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200 ease-out"
         />
-        <Button
-          variant="ghost"
-          size="sm"
+        
+        {/* Favorite Heart - Airbnb Style */}
+        <button
           onClick={handleFavoriteToggle}
-          className="absolute top-3 right-3 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
+          className="absolute top-3 right-3 p-2 hover:scale-110 transition-transform duration-200"
+          aria-label={isFavorited ? (language === 'ar' ? 'إزالة من المفضلة' : 'Remove from favorites') : (language === 'ar' ? 'أضف إلى المفضلة' : 'Add to favorites')}
         >
-          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-        </Button>
-        <div className="absolute bottom-3 left-3 bg-primary/90 backdrop-blur-sm text-primary-foreground px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
-          {language === 'ar' ? property.type : property.type}
-        </div>
+          <Heart 
+            className={`h-6 w-6 transition-colors duration-200 ${
+              isFavorited 
+                ? 'fill-red-500 stroke-red-500' 
+                : 'fill-black/20 stroke-white hover:stroke-gray-300'
+            }`}
+            strokeWidth={1.5}
+          />
+        </button>
+
+        {/* Guest Favorite Badge */}
+        {guestFavorite && (
+          <div className="absolute top-3 left-3 bg-white text-gray-900 px-2 py-1 rounded-full text-xs font-medium shadow-sm">
+            {language === 'ar' ? 'مفضل الضيوف' : 'Guest favorite'}
+          </div>
+        )}
       </div>
 
-      <CardContent className="p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="flex items-start justify-between mb-2">
-          <h3 className={`font-semibold text-lg text-foreground line-clamp-1 ${isRTL ? 'text-arabic' : 'text-latin'}`}>
-            {property.title}
-          </h3>
-          <div className="flex items-center space-x-1 rtl:space-x-reverse">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">{property.rating}</span>
-            <span className="text-sm text-muted-foreground">({property.reviews})</span>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-1 rtl:space-x-reverse text-muted-foreground mb-3">
-          <MapPin className="h-4 w-4" />
-          <span className="text-sm">{property.location}</span>
-        </div>
-
-        <div className="flex items-center space-x-2 rtl:space-x-reverse mb-3">
-          {property.features.slice(0, 2).map((feature, index) => (
-            <span 
-              key={index}
-              className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
-            >
-              {getAmenityLabel(feature, language)}
-            </span>
-          ))}
-          {property.features.length > 2 && (
-            <span className="text-xs text-muted-foreground">
-              +{property.features.length - 2} {language === 'ar' ? 'المزيد' : 'more'}
-            </span>
-          )}
-        </div>
-
+      {/* Content - Airbnb Style */}
+      <div className="space-y-1">
+        {/* Location and Rating */}
         <div className="flex items-center justify-between">
-          <div className={`${isRTL ? 'text-arabic' : 'text-latin'}`}>
-            <span className="text-sm font-medium text-gray-400">
-              {formatPrice(property.price, property.currency)}
-            </span>
-            <span className="text-xs text-gray-400">
-              {language === 'ar' ? ' / ليلة' : ' / night'}
-            </span>
+          <h3 className={`text-gray-900 font-medium text-sm line-clamp-1 flex-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
+            {property.location}
+          </h3>
+          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+            <Star className="h-3 w-3 fill-black stroke-black" />
+            <span className="text-sm text-gray-900">{property.rating.toFixed(1)}</span>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate(`/property/${property.id}`)}
-            className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-          >
-            {language === 'ar' ? 'احجز' : 'Book'}
-          </Button>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Property Title */}
+        <p className={`text-gray-600 text-sm line-clamp-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
+          {property.title}
+        </p>
+
+        {/* Date placeholder - Airbnb shows dates */}
+        <p className="text-gray-600 text-sm">
+          {language === 'ar' ? '٥-١٠ نوفمبر' : 'Nov 5–10'}
+        </p>
+
+        {/* Price */}
+        <div className={`pt-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
+          <span className="text-gray-900 font-medium text-sm">
+            {formatPrice(property.price, property.currency)}
+          </span>
+          <span className="text-gray-600 text-sm font-normal">
+            {language === 'ar' ? ' ليلة' : ' night'}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };

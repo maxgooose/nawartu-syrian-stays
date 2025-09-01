@@ -17,7 +17,7 @@ import {
   User, 
   Mail, 
   Phone, 
-  Globe, 
+  Languages, 
   Shield, 
   Key,
   Upload,
@@ -346,7 +346,7 @@ const ProfileManagement = () => {
                     </div>
                   )}
                   <div className="flex items-center justify-center gap-2">
-                    <Globe className="h-4 w-4" />
+                    <Languages className="h-4 w-4" />
                     <span>{profile.preferred_language === 'ar' ? 'العربية' : 'English'}</span>
                   </div>
                 </div>

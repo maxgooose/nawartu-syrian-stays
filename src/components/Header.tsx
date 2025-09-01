@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Globe, Menu, X, User, LogOut, Shield, MapPin } from "lucide-react";
+import { Menu, X, User, LogOut, Shield, MapPin, Languages } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,8 +35,8 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
           {/* Logo - Airbnb Style */}
           <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0">
             <img src="/nawartu-logo.png" alt="Nawartu Logo" className="h-8 w-8" />
-            <span className="text-xl font-semibold text-pink-500 tracking-normal">
-              {language === 'ar' ? 'نورتوا' : 'nawartu'}
+            <span className="text-xl font-semibold tracking-normal" style={{ color: '#0F5E2B' }}>
+              {language === 'ar' ? 'نورتوا' : 'Nawartu'}
             </span>
           </div>
 
@@ -57,12 +57,14 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
 
           {/* Right Section - Airbnb Style */}
           <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0">
-            {/* Language Toggle */}
+            {/* Language Toggle - Clear and understandable */}
             <button
               onClick={toggleLanguage}
-              className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all duration-200"
+              className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all duration-200 text-sm font-medium"
+              title={language === 'ar' ? 'تغيير إلى الإنجليزية' : 'Switch to Arabic'}
             >
-              <Globe className="h-4 w-4" />
+              <Languages className="h-4 w-4" />
+              <span>{language === 'ar' ? 'EN' : 'AR'}</span>
             </button>
 
             {/* User Menu - Airbnb Style */}
@@ -112,7 +114,11 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-1 rtl:space-x-reverse">
-                <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 border border-gray-300 rounded-full hover:shadow-md transition-all duration-200">
+                <button 
+                  onClick={() => navigate('/auth')}
+                  className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 border border-gray-300 rounded-full hover:shadow-md transition-all duration-200"
+                  aria-label={language === 'ar' ? 'تسجيل الدخول أو إنشاء حساب' : 'Sign in or create account'}
+                >
                   <Menu className="h-4 w-4 text-gray-600" />
                   <div className="h-8 w-8 bg-gray-500 rounded-full flex items-center justify-center">
                     <User className="h-4 w-4 text-white" />

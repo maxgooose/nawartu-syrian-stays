@@ -22,7 +22,7 @@ import {
   MapPin,
   DollarSign,
   Clock,
-  Globe,
+  Languages,
   ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -342,9 +342,10 @@ const AdminDashboard = () => {
               size="sm"
               onClick={() => handleLanguageChange(language === 'ar' ? 'en' : 'ar')}
               className="flex items-center gap-2"
+              title={language === 'ar' ? 'تغيير إلى الإنجليزية' : 'Switch to Arabic'}
             >
-              <Globe className="h-4 w-4" />
-              {language === 'ar' ? 'English' : 'العربية'}
+              <Languages className="h-4 w-4" />
+              {language === 'ar' ? 'EN' : 'AR'}
             </Button>
           </div>
         </div>

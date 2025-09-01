@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Mail, Lock, Globe } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Languages } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PhoneInputComponent } from '@/components/PhoneInput';
 
@@ -197,9 +197,10 @@ const Auth = () => {
               size="sm"
               onClick={() => handleLanguageChange(language === 'ar' ? 'en' : 'ar')}
               className="gap-2"
+              title={language === 'ar' ? 'تغيير إلى الإنجليزية' : 'Switch to Arabic'}
             >
-              <Globe className="h-4 w-4" />
-              {language === 'ar' ? 'English' : 'العربية'}
+              <Languages className="h-4 w-4" />
+              {language === 'ar' ? 'EN' : 'AR'}
             </Button>
           </div>
         </CardHeader>

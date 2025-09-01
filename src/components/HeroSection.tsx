@@ -54,6 +54,18 @@ export const HeroSection = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Lock body scroll on mobile when a panel is open
+  useEffect(() => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (activeSection && isMobile) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [activeSection]);
+
   const handleSearch = () => {
     // Validate required fields
     if (!searchData.governorate && !searchData.location) {
@@ -159,7 +171,7 @@ export const HeroSection = ({
       {/* Airbnb-style Search Bar */}
       <div className="absolute top-6 left-4 right-4 z-50" ref={searchRef}>
         <div className="bg-white rounded-full shadow-2xl border border-gray-200 overflow-hidden">
-          <div className="flex items-center">
+          <div className="flex items-center divide-x divide-gray-300">
             {/* Where Section */}
             <div 
               className={`flex-1 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-all duration-200 rounded-l-full ${
@@ -176,7 +188,7 @@ export const HeroSection = ({
             </div>
 
             {/* Divider */}
-            <div className="w-px h-12 bg-gray-300"></div>
+            <div className="hidden sm:block w-px h-12 bg-gray-300"></div>
 
             {/* When Section */}
             <div 
@@ -194,7 +206,7 @@ export const HeroSection = ({
             </div>
 
             {/* Divider */}
-            <div className="w-px h-12 bg-gray-300"></div>
+            <div className="hidden sm:block w-px h-12 bg-gray-300"></div>
 
             {/* Who Section */}
             <div 
@@ -224,10 +236,21 @@ export const HeroSection = ({
           </div>
         </div>
 
-        {/* Where Panel - Airbnb Style */}
+        {/* Backdrop on mobile when any panel is open */}
+        {activeSection && (
+          <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setActiveSection(null)} />
+        )}
+
+                 {/* Where Panel - fixed background */}
         {activeSection === 'where' && (
-          <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+          <div className="fixed inset-0 z-50 bg-white md:inset-auto md:absolute md:top-full md:left-0 md:right-0 md:mt-3 md:bg-white md:rounded-3xl md:shadow-2xl md:border md:border-gray-100 overflow-auto max-w-full md:max-w-2xl md:mx-auto">
             <div className="p-0">
+              {/* Mobile close */}
+              <div className="md:hidden flex justify-end p-4">
+                <button onClick={() => setActiveSection(null)} className="p-2 rounded-full border text-gray-600">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
               {/* Search Input - Integrated at top */}
               <div className="p-6 pb-4">
                 <div className="relative">
@@ -387,9 +410,15 @@ export const HeroSection = ({
           </div>
         )}
 
-        {/* When - Direct Calendar without panel */}
+        {/* When - fullscreen on mobile */}
         {activeSection === 'when' && (
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2">
+          <div className="fixed inset-0 z-50 bg-white p-4 md:p-0 md:absolute md:top-full md:left-1/2 md:transform md:-translate-x-1/2 md:mt-2">
+            <div className="md:hidden flex justify-between items-center mb-2">
+              <div className="text-sm font-medium text-gray-700">{language === 'ar' ? 'التواريخ' : 'Dates'}</div>
+              <button onClick={() => setActiveSection(null)} className="p-2 rounded-full border text-gray-600">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
             <DateRangePicker
               dateRange={searchData.dateRange}
               onDateRangeChange={handleDateRangeChange}
@@ -401,9 +430,16 @@ export const HeroSection = ({
           </div>
         )}
 
-        {/* Who - Direct Guest Controls without any panel */}
+        {/* Who - responsive panel */}
         {activeSection === 'who' && (
-          <div className="absolute top-full right-0 left-0 md:left-auto md:right-4 mt-2 bg-white rounded-lg shadow-lg border p-4 w-full md:w-80 z-50">
+          <div className="fixed inset-0 z-50 bg-white p-4 md:absolute md:inset-auto md:top-full md:right-4 md:mt-2 md:bg-white md:rounded-lg md:shadow-lg md:border md:w-80 md:p-4 overflow-auto">
+            {/* Mobile header */}
+            <div className="md:hidden flex justify-between items-center mb-2">
+              <div className="text-sm font-medium text-gray-700">{language === 'ar' ? 'الضيوف' : 'Guests'}</div>
+              <button onClick={() => setActiveSection(null)} className="p-2 rounded-full border text-gray-600">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
             <div className="space-y-4">
               {/* Adults */}
               <div className="flex items-center justify-between">
