@@ -33,7 +33,8 @@ interface PropertyImageGalleryProps {
 export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
   images,
   propertyName,
-  className
+  className,
+  onClose
 }) => {
   const { language } = useLanguage();
   const isRTL = language === 'ar';

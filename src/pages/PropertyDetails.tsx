@@ -895,10 +895,10 @@ const PropertyDetails = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">
-                      {language === 'ar' ? 'أفضل 10% من المنازل' : 'Top 10% of homes'}
+                      {language === 'ar' ? 'إقامة استثنائية' : 'Exceptional Stay'}
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
-                      {language === 'ar' ? 'هذا المنزل مصنف بدرجة عالية بناءً على التقييمات والمراجعات والموثوقية.' : 'This home is highly ranked based on ratings, reviews, and reliability.'}
+                      {language === 'ar' ? 'تجربة فريدة تجمع بين الراحة والأصالة في قلب الوجهات السورية الساحرة.' : 'A unique experience blending comfort and authenticity in the heart of Syria\'s most enchanting destinations.'}
                     </p>
                   </div>
                 </div>
@@ -1640,6 +1640,44 @@ const PropertyDetails = () => {
           listingName={listing?.name || ''}
           nights={calculateTotalNights()}
         />
+
+        {/* Property Image Gallery Modal */}
+        {showAllPhotos && (
+          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+            <div className="max-w-4xl max-h-[90vh] w-full h-full relative">
+              {/* Close button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowAllPhotos(false)}
+                className="absolute top-4 right-4 z-10 bg-white/20 hover:bg-white/30 text-white rounded-full"
+              >
+                <X className="h-6 w-6" />
+              </Button>
+              
+              {/* Image container */}
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-full overflow-y-auto p-4">
+                  {(listing.images || []).map((image, index) => (
+                    <div key={index} className="aspect-square relative group cursor-pointer">
+                      <img
+                        src={getPublicImageUrl(image) || '/placeholder.svg'}
+                        alt={`${listing.name} ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors duration-200" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Image counter */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
+                {listing.images?.length || 0} {language === 'ar' ? 'صورة' : 'photos'}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
