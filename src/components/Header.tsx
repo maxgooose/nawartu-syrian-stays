@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, Shield, MapPin, Languages } from "lucide-react";
+import { Menu, X, User, LogOut, Shield, MapPin, Languages, Home, Search } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -81,7 +81,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-white border border-gray-200 shadow-xl rounded-xl p-2 z-[45] min-w-[240px]">
+                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-white border border-gray-200 shadow-xl rounded-xl p-2 z-50 min-w-[240px] mr-2">
                   {profile?.role === 'admin' && (
                     <DropdownMenuItem onClick={() => navigate('/admin-dashboard')}>
                       <Shield className="mr-2 h-4 w-4" />
@@ -94,8 +94,12 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                       {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
                     </DropdownMenuItem>
                   )}
+                  <DropdownMenuItem onClick={() => navigate('/')} className="lg:hidden">
+                    <Home className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? 'الرئيسية' : 'Home'}
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/browse')}>
-                    <User className="mr-2 h-4 w-4" />
+                    <Search className="mr-2 h-4 w-4" />
                     {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/map')}>
@@ -141,9 +145,9 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-sm animate-slide-up z-[45]">
+        {/* Mobile Menu - Only show when not logged in */}
+        {isMobileMenuOpen && !user && (
+          <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-sm animate-slide-up z-40">
             <nav className="flex flex-col space-y-3 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
               <Link 
                 to="/" 
