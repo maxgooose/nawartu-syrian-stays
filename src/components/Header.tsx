@@ -29,7 +29,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
   const isRTL = language === 'ar';
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <header className="fixed top-0 w-full z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20" dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Logo - Airbnb Style */}
@@ -81,7 +81,7 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-white border border-gray-200 shadow-xl rounded-xl p-2 z-[70] min-w-[240px]">
+                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-white border border-gray-200 shadow-xl rounded-xl p-2 z-[45] min-w-[240px]">
                   {profile?.role === 'admin' && (
                     <DropdownMenuItem onClick={() => navigate('/admin-dashboard')}>
                       <Shield className="mr-2 h-4 w-4" />
@@ -127,21 +127,23 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
               </div>
             )}
 
-            {/* Mobile Menu Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="lg:hidden p-2"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+            {/* Mobile Menu Toggle - Only show when not logged in */}
+            {!user && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="lg:hidden p-2"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            )}
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-sm animate-slide-up z-[70]">
+          <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-sm animate-slide-up z-[45]">
             <nav className="flex flex-col space-y-3 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
               <Link 
                 to="/" 

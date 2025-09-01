@@ -84,20 +84,20 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
       </div>
 
       {/* Content - Airbnb Style */}
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {/* Location and Rating */}
-        <div className="flex items-center justify-between">
-          <h3 className={`text-gray-900 font-medium text-sm line-clamp-1 flex-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className={`text-gray-900 font-medium text-sm sm:text-base line-clamp-2 sm:line-clamp-1 flex-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
             {property.location}
           </h3>
-          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+          <div className="flex items-center gap-1 flex-shrink-0">
             <Star className="h-3 w-3 fill-black stroke-black" />
             <span className="text-sm text-gray-900">{property.rating.toFixed(1)}</span>
           </div>
         </div>
 
         {/* Property Title */}
-        <p className={`text-gray-600 text-sm line-clamp-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
+        <p className={`text-gray-600 text-sm line-clamp-2 sm:line-clamp-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
           {property.title}
         </p>
 

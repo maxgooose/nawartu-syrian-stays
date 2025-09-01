@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -142,12 +141,12 @@ export const HeroSection = ({
     setActiveSection(null);
   };
 
-  const handleDateRangeChange = (range: any) => {
+  const handleDateRangeChange = (range: { from?: Date; to?: Date } | undefined) => {
     setSearchData(prev => ({ ...prev, dateRange: range }));
     // Keep calendar open - don't auto-close when both dates are selected
   };
 
-  const handleGuestChange = (guests: any) => {
+  const handleGuestChange = (guests: { adults: number; children: number; infants: number }) => {
     setSearchData(prev => ({ ...prev, guests }));
     setActiveSection(null);
   };
@@ -169,12 +168,12 @@ export const HeroSection = ({
       <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20"></div>
 
       {/* Airbnb-style Search Bar */}
-      <div className="absolute top-6 left-4 right-4 z-50" ref={searchRef}>
+      <div className="absolute top-4 sm:top-6 left-2 right-2 sm:left-4 sm:right-4 z-30" ref={searchRef}>
         <div className="bg-white rounded-full shadow-2xl border border-gray-200 overflow-hidden">
           <div className="flex items-center divide-x divide-gray-300">
             {/* Where Section */}
             <div 
-              className={`flex-1 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-all duration-200 rounded-l-full ${
+              className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-gray-50 transition-all duration-200 rounded-l-full ${
                 activeSection === 'where' ? 'bg-gray-50 shadow-sm' : ''
               }`}
               onClick={() => handleSectionClick('where')}
@@ -192,7 +191,7 @@ export const HeroSection = ({
 
             {/* When Section */}
             <div 
-              className={`flex-1 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${
+              className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${
                 activeSection === 'when' ? 'bg-gray-50' : ''
               }`}
               onClick={() => handleSectionClick('when')}
@@ -210,7 +209,7 @@ export const HeroSection = ({
 
             {/* Who Section */}
             <div 
-              className={`flex-1 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${
+              className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${
                 activeSection === 'who' ? 'bg-gray-50' : ''
               }`}
               onClick={() => handleSectionClick('who')}
@@ -224,13 +223,13 @@ export const HeroSection = ({
             </div>
 
             {/* Search Button */}
-            <div className="px-2 py-2">
+            <div className="px-1 sm:px-2 py-2">
               <Button 
                 onClick={handleSearch}
                 size="sm" 
-                className="h-10 w-10 p-0 rounded-full bg-primary hover:bg-primary/90"
+                className="h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full bg-primary hover:bg-primary/90"
               >
-                <Search className="h-4 w-4" />
+                <Search className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
@@ -238,12 +237,12 @@ export const HeroSection = ({
 
         {/* Backdrop on mobile when any panel is open */}
         {activeSection && (
-          <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setActiveSection(null)} />
+          <div className="fixed inset-0 bg-black/40 z-50 md:hidden" onClick={() => setActiveSection(null)} />
         )}
 
                  {/* Where Panel - fixed background */}
         {activeSection === 'where' && (
-          <div className="fixed inset-0 z-50 bg-white md:inset-auto md:absolute md:top-full md:left-0 md:right-0 md:mt-3 md:bg-white md:rounded-3xl md:shadow-2xl md:border md:border-gray-100 overflow-auto max-w-full md:max-w-2xl md:mx-auto">
+          <div className="fixed inset-0 z-[60] bg-white md:inset-auto md:absolute md:top-full md:left-0 md:right-0 md:mt-3 md:bg-white md:rounded-3xl md:shadow-2xl md:border md:border-gray-100 overflow-auto max-w-full md:max-w-2xl md:mx-auto">
             <div className="p-0">
               {/* Mobile close */}
               <div className="md:hidden flex justify-end p-4">
@@ -412,7 +411,7 @@ export const HeroSection = ({
 
         {/* When - fullscreen on mobile */}
         {activeSection === 'when' && (
-          <div className="fixed inset-0 z-50 bg-white p-4 md:p-0 md:absolute md:top-full md:left-1/2 md:transform md:-translate-x-1/2 md:mt-2">
+          <div className="fixed inset-0 z-[60] bg-white p-4 md:p-0 md:absolute md:top-full md:left-1/2 md:transform md:-translate-x-1/2 md:mt-2">
             <div className="md:hidden flex justify-between items-center mb-2">
               <div className="text-sm font-medium text-gray-700">{language === 'ar' ? 'التواريخ' : 'Dates'}</div>
               <button onClick={() => setActiveSection(null)} className="p-2 rounded-full border text-gray-600">
@@ -432,7 +431,7 @@ export const HeroSection = ({
 
         {/* Who - responsive panel */}
         {activeSection === 'who' && (
-          <div className="fixed inset-0 z-50 bg-white p-4 md:absolute md:inset-auto md:top-full md:right-4 md:mt-2 md:bg-white md:rounded-lg md:shadow-lg md:border md:w-80 md:p-4 overflow-auto">
+          <div className="fixed inset-0 z-[60] bg-white p-4 md:absolute md:inset-auto md:top-full md:right-4 md:mt-2 md:bg-white md:rounded-lg md:shadow-lg md:border md:w-80 md:p-4 overflow-auto">
             {/* Mobile header */}
             <div className="md:hidden flex justify-between items-center mb-2">
               <div className="text-sm font-medium text-gray-700">{language === 'ar' ? 'الضيوف' : 'Guests'}</div>
@@ -440,7 +439,7 @@ export const HeroSection = ({
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Adults */}
               <div className="flex items-center justify-between">
                 <div>
@@ -451,39 +450,39 @@ export const HeroSection = ({
                     {language === 'ar' ? '13 سنة وما فوق' : '13 years and older'}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => {
-                      console.log('Adults minus clicked, current:', searchData.guests.adults);
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       if (searchData.guests.adults > 1) {
                         setSearchData(prev => ({ 
                           ...prev, 
                           guests: { ...prev.guests, adults: prev.guests.adults - 1 }
                         }));
-                        console.log('After click, adults should be:', searchData.guests.adults - 1);
                       }
                     }}
                     disabled={searchData.guests.adults <= 1}
-                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                    className="h-8 w-8 p-0 rounded-full border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
                   <span className="w-8 text-center font-medium">{searchData.guests.adults}</span>
                   <button
                     type="button"
-                    onClick={() => {
-                      console.log('Adults plus clicked, current:', searchData.guests.adults);
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       if (searchData.guests.adults < 16) {
                         setSearchData(prev => ({ 
                           ...prev, 
                           guests: { ...prev.guests, adults: prev.guests.adults + 1 }
                         }));
-                        console.log('After click, adults should be:', searchData.guests.adults + 1);
                       }
                     }}
                     disabled={searchData.guests.adults >= 16}
-                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                    className="h-8 w-8 p-0 rounded-full border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -500,7 +499,7 @@ export const HeroSection = ({
                     {language === 'ar' ? '2-12 سنة' : '2-12 years'}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -512,7 +511,7 @@ export const HeroSection = ({
                       }
                     }}
                     disabled={searchData.guests.children <= 0}
-                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                    className="h-8 w-8 p-0 rounded-full border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
@@ -528,7 +527,7 @@ export const HeroSection = ({
                       }
                     }}
                     disabled={searchData.guests.children >= 8}
-                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                    className="h-8 w-8 p-0 rounded-full border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -545,7 +544,7 @@ export const HeroSection = ({
                     {language === 'ar' ? 'أقل من سنتين' : 'Under 2 years'}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={(e) => {
@@ -557,7 +556,7 @@ export const HeroSection = ({
                       }
                     }}
                     disabled={searchData.guests.infants <= 0}
-                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                    className="h-8 w-8 p-0 rounded-full border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
@@ -573,7 +572,7 @@ export const HeroSection = ({
                       }
                     }}
                     disabled={searchData.guests.infants >= 4}
-                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                    className="h-8 w-8 p-0 rounded-full border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -593,21 +592,21 @@ export const HeroSection = ({
       </div>
 
       {/* Hero Content - Airbnb Style */}
-      <div className="relative z-10 container mx-auto px-4 pt-32 sm:pt-40 md:pt-48 lg:pt-56">
-        <div className="max-w-2xl animate-slide-up">
+      <div className="relative z-10 container mx-auto px-4 pt-28 sm:pt-32 md:pt-40 lg:pt-48 xl:pt-56">
+        <div className="max-w-2xl animate-slide-up mobile-optimized">
           {/* Main Headline - Clean Airbnb Style */}
           <div className={`${isRTL ? 'text-arabic text-right' : 'text-latin text-left'} mb-8`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold text-white mb-6 leading-tight tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-semibold text-white mb-6 leading-tight tracking-tight mobile-text">
               {language === 'ar' ? (
                 <>
                   <span className="block leading-none">نورتوا</span>
-                  <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-white/90 mt-2 leading-tight">الضيافة السورية</span>
+                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-white/90 mt-2 leading-tight">الضيافة السورية</span>
                 </>
               ) : (
                 <>
                   <span className="block leading-none">Not sure</span>
                   <span className="block leading-none">where to go?</span>
-                  <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-white/90 mt-2 leading-tight">Perfect.</span>
+                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-white/90 mt-2 leading-tight">Perfect.</span>
                 </>
               )}
             </h1>
@@ -622,7 +621,7 @@ export const HeroSection = ({
                   element.scrollIntoView({ behavior: 'smooth' });
                 }
               }}
-              className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-full font-medium text-lg hover:bg-gray-100 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+              className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-4 sm:px-8 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-gray-100 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-h-[44px] min-w-[44px]"
             >
               {language === 'ar' ? 'اكتشف سوريا' : 'Discover Syria'}
               <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

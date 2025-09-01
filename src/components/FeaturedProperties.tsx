@@ -71,7 +71,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
             <div className="h-12 bg-gray-200 rounded w-1/2 mb-6 animate-pulse"></div>
             <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 sm:gap-x-6 gap-y-8 sm:gap-y-10">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10">
             {[...Array(16)].map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="aspect-square bg-gray-200 rounded-xl mb-3"></div>
@@ -113,7 +113,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
         </div>
 
         {/* Airbnb-style Property Grid - 2 cols on mobile like Airbnb */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 sm:gap-x-6 gap-y-8 sm:gap-y-10">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10">
           {listings.map((listing) => (
             <PropertyCard 
               key={listing.id}
