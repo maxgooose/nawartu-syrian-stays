@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Search, MapPin, Calendar, Users, X, Minus, Plus } from "lucide-react";
 import { GuestSelector } from "@/components/GuestSelector";
@@ -15,6 +16,7 @@ interface HeroSectionProps {
 export const HeroSection = ({
   language
 }: HeroSectionProps) => {
+  const navigate = useNavigate();
   const [searchData, setSearchData] = useState({
     location: '',
     governorate: null as SyrianGovernorate | null,
@@ -615,12 +617,7 @@ export const HeroSection = ({
           {/* CTA Button - Airbnb Style */}
           <div className={`${isRTL ? 'text-right' : 'text-left'} mb-12`}>
             <button 
-              onClick={() => {
-                const element = document.querySelector('.absolute.top-6');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
+              onClick={() => navigate('/browse')}
               className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-4 sm:px-8 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-gray-100 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-h-[44px] min-w-[44px]"
             >
               {language === 'ar' ? 'اكتشف سوريا' : 'Discover Syria'}
