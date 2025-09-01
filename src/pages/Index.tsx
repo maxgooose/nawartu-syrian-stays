@@ -8,9 +8,9 @@ const Index = () => {
   const { language, handleLanguageChange } = useLanguage();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Header language={language} onLanguageChange={handleLanguageChange} />
-      <main className="pt-16">
+      <main className="pt-20">
         <HeroSection language={language} />
         <FeaturedProperties language={language} />
       </main>

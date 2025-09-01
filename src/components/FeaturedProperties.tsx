@@ -32,7 +32,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
           .from('listings')
           .select('*')
           .eq('status', 'approved')
-          .limit(8);
+          .limit(16);
 
         if (error) {
           console.error('Error fetching listings:', error);
@@ -65,27 +65,20 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-background pattern-classic-elegant relative">
-        <div className="container-custom relative z-10">
-          <div className={`text-center mb-12 ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {language === 'ar' ? 'عقارات مميزة' : 'Featured Properties'}
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {language === 'ar' 
-                ? 'اكتشف أجمل العقارات المختارة بعناية في أفضل المواقع السورية'
-                : 'Discover the most beautiful carefully selected properties in the best Syrian locations'
-              }
-            </p>
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className={`mb-12 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="h-12 bg-gray-200 rounded w-1/2 mb-6 animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-card rounded-lg animate-pulse">
-                <div className="h-48 bg-muted rounded-t-lg"></div>
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
-                  <div className="h-3 bg-muted rounded w-1/2"></div>
-                  <div className="h-4 bg-muted rounded w-1/4"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            {[...Array(16)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-square bg-gray-200 rounded-xl mb-3"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
                 </div>
               </div>
             ))}
@@ -100,21 +93,23 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
   }
 
   return (
-    <section className="py-16 bg-background pattern-classic-elegant relative">
-      <div className="container-custom relative z-10">
-        <div className={`text-center mb-12 ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {language === 'ar' ? 'عقارات مميزة' : 'Featured Listings'}
+    <section className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Airbnb-style Section Header */}
+        <div className={`mb-12 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-gray-900 mb-6 leading-tight">
+            {language === 'ar' ? 'استكشف الإقامات القريبة' : 'Explore nearby stays'}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-3xl font-light leading-relaxed">
             {language === 'ar' 
-              ? 'اكتشف أجمل العقارات المختارة بعناية في أفضل المواقع السورية'
-              : 'Discover the most beautiful carefully selected listings in the best Syrian locations'
+              ? 'اكتشف أماكن إقامة فريدة ومميزة في أجمل المناطق السورية'
+              : 'Discover unique accommodations in Syria\'s most beautiful destinations'
             }
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Modern Property Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
           {listings.map((listing) => (
             <PropertyCard 
               key={listing.id}
@@ -124,14 +119,20 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        {/* Clean CTA Button */}
+        <div className={`mt-16 ${isRTL ? 'text-right' : 'text-left'}`}>
           <button 
             onClick={() => window.location.href = '/browse'}
-            className="text-primary hover:text-primary/80 font-semibold transition-colors"
+            className="inline-flex items-center gap-2 text-lg font-medium text-gray-900 hover:text-gray-600 transition-colors group"
           >
-            {language === 'ar' ? 'عرض جميع العقارات ←' : 'View All Listings →'}
+            {language === 'ar' ? 'عرض جميع العقارات' : 'Show all stays'}
+            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </button>
         </div>
+
+        {/* Removed secondary promo section to prioritize more listings */}
       </div>
     </section>
   );

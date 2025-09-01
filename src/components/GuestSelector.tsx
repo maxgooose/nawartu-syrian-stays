@@ -59,8 +59,8 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
   };
 
   const getTotalGuests = () => {
-    // Only adults count toward total guests
-    return value.adults;
+    // Adults and children count toward total guests, infants don't
+    return value.adults + value.children;
   };
 
   const getDisplayText = () => {
@@ -208,8 +208,8 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
             {/* Summary */}
             <div className="text-sm text-muted-foreground pt-2 border-t">
               {language === 'ar' 
-                ? `إجمالي الضيوف المحتسبين: ${getTotalGuests()} (البالغون فقط)`
-                : `Total counted guests: ${getTotalGuests()} (adults only)`
+                ? `إجمالي الضيوف: ${getTotalGuests()}`
+                : `Total guests: ${getTotalGuests()}`
               }
             </div>
           </div>
@@ -329,8 +329,8 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
       {/* Summary */}
       <div className={`text-sm ${isWhiteTheme ? 'text-white/70' : 'text-muted-foreground'}`}>
         {language === 'ar' 
-          ? `إجمالي الضيوف المحتسبين: ${getTotalGuests()} (البالغون فقط)`
-          : `Total counted guests: ${getTotalGuests()} (adults only)`
+          ? `إجمالي الضيوف: ${getTotalGuests()}`
+          : `Total guests: ${getTotalGuests()}`
         }
       </div>
     </div>

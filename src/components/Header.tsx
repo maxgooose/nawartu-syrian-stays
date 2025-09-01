@@ -29,77 +29,57 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
   const isRTL = language === 'ar';
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16" dir={isRTL ? 'rtl' : 'ltr'}>
-          {/* Logo */}
+    <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20" dir={isRTL ? 'rtl' : 'ltr'}>
+          {/* Logo - Airbnb Style */}
           <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0">
-            <img src="/nawartu-logo.png" alt="Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
-            <span className="text-lg sm:text-2xl font-bold text-primary tracking-wide">
-              {language === 'ar' ? 'نورتوا' : 'Nawartu'}
+            <img src="/nawartu-logo.png" alt="Nawartu Logo" className="h-8 w-8" />
+            <span className="text-xl font-semibold text-pink-500 tracking-normal">
+              {language === 'ar' ? 'نورتوا' : 'nawartu'}
             </span>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6 rtl:space-x-reverse flex-1 justify-center">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-              {language === 'ar' ? 'الرئيسية' : 'Home'}
+          {/* Center Navigation - Minimal Airbnb Style */}
+          <nav className="hidden lg:flex items-center space-x-1 rtl:space-x-reverse">
+            <Link to="/" className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 font-medium">
+              {language === 'ar' ? 'الرئيسية' : 'Stays'}
             </Link>
-            <Link to="/browse" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-              {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+            <Link to="/browse" className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 font-medium">
+              {language === 'ar' ? 'تصفح' : 'Experiences'}
             </Link>
-            <Link to="/map" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-              {language === 'ar' ? 'الخريطة التفاعلية' : 'Interactive Map'}
-            </Link>
-            {profile?.role === 'host' && (
-              <Link to="/host-dashboard" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
-              </Link>
-            )}
-            {profile?.role === 'admin' && (
-              <Link to="/admin-dashboard" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                {language === 'ar' ? 'لوحة الإدارة' : 'Admin Panel'}
-              </Link>
-            )}
             {profile?.role !== 'host' && (
-              <Link to="/become-host" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+              <Link to="/become-host" className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 font-medium">
                 {language === 'ar' ? 'كن مضيف' : 'Become a Host'}
               </Link>
             )}
           </nav>
 
-          {/* Right Section */}
+          {/* Right Section - Airbnb Style */}
           <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0">
             {/* Language Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={toggleLanguage}
-              className="flex items-center space-x-1 rtl:space-x-reverse p-2"
+              className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all duration-200"
             >
               <Globe className="h-4 w-4" />
-              <span className="hidden md:inline text-sm">
-                {language === 'ar' ? 'English' : 'العربية'}
-              </span>
-            </Button>
+            </button>
 
-            {/* Auth Section */}
+            {/* User Menu - Airbnb Style */}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-1 rtl:space-x-reverse p-2">
-                    <Avatar className="h-6 w-6">
+                  <button className="flex items-center space-x-2 rtl:space-x-reverse p-2 border border-gray-300 rounded-full hover:shadow-md transition-all duration-200">
+                    <Menu className="h-4 w-4 text-gray-600" />
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src={profile?.avatar_url} />
-                      <AvatarFallback className="text-xs">
+                      <AvatarFallback className="text-sm bg-gray-500 text-white">
                         {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden lg:inline max-w-20 truncate text-sm">
-                      {profile?.full_name || user.email?.split('@')[0]}
-                    </span>
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-background border shadow-lg z-[70]">
+                <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="bg-white border border-gray-200 shadow-xl rounded-xl p-2 z-[70] min-w-[240px]">
                   {profile?.role === 'admin' && (
                     <DropdownMenuItem onClick={() => navigate('/admin-dashboard')}>
                       <Shield className="mr-2 h-4 w-4" />
@@ -131,17 +111,13 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="hidden sm:flex items-center space-x-2 rtl:space-x-reverse">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/auth" className="text-sm">
-                    {language === 'ar' ? 'تسجيل دخول' : 'Login'}
-                  </Link>
-                </Button>
-                <Button variant="default" size="sm" asChild>
-                  <Link to="/auth" className="text-sm">
-                    {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
-                  </Link>
-                </Button>
+              <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 border border-gray-300 rounded-full hover:shadow-md transition-all duration-200">
+                  <Menu className="h-4 w-4 text-gray-600" />
+                  <div className="h-8 w-8 bg-gray-500 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                </button>
               </div>
             )}
 

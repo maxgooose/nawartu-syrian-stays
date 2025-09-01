@@ -2,7 +2,7 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Calendar, Users, X } from "lucide-react";
+import { Search, MapPin, Calendar, Users, X, Minus, Plus } from "lucide-react";
 import { GuestSelector } from "@/components/GuestSelector";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import heroImage from "@/assets/airbnb-style-hero.jpg";
@@ -35,7 +35,16 @@ export const HeroSection = ({
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      // Allow clicks inside Radix Popover portals (calendar) without closing
+      const targetNode = event.target as Node;
+      const popoverWrappers = Array.from(document.querySelectorAll('[data-radix-popper-content-wrapper]')) as HTMLElement[];
+      const clickedInsidePopover = popoverWrappers.some((el) => el.contains(targetNode));
+
+      if (clickedInsidePopover) {
+        return;
+      }
+
+      if (searchRef.current && !searchRef.current.contains(targetNode)) {
         setActiveSection(null);
         setIsSearchExpanded(false);
       }
@@ -86,7 +95,7 @@ export const HeroSection = ({
   };
 
   const getGuestText = () => {
-    const total = searchData.guests.adults + searchData.guests.children + searchData.guests.infants;
+    const total = searchData.guests.adults + searchData.guests.children; // Exclude infants from count
     if (total === 1) return language === 'ar' ? '1 ضيف' : '1 guest';
     if (total === 2) return language === 'ar' ? '2 ضيف' : '2 guests';
     return language === 'ar' ? `${total} ضيوف` : `${total} guests`;
@@ -104,12 +113,12 @@ export const HeroSection = ({
 
   const getLocationText = () => {
     if (searchData.governorate) {
-      return searchData.governorate.nameAr;
+      return language === 'ar' ? searchData.governorate.nameAr : searchData.governorate.nameEn;
     }
     if (searchData.location) {
       return searchData.location;
     }
-    return language === 'ar' ? 'أين تريد الذهاب؟' : 'Where to?';
+    return language === 'ar' ? 'البحث عن وجهات' : 'Search destinations';
   };
 
   const handleGovernorateSelect = (governorate: SyrianGovernorate) => {
@@ -123,9 +132,7 @@ export const HeroSection = ({
 
   const handleDateRangeChange = (range: any) => {
     setSearchData(prev => ({ ...prev, dateRange: range }));
-    if (range?.from && range?.to) {
-      setActiveSection(null);
-    }
+    // Keep calendar open - don't auto-close when both dates are selected
   };
 
   const handleGuestChange = (guests: any) => {
@@ -134,6 +141,7 @@ export const HeroSection = ({
   };
 
   const handleSectionClick = (section: 'where' | 'when' | 'who') => {
+    console.log('Section clicked:', section, 'Current active:', activeSection);
     if (activeSection === section) {
       setActiveSection(null);
     } else {
@@ -154,15 +162,15 @@ export const HeroSection = ({
           <div className="flex items-center">
             {/* Where Section */}
             <div 
-              className={`flex-1 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${
-                activeSection === 'where' ? 'bg-gray-50' : ''
+              className={`flex-1 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-all duration-200 rounded-l-full ${
+                activeSection === 'where' ? 'bg-gray-50 shadow-sm' : ''
               }`}
               onClick={() => handleSectionClick('where')}
             >
-              <div className="text-xs font-semibold text-gray-800 mb-1">
+              <div className="text-xs font-semibold text-gray-900 mb-1">
                 {language === 'ar' ? 'أين' : 'Where'}
               </div>
-              <div className="text-sm text-gray-600 truncate">
+              <div className="text-sm text-gray-500 truncate font-normal">
                 {getLocationText()}
               </div>
             </div>
@@ -216,177 +224,375 @@ export const HeroSection = ({
           </div>
         </div>
 
-        {/* Dropdown Panels - Properly positioned */}
-        {activeSection && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-            {/* Where Panel */}
-            {activeSection === 'where' && (
-              <div className="p-6">
-                <div className="text-lg font-semibold text-gray-800 mb-4">
-                  {language === 'ar' ? 'أين تريد الذهاب؟' : 'Where to?'}
-                </div>
-                
-                {/* Search Input */}
-                <div className="mb-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchData.location}
-                      onChange={(e) => setSearchData(prev => ({ ...prev, location: e.target.value }))}
-                      placeholder={language === 'ar' ? 'ابحث عن وجهة...' : 'Search destinations...'}
-                      className="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
-                    />
-                  </div>
-                </div>
-
-                {/* Governorate Dropdown */}
-                <div className="mb-4">
-                  <SyrianGovernorateDropdown
-                    onGovernorateSelect={handleGovernorateSelect}
-                    selectedGovernorate={searchData.governorate}
-                    placeholder={language === 'ar' ? 'أو اختر من المحافظات...' : 'Or select from governorates...'}
-                    showSearch={true}
-                    className="h-12"
+        {/* Where Panel - Airbnb Style */}
+        {activeSection === 'where' && (
+          <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+            <div className="p-0">
+              {/* Search Input - Integrated at top */}
+              <div className="p-6 pb-4">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchData.location}
+                    onChange={(e) => setSearchData(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder={language === 'ar' ? 'ابحث عن وجهات...' : 'Search destinations'}
+                    className="w-full h-14 pl-12 pr-4 border-0 bg-gray-50 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-300 outline-none transition-all duration-200 text-base font-medium placeholder-gray-500"
                   />
-                </div>
-
-                {/* Popular Locations */}
-                <div className="mb-4">
-                  <div className="text-sm font-medium text-gray-700 mb-3">
-                    {language === 'ar' ? 'المواقع الشائعة' : 'Popular locations'}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { id: 'damascus', nameAr: 'دمشق', nameEn: 'Damascus', icon: '🏛️' },
-                      { id: 'aleppo', nameAr: 'حلب', nameEn: 'Aleppo', icon: '🏰' },
-                      { id: 'latakia', nameAr: 'اللاذقية', nameEn: 'Latakia', icon: '🌊' },
-                      { id: 'homs', nameAr: 'حمص', nameEn: 'Homs', icon: '🏺' }
-                    ].map((location) => (
-                      <button
-                        key={location.id}
-                        onClick={() => {
-                          const governorate = SYRIAN_GOVERNORATES.find(g => 
-                            g.nameEn.toLowerCase().includes(location.nameEn.toLowerCase()) ||
-                            g.nameAr.includes(location.nameAr)
-                          );
-                          if (governorate) {
-                            handleGovernorateSelect(governorate);
-                          }
-                        }}
-                        className="flex items-center gap-2 p-3 text-left rounded-lg border border-gray-200 hover:border-primary hover:bg-primary/5 transition-all duration-200 group"
-                      >
-                        <span className="text-lg">{location.icon}</span>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-800 group-hover:text-primary">
-                            {language === 'ar' ? location.nameAr : location.nameEn}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {language === 'ar' ? location.nameEn : location.nameAr}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="pt-4 border-t border-gray-200">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        if (navigator.geolocation) {
-                          navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                              const { latitude, longitude } = position.coords;
-                              const nearest = SYRIAN_GOVERNORATES.reduce((nearest, current) => {
-                                const nearestDist = Math.sqrt(
-                                  Math.pow(latitude - nearest.latitude, 2) + 
-                                  Math.pow(longitude - nearest.longitude, 2)
-                                );
-                                const currentDist = Math.sqrt(
-                                  Math.pow(latitude - current.latitude, 2) + 
-                                  Math.pow(longitude - current.longitude, 2)
-                                );
-                                return currentDist < nearestDist ? current : nearest;
-                              });
-                              handleGovernorateSelect(nearest);
-                            },
-                            () => {
-                              alert(language === 'ar' ? 'لا يمكن تحديد موقعك' : 'Cannot determine your location');
-                            }
-                          );
-                        }
-                      }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-colors duration-200"
-                    >
-                      <MapPin className="h-4 w-4" />
-                      {language === 'ar' ? 'موقعي الحالي' : 'My location'}
-                    </button>
-                  </div>
                 </div>
               </div>
-            )}
 
-            {/* When Panel - Calendar */}
-            {activeSection === 'when' && (
-              <div className="p-6">
-                <div className="w-full flex justify-center">
-                  <DateRangePicker
-                    dateRange={searchData.dateRange}
-                    onDateRangeChange={handleDateRangeChange}
-                    language={language}
-                    placeholder={language === 'ar' ? 'اختر التواريخ' : 'Select dates'}
-                    variant="default"
-                    autoOpen={true}
-                  />
-                </div>
-                {searchData.dateRange?.from && searchData.dateRange?.to && (
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-sm text-green-800">
-                      {language === 'ar' ? 'تم اختيار التواريخ بنجاح!' : 'Dates selected successfully!'}
+              {/* Suggested Destinations Header */}
+              <div className="px-6 pb-3">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  {language === 'ar' ? 'الوجهات المقترحة' : 'Suggested destinations'}
+                </h3>
+              </div>
+
+              {/* Nearby Option */}
+              <div className="px-6 pb-2">
+                  <button
+                    onClick={() => {
+                      if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                          (position) => {
+                            const { latitude, longitude } = position.coords;
+                            const nearest = SYRIAN_GOVERNORATES.reduce((nearest, current) => {
+                              const nearestDist = Math.sqrt(
+                                Math.pow(latitude - nearest.latitude, 2) + 
+                                Math.pow(longitude - nearest.longitude, 2)
+                              );
+                              const currentDist = Math.sqrt(
+                                Math.pow(latitude - current.latitude, 2) + 
+                                Math.pow(longitude - current.longitude, 2)
+                              );
+                              return currentDist < nearestDist ? current : nearest;
+                            });
+                            handleGovernorateSelect(nearest);
+                          },
+                          () => {
+                            alert(language === 'ar' ? 'لا يمكن تحديد موقعك' : 'Cannot determine your location');
+                          }
+                        );
+                      }
+                    }}
+                  className="w-full flex items-center gap-4 p-4 text-left rounded-xl hover:bg-gray-50 transition-colors duration-200 group"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <MapPin className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-base font-medium text-gray-900 group-hover:text-gray-700">
+                      {language === 'ar' ? 'قريب مني' : 'Nearby'}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-0.5">
+                      {language === 'ar' ? 'اكتشف ما حولك' : 'Find what\'s around you'}
                     </div>
                   </div>
-                )}
+                </button>
               </div>
-            )}
 
-            {/* Who Panel */}
-            {activeSection === 'who' && (
-              <div className="p-6">
-                <div className="text-lg font-semibold text-gray-800 mb-4">
-                  {language === 'ar' ? 'من سيحجز؟' : 'Who\'s coming?'}
+              {/* Popular Syrian Destinations */}
+              <div className="space-y-1">
+                {[
+                  { 
+                    id: 'damascus', 
+                    nameAr: 'دمشق، سوريا', 
+                    nameEn: 'Damascus, Syria', 
+                    icon: '🏛️',
+                    descAr: 'العاصمة التاريخية',
+                    descEn: 'Historic capital city'
+                  },
+                  { 
+                    id: 'aleppo', 
+                    nameAr: 'حلب، سوريا', 
+                    nameEn: 'Aleppo, Syria', 
+                    icon: '🏰',
+                    descAr: 'مدينة التراث العالمي',
+                    descEn: 'UNESCO World Heritage site'
+                  },
+                  { 
+                    id: 'latakia', 
+                    nameAr: 'اللاذقية، سوريا', 
+                    nameEn: 'Latakia, Syria', 
+                    icon: '🌊',
+                    descAr: 'ساحل البحر الأبيض المتوسط',
+                    descEn: 'Mediterranean coastal city'
+                  },
+                  { 
+                    id: 'homs', 
+                    nameAr: 'حمص، سوريا', 
+                    nameEn: 'Homs, Syria', 
+                    icon: '🏺',
+                    descAr: 'مدينة الحضارات القديمة',
+                    descEn: 'Ancient civilizations hub'
+                  },
+                  { 
+                    id: 'tartus', 
+                    nameAr: 'طرطوس، سوريا', 
+                    nameEn: 'Tartus, Syria', 
+                    icon: '⛵',
+                    descAr: 'المدينة الساحلية الجميلة',
+                    descEn: 'Beautiful coastal destination'
+                  },
+                  { 
+                    id: 'palmyra', 
+                    nameAr: 'تدمر، سوريا', 
+                    nameEn: 'Palmyra, Syria', 
+                    icon: '🏜️',
+                    descAr: 'أطلال تدمر الأثرية',
+                    descEn: 'Ancient archaeological site'
+                  }
+                ].map((location) => (
+                  <div key={location.id} className="px-6">
+                    <button
+                      onClick={() => {
+                        const governorate = SYRIAN_GOVERNORATES.find(g => 
+                          g.nameEn.toLowerCase().includes(location.nameEn.split(',')[0].toLowerCase()) ||
+                          g.nameAr.includes(location.nameAr.split('،')[0])
+                        );
+                        if (governorate) {
+                          handleGovernorateSelect(governorate);
+                        }
+                      }}
+                      className="w-full flex items-center gap-4 p-4 text-left rounded-xl hover:bg-gray-50 transition-colors duration-200 group"
+                    >
+                      <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0 group-hover:bg-gray-200 transition-colors">
+                        {location.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-base font-medium text-gray-900 group-hover:text-gray-700">
+                          {language === 'ar' ? location.nameAr : location.nameEn}
+                        </div>
+                        <div className="text-sm text-gray-500 mt-0.5">
+                          {language === 'ar' ? location.descAr : location.descEn}
+                        </div>
+                      </div>
+                  </button>
                 </div>
-                <GuestSelector
-                  value={searchData.guests}
-                  onChange={handleGuestChange}
-                  className="text-gray-800"
-                  variant="dropdown"
-                  placeholder={language === 'ar' ? 'اختر عدد الضيوف' : 'Select guests'}
+                ))}
+              </div>
+
+              {/* Governorate Dropdown - Hidden but available */}
+              <div className="hidden">
+                <SyrianGovernorateDropdown
+                  onGovernorateSelect={handleGovernorateSelect}
+                  selectedGovernorate={searchData.governorate}
+                  placeholder={language === 'ar' ? 'أو اختر من المحافظات...' : 'Or select from governorates...'}
+                  showSearch={true}
+                  className="h-12"
                 />
               </div>
-            )}
+            </div>
+          </div>
+        )}
+
+        {/* When - Direct Calendar without panel */}
+        {activeSection === 'when' && (
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2">
+            <DateRangePicker
+              dateRange={searchData.dateRange}
+              onDateRangeChange={handleDateRangeChange}
+              language={language}
+              placeholder={language === 'ar' ? 'اختر التواريخ' : 'Select dates'}
+              variant="default"
+              autoOpen={true}
+            />
+          </div>
+        )}
+
+        {/* Who - Direct Guest Controls without any panel */}
+        {activeSection === 'who' && (
+          <div className="absolute top-full right-0 left-0 md:left-auto md:right-4 mt-2 bg-white rounded-lg shadow-lg border p-4 w-full md:w-80 z-50">
+            <div className="space-y-4">
+              {/* Adults */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-gray-800">
+                    {language === 'ar' ? 'البالغون' : 'Adults'}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {language === 'ar' ? '13 سنة وما فوق' : '13 years and older'}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      console.log('Adults minus clicked, current:', searchData.guests.adults);
+                      if (searchData.guests.adults > 1) {
+                        setSearchData(prev => ({ 
+                          ...prev, 
+                          guests: { ...prev.guests, adults: prev.guests.adults - 1 }
+                        }));
+                        console.log('After click, adults should be:', searchData.guests.adults - 1);
+                      }
+                    }}
+                    disabled={searchData.guests.adults <= 1}
+                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-8 text-center font-medium">{searchData.guests.adults}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      console.log('Adults plus clicked, current:', searchData.guests.adults);
+                      if (searchData.guests.adults < 16) {
+                        setSearchData(prev => ({ 
+                          ...prev, 
+                          guests: { ...prev.guests, adults: prev.guests.adults + 1 }
+                        }));
+                        console.log('After click, adults should be:', searchData.guests.adults + 1);
+                      }
+                    }}
+                    disabled={searchData.guests.adults >= 16}
+                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Children */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-gray-800">
+                    {language === 'ar' ? 'الأطفال' : 'Children'}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {language === 'ar' ? '2-12 سنة' : '2-12 years'}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (searchData.guests.children > 0) {
+                        const newGuests = { ...searchData.guests, children: searchData.guests.children - 1 };
+                        setSearchData(prev => ({ ...prev, guests: newGuests }));
+                      }
+                    }}
+                    disabled={searchData.guests.children <= 0}
+                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-8 text-center font-medium">{searchData.guests.children}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (searchData.guests.children < 8) {
+                        const newGuests = { ...searchData.guests, children: searchData.guests.children + 1 };
+                        setSearchData(prev => ({ ...prev, guests: newGuests }));
+                      }
+                    }}
+                    disabled={searchData.guests.children >= 8}
+                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Infants */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-gray-800">
+                    {language === 'ar' ? 'الرضع' : 'Infants'}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {language === 'ar' ? 'أقل من سنتين' : 'Under 2 years'}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (searchData.guests.infants > 0) {
+                        const newGuests = { ...searchData.guests, infants: searchData.guests.infants - 1 };
+                        setSearchData(prev => ({ ...prev, guests: newGuests }));
+                      }
+                    }}
+                    disabled={searchData.guests.infants <= 0}
+                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="w-8 text-center font-medium">{searchData.guests.infants}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (searchData.guests.infants < 4) {
+                        const newGuests = { ...searchData.guests, infants: searchData.guests.infants + 1 };
+                        setSearchData(prev => ({ ...prev, guests: newGuests }));
+                      }
+                    }}
+                    disabled={searchData.guests.infants >= 4}
+                    className="h-8 w-8 p-0 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="text-sm text-gray-600 pt-2 border-t">
+                {language === 'ar' 
+                  ? `إجمالي الضيوف: ${searchData.guests.adults + searchData.guests.children}`
+                  : `Total guests: ${searchData.guests.adults + searchData.guests.children}`
+                }
+              </div>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Hero Content */}
-      <div className="relative z-10 container mx-auto px-4 text-center pt-20 sm:pt-24 md:pt-28 lg:pt-32">
-        <div className="max-w-4xl mx-auto animate-slide-up">
-          {/* Hero Text */}
-          <div className={`${isRTL ? 'text-arabic' : 'text-latin'} ${language === 'ar' ? 'mb-8' : 'mb-16'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-lg">
-              {language === 'ar' ? <>
-                  <span className="block">الضيافة السورية</span>
-                  <span className="block text-primary drop-shadow-xl">عأصولها</span>
-                </> : <>
-                  <span className="block">Syrian Hospitality</span>
-                  <span className="block text-primary drop-shadow-xl">Done Right</span>
-                </>}
+      {/* Hero Content - Airbnb Style */}
+      <div className="relative z-10 container mx-auto px-4 pt-32 sm:pt-40 md:pt-48 lg:pt-56">
+        <div className="max-w-2xl animate-slide-up">
+          {/* Main Headline - Clean Airbnb Style */}
+          <div className={`${isRTL ? 'text-arabic text-right' : 'text-latin text-left'} mb-8`} dir={isRTL ? 'rtl' : 'ltr'}>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold text-white mb-6 leading-tight tracking-tight">
+              {language === 'ar' ? (
+                <>
+                  <span className="block leading-none">نورتوا</span>
+                  <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-white/90 mt-2 leading-tight">الضيافة السورية</span>
+                </>
+              ) : (
+                <>
+                  <span className="block leading-none">Not sure</span>
+                  <span className="block leading-none">where to go?</span>
+                  <span className="block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-white/90 mt-2 leading-tight">Perfect.</span>
+                </>
+              )}
             </h1>
-            <p className="text-xl sm:text-2xl md:text-3xl text-white/90 max-w-3xl mx-auto leading-relaxed px-4 drop-shadow-md">
-              {language === 'ar' ? 'استأجر أجمل العقارات التراثية والحديثة في سوريا. تجربة إقامة أصيلة وفريدة.' : 'Rent the most beautiful heritage and modern properties in Syria. An authentic and unique stay experience.'}
-            </p>
+          </div>
+          
+          {/* CTA Button - Airbnb Style */}
+          <div className={`${isRTL ? 'text-right' : 'text-left'} mb-12`}>
+            <button 
+              onClick={() => {
+                const element = document.querySelector('.absolute.top-6');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-full font-medium text-lg hover:bg-gray-100 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+            >
+              {language === 'ar' ? 'اكتشف سوريا' : 'Discover Syria'}
+              <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>

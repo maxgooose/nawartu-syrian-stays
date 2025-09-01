@@ -32,8 +32,9 @@ export function DateRangePicker({
   const isRTL = language === 'ar';
   const locale = language === 'ar' ? ar : enUS;
   const [isOpen, setIsOpen] = React.useState(autoOpen);
-  const [currentMonth, setCurrentMonth] = React.useState(new Date(2025, 7, 1)); // August 2025
+  const [currentMonth, setCurrentMonth] = React.useState(new Date());
   const [flexibility, setFlexibility] = React.useState('exact');
+  const [hoveredDate, setHoveredDate] = React.useState<Date | undefined>(undefined);
   
   // Auto-open effect
   React.useEffect(() => {
@@ -42,15 +43,7 @@ export function DateRangePicker({
     }
   }, [autoOpen]);
   
-  // Set default dates (Sep 1 - Sep 18, 2025)
-  React.useEffect(() => {
-    if (!dateRange && autoOpen) {
-      onDateRangeChange({
-        from: new Date(2025, 8, 1), // Sep 1, 2025
-        to: new Date(2025, 8, 18)   // Sep 18, 2025
-      });
-    }
-  }, [autoOpen, dateRange, onDateRangeChange]);
+  // No default date selection - let users choose their own dates
   
   // Calculate nights between dates
   const nights = dateRange?.from && dateRange?.to 
@@ -78,30 +71,36 @@ export function DateRangePicker({
     onDateRangeChange(undefined);
   };
 
-  // Generate calendar days for a month
-  const generateCalendarDays = (monthDate: Date) => {
+  // Generate month cells (exact month only, no overflow days)
+  const generateMonthCells = (monthDate: Date) => {
     const year = monthDate.getFullYear();
     const month = monthDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
-    const days = [];
-    const currentDate = new Date(startDate);
-    
-    for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
-      days.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    
-    return days;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const leadingEmpty = firstDay.getDay(); // 0..6 (Sun..Sat)
+
+    const cells: Array<Date | null> = [];
+    // Leading blanks to align week start
+    for (let i = 0; i < leadingEmpty; i++) cells.push(null);
+    // Month days
+    for (let day = 1; day <= daysInMonth; day++) cells.push(new Date(year, month, day));
+    // Trailing blanks to complete 6x7 grid (42 cells)
+    while (cells.length < 42) cells.push(null);
+    return cells;
   };
 
   // Check if date is in range
   const isInRange = (date: Date) => {
     if (!dateRange?.from || !dateRange?.to) return false;
     return date >= dateRange.from && date <= dateRange.to;
+  };
+
+  // Hover preview range when only start date is selected (desktop UX)
+  const isInPreviewRange = (date: Date) => {
+    if (!dateRange?.from || dateRange?.to || !hoveredDate) return false;
+    const start = dateRange.from < hoveredDate ? dateRange.from : hoveredDate;
+    const end = dateRange.from < hoveredDate ? hoveredDate : dateRange.from;
+    return date >= start && date <= end;
   };
 
   // Check if date is start or end
@@ -113,32 +112,21 @@ export function DateRangePicker({
     return dateRange?.to && isSameDay(date, dateRange.to);
   };
 
-  // Get day class names
+  // Base day class names (structural)
   const getDayClassName = (date: Date, isCurrentMonth: boolean) => {
-    const isToday = isSameDay(date, new Date());
-    const isStart = isStartDate(date);
-    const isEnd = isEndDate(date);
-    const inRange = isInRange(date);
     const isPast = isBefore(date, startOfDay(new Date()));
-    
     return cn(
-      "w-10 h-10 flex items-center justify-center text-sm rounded-full transition-all duration-200 cursor-pointer",
+      "relative w-10 h-10 flex items-center justify-center text-sm transition-all duration-200 cursor-pointer",
       !isCurrentMonth && "text-gray-300",
       isCurrentMonth && !isPast && "hover:bg-gray-100",
-      isPast && "text-gray-300 cursor-not-allowed",
-      isToday && !isStart && !isEnd && "border-2 border-gray-900",
-      inRange && !isStart && !isEnd && "bg-gray-100",
-      (isStart || isEnd) && "bg-gray-900 text-white hover:bg-gray-800",
-      isStart && isEnd && "rounded-full",
-      isStart && !isEnd && "rounded-l-full rounded-r-none bg-gray-900",
-      isEnd && !isStart && "rounded-r-full rounded-l-none bg-gray-900"
+      isPast && "text-gray-300 cursor-not-allowed"
     );
   };
 
   const flexibilityOptions = [
     { value: 'exact', label: language === 'ar' ? 'تواريخ محددة' : 'Exact dates' },
-    { value: '1', label: '±1 day' },
-    { value: '2', label: '±2 days' },
+    { value: '1', label: '+1 day' },
+    { value: '2', label: '+2 days' },
     { value: '3', label: '±3 days' },
     { value: '7', label: '±7 days' },
     { value: '14', label: '±14 days' }
@@ -219,7 +207,7 @@ export function DateRangePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-auto p-0 bg-white border border-gray-200 shadow-xl z-50 rounded-3xl" 
+          className="w-full max-w-sm md:max-w-none p-0 bg-white border border-gray-200 shadow-xl z-50 rounded-3xl" 
           align="center"
           side="bottom"
           sideOffset={4}
@@ -249,54 +237,104 @@ export function DateRangePicker({
               </button>
             </div>
 
-            {/* Two Month Calendar */}
-            <div className="flex gap-8">
+            {/* Responsive Calendar: single month on small screens */}
+            <div className="flex gap-8 md:flex-row flex-col">
               {/* First Month */}
               <div className="flex-1">
-                <div className="grid grid-cols-7 gap-1 mb-2">
+                <div className="grid grid-cols-7 gap-0 mb-2">
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
                     <div key={day} className="w-10 h-8 flex items-center justify-center text-xs font-medium text-gray-500">
                       {day}
                     </div>
                   ))}
                 </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {generateCalendarDays(currentMonth).map((date, index) => {
-                    const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+                <div className="grid grid-cols-7 gap-0" onMouseLeave={() => setHoveredDate(undefined)}>
+                  {generateMonthCells(currentMonth).map((cell, index) => {
+                    if (!cell) {
+                      return <div key={index} className="w-10 h-10" />;
+                    }
+                    const date = cell;
+                    const isCurrentMonth = true;
+                    const isStart = isStartDate(date);
+                    const isEnd = isEndDate(date);
+                    const inRange = isInRange(date);
+                    const inPreview = isInPreviewRange(date);
+                    const hasCompleteRange = Boolean(dateRange?.from && dateRange?.to);
+                    const isPast = isBefore(date, startOfDay(new Date()));
                     return (
                       <button
                         key={index}
-                        onClick={() => !isBefore(date, startOfDay(new Date())) && handleDateSelect(date)}
+                        onClick={() => !isPast && handleDateSelect(date)}
+                        onMouseEnter={() => !isPast && setHoveredDate(date)}
                         className={getDayClassName(date, isCurrentMonth)}
-                        disabled={isBefore(date, startOfDay(new Date()))}
+                        disabled={isPast}
                       >
-                        {date.getDate()}
+                        {(inRange || inPreview) && !isStart && !isEnd && (
+                          <span className="absolute inset-0 bg-gray-100" />
+                        )}
+                        {(isStart && (hasCompleteRange || hoveredDate)) && (
+                          <span className="absolute inset-y-0 left-1/2 right-0 bg-gray-100 rounded-r-full" />
+                        )}
+                        {(isEnd || (hoveredDate && isSameDay(date, hoveredDate) && !hasCompleteRange)) && (
+                          <span className="absolute inset-y-0 left-0 right-1/2 bg-gray-100 rounded-l-full" />
+                        )}
+                        <span className={cn(
+                          "relative z-10 w-10 h-10 flex items-center justify-center rounded-full",
+                          (isStart || isEnd) ? "bg-gray-900 text-white" : "",
+                        )}>
+                          {date.getDate()}
+                        </span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Second Month */}
-              <div className="flex-1">
-                <div className="grid grid-cols-7 gap-1 mb-2">
+              {/* Second Month (hidden on small screens) */}
+              <div className="flex-1 hidden md:block">
+                <div className="grid grid-cols-7 gap-0 mb-2">
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
                     <div key={day} className="w-10 h-8 flex items-center justify-center text-xs font-medium text-gray-500">
                       {day}
                     </div>
                   ))}
                 </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {generateCalendarDays(addMonths(currentMonth, 1)).map((date, index) => {
-                    const isCurrentMonth = date.getMonth() === addMonths(currentMonth, 1).getMonth();
+                <div className="grid grid-cols-7 gap-0" onMouseLeave={() => setHoveredDate(undefined)}>
+                  {generateMonthCells(addMonths(currentMonth, 1)).map((cell, index) => {
+                    if (!cell) {
+                      return <div key={index} className="w-10 h-10" />;
+                    }
+                    const date = cell;
+                    const isCurrentMonth = true;
+                    const isStart = isStartDate(date);
+                    const isEnd = isEndDate(date);
+                    const inRange = isInRange(date);
+                    const inPreview = isInPreviewRange(date);
+                    const hasCompleteRange = Boolean(dateRange?.from && dateRange?.to);
+                    const isPast = isBefore(date, startOfDay(new Date()));
                     return (
                       <button
                         key={index}
-                        onClick={() => !isBefore(date, startOfDay(new Date())) && handleDateSelect(date)}
+                        onClick={() => !isPast && handleDateSelect(date)}
+                        onMouseEnter={() => !isPast && setHoveredDate(date)}
                         className={getDayClassName(date, isCurrentMonth)}
-                        disabled={isBefore(date, startOfDay(new Date()))}
+                        disabled={isPast}
                       >
-                        {date.getDate()}
+                        {(inRange || inPreview) && !isStart && !isEnd && (
+                          <span className="absolute inset-0 bg-gray-100" />
+                        )}
+                        {(isStart && (hasCompleteRange || hoveredDate)) && (
+                          <span className="absolute inset-y-0 left-1/2 right-0 bg-gray-100 rounded-r-full" />
+                        )}
+                        {(isEnd || (hoveredDate && isSameDay(date, hoveredDate) && !hasCompleteRange)) && (
+                          <span className="absolute inset-y-0 left-0 right-1/2 bg-gray-100 rounded-l-full" />
+                        )}
+                        <span className={cn(
+                          "relative z-10 w-10 h-10 flex items-center justify-center rounded-full",
+                          (isStart || isEnd) ? "bg-gray-900 text-white" : "",
+                        )}>
+                          {date.getDate()}
+                        </span>
                       </button>
                     );
                   })}
