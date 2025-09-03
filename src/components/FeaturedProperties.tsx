@@ -3,6 +3,7 @@ import { PropertyCard } from "./PropertyCard";
 import { getPublicImageUrl } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { getTranslatedContent } from "@/lib/translation";
+import { getTranslatedContentWithAuto } from "@/lib/autoTranslation";
 
 interface FeaturedPropertiesProps {
   language: 'ar' | 'en';
@@ -30,6 +31,7 @@ interface Listing {
 
 export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
   const [listings, setListings] = useState<Listing[]>([]);
+  const [translatedListings, setTranslatedListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const isRTL = language === 'ar';
 
@@ -58,14 +60,38 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
     fetchFeaturedListings();
   }, []);
 
-  const formatListingForPropertyCard = (listing: Listing) => {
-    // Get translated content based on current language
-    const translatedContent = getTranslatedContent(listing, language);
+  // Translate listings when language or listings change
+  useEffect(() => {
+    const translateListings = async () => {
+      if (listings.length === 0) {
+        setTranslatedListings([]);
+        return;
+      }
+
+      const translations = await Promise.all(
+        listings.map(async (listing) => {
+          const translatedContent = await getTranslatedContentWithAuto(listing, language, true);
+          return {
+            listing,
+            translatedContent,
+            formattedCard: formatListingForPropertyCard(listing, translatedContent)
+          };
+        })
+      );
+      setTranslatedListings(translations);
+    };
+
+    translateListings();
+  }, [listings, language]);
+
+  const formatListingForPropertyCard = (listing: Listing, translatedContent?: any) => {
+    // Use provided translated content or fall back to basic translation
+    const content = translatedContent || getTranslatedContent(listing, language);
     
     return {
       id: listing.id,
-      title: translatedContent.name,
-      location: translatedContent.location,
+      title: content.name,
+      location: content.location,
       price: listing.price_per_night_usd,
       currency: 'USD' as const,
       rating: 4.5, // Default rating until we implement reviews
@@ -132,16 +158,16 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
 
         {/* Modern Property Grid */}
         <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-12">
-          {listings.map((listing, index) => (
+          {translatedListings.map((item, index) => (
             <div 
-              key={listing.id}
+              key={item.listing.id}
               className="group cursor-pointer"
               style={{
                 animationDelay: `${index * 0.1}s`
               }}
             >
               <PropertyCard 
-                property={formatListingForPropertyCard(listing)}
+                property={item.formattedCard}
                 language={language}
               />
             </div>

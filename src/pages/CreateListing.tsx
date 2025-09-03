@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign, MessageCircle, Phone } from "lucide-react";
+import { ArrowRight, Upload, MapPin, Home, Users, Bed, Bath, DollarSign, MessageCircle, Phone, Languages } from "lucide-react";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -19,6 +19,7 @@ import { AMENITIES, getAmenityLabel } from "@/lib/amenities";
 import { getPublicImageUrl } from "@/lib/utils";
 import SyrianGovernorateDropdown from "@/components/SyrianGovernorateDropdown";
 import { SyrianGovernorate } from "@/lib/syrianGovernorates";
+import { translateText } from "@/lib/autoTranslation";
 
 const CreateListing = () => {
   const { language } = useLanguage();
@@ -27,6 +28,7 @@ const CreateListing = () => {
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
+  const [translating, setTranslating] = useState(false);
 
   // Redirect non-hosts to become host page
   React.useEffect(() => {
@@ -73,6 +75,55 @@ const CreateListing = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Auto-translate missing fields
+  const handleAutoTranslate = async () => {
+    setTranslating(true);
+    try {
+      const updates: any = {};
+
+      // Translate name
+      if (formData.name_en && !formData.name_ar) {
+        updates.name_ar = await translateText(formData.name_en, 'ar', 'en');
+      } else if (formData.name_ar && !formData.name_en) {
+        updates.name_en = await translateText(formData.name_ar, 'en', 'ar');
+      }
+
+      // Translate description
+      if (formData.description_en && !formData.description_ar) {
+        updates.description_ar = await translateText(formData.description_en, 'ar', 'en');
+      } else if (formData.description_ar && !formData.description_en) {
+        updates.description_en = await translateText(formData.description_ar, 'en', 'ar');
+      }
+
+      // Translate location
+      if (formData.location_en && !formData.location_ar) {
+        updates.location_ar = await translateText(formData.location_en, 'ar', 'en');
+      } else if (formData.location_ar && !formData.location_en) {
+        updates.location_en = await translateText(formData.location_ar, 'en', 'ar');
+      }
+
+      setFormData(prev => ({ ...prev, ...updates }));
+      
+      toast({
+        title: language === 'ar' ? "تمت الترجمة" : "Translation Complete",
+        description: language === 'ar' 
+          ? "تمت ترجمة الحقول الفارغة تلقائياً" 
+          : "Empty fields have been auto-translated",
+      });
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast({
+        title: language === 'ar' ? "خطأ في الترجمة" : "Translation Error",
+        description: language === 'ar' 
+          ? "حدث خطأ أثناء الترجمة التلقائية" 
+          : "An error occurred during auto-translation",
+        variant: "destructive",
+      });
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const handleAmenityChange = (amenity: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -108,8 +159,30 @@ const CreateListing = () => {
     setLoading(true);
 
     try {
+      // Auto-translate missing fields before submission
+      let finalFormData = { ...formData };
+      
+      // Check and translate missing fields
+      if (finalFormData.name_en && !finalFormData.name_ar) {
+        finalFormData.name_ar = await translateText(finalFormData.name_en, 'ar', 'en');
+      } else if (finalFormData.name_ar && !finalFormData.name_en) {
+        finalFormData.name_en = await translateText(finalFormData.name_ar, 'en', 'ar');
+      }
+
+      if (finalFormData.description_en && !finalFormData.description_ar) {
+        finalFormData.description_ar = await translateText(finalFormData.description_en, 'ar', 'en');
+      } else if (finalFormData.description_ar && !finalFormData.description_en) {
+        finalFormData.description_en = await translateText(finalFormData.description_ar, 'en', 'ar');
+      }
+
+      if (finalFormData.location_en && !finalFormData.location_ar) {
+        finalFormData.location_ar = await translateText(finalFormData.location_en, 'ar', 'en');
+      } else if (finalFormData.location_ar && !finalFormData.location_en) {
+        finalFormData.location_en = await translateText(finalFormData.location_ar, 'en', 'ar');
+      }
+
       // Sanitize images: drop any blob: entries and normalize keys to public URLs
-      const sanitizedImages = (formData.images || [])
+      const sanitizedImages = (finalFormData.images || [])
         .map((img) => getPublicImageUrl(img) || '')
         .filter((u) => !!u);
 
@@ -117,16 +190,23 @@ const CreateListing = () => {
         .from('listings')
         .insert({
           host_id: profile.id,
-          name_en: formData.name_en,
-          name_ar: formData.name_ar,
-          description_en: formData.description_en,
-          description_ar: formData.description_ar,
-          location_en: formData.location_en,
-          location_ar: formData.location_ar,
+          name_en: finalFormData.name_en,
+          name_ar: finalFormData.name_ar,
+          description_en: finalFormData.description_en,
+          description_ar: finalFormData.description_ar,
+          location_en: finalFormData.location_en,
+          location_ar: finalFormData.location_ar,
+          // Mark auto-translated fields
+          name_en_auto_translated: formData.name_en ? false : true,
+          name_ar_auto_translated: formData.name_ar ? false : true,
+          description_en_auto_translated: formData.description_en ? false : true,
+          description_ar_auto_translated: formData.description_ar ? false : true,
+          location_en_auto_translated: formData.location_en ? false : true,
+          location_ar_auto_translated: formData.location_ar ? false : true,
           // Keep backward compatibility
-          name: formData.name_ar || formData.name_en,
-          description: formData.description_ar || formData.description_en,
-          location: formData.location_ar || formData.location_en,
+          name: finalFormData.name_ar || finalFormData.name_en,
+          description: finalFormData.description_ar || finalFormData.description_en,
+          location: finalFormData.location_ar || finalFormData.location_en,
           latitude: formData.latitude,
           longitude: formData.longitude,
           price_per_night_usd: parseFloat(formData.price_per_night_usd),
@@ -271,13 +351,31 @@ const CreateListing = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Bilingual Name Fields */}
                   <div className="md:col-span-2 space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700">
-                      {language === 'ar' ? 'اسم العقار (مطلوب بكلا اللغتين) *' : 'Listing Name (Required in both languages) *'}
-                    </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'اسم العقار (يمكن إدخاله بلغة واحدة) *' : 'Listing Name (Can be entered in one language) *'}
+                      </h4>
+                      {((formData.name_en && !formData.name_ar) || (formData.name_ar && !formData.name_en)) && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleAutoTranslate}
+                          disabled={translating}
+                          className="flex items-center gap-2"
+                        >
+                          <Languages className="h-4 w-4" />
+                          {translating 
+                            ? (language === 'ar' ? 'جاري الترجمة...' : 'Translating...') 
+                            : (language === 'ar' ? 'ترجمة تلقائية' : 'Auto-translate')
+                          }
+                        </Button>
+                      )}
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="name_en" className="text-sm">
-                          {language === 'ar' ? 'الاسم بالإنجليزية *' : 'Name in English *'}
+                          {language === 'ar' ? 'الاسم بالإنجليزية' : 'Name in English'}
                         </Label>
                         <Input
                           id="name_en"
@@ -285,14 +383,13 @@ const CreateListing = () => {
                           value={formData.name_en}
                           onChange={handleInputChange}
                           placeholder="Example: Luxury apartment in city center"
-                          required
                           dir="ltr"
                           className="text-left"
                         />
                       </div>
                       <div>
                         <Label htmlFor="name_ar" className="text-sm">
-                          {language === 'ar' ? 'الاسم بالعربية *' : 'Name in Arabic *'}
+                          {language === 'ar' ? 'الاسم بالعربية' : 'Name in Arabic'}
                         </Label>
                         <Input
                           id="name_ar"
@@ -300,7 +397,6 @@ const CreateListing = () => {
                           value={formData.name_ar}
                           onChange={handleInputChange}
                           placeholder="مثال: شقة فاخرة في وسط المدينة"
-                          required
                           dir="rtl"
                           className="text-right"
                         />
@@ -337,12 +433,12 @@ const CreateListing = () => {
                   {/* Bilingual Location Fields */}
                   <div className="md:col-span-2 space-y-4">
                     <h4 className="text-sm font-medium text-gray-700">
-                      {language === 'ar' ? 'العنوان التفصيلي (مطلوب بكلا اللغتين) *' : 'Detailed Address (Required in both languages) *'}
+                      {language === 'ar' ? 'العنوان التفصيلي (يمكن إدخاله بلغة واحدة) *' : 'Detailed Address (Can be entered in one language) *'}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="location_en" className="text-sm">
-                          {language === 'ar' ? 'العنوان بالإنجليزية *' : 'Address in English *'}
+                          {language === 'ar' ? 'العنوان بالإنجليزية' : 'Address in English'}
                         </Label>
                         <Input
                           id="location_en"
@@ -350,14 +446,13 @@ const CreateListing = () => {
                           value={formData.location_en}
                           onChange={handleInputChange}
                           placeholder="Example: Malki, Jalaa Street, No. 15"
-                          required
                           dir="ltr"
                           className="text-left"
                         />
                       </div>
                       <div>
                         <Label htmlFor="location_ar" className="text-sm">
-                          {language === 'ar' ? 'العنوان بالعربية *' : 'Address in Arabic *'}
+                          {language === 'ar' ? 'العنوان بالعربية' : 'Address in Arabic'}
                         </Label>
                         <Input
                           id="location_ar"
@@ -365,7 +460,6 @@ const CreateListing = () => {
                           value={formData.location_ar}
                           onChange={handleInputChange}
                           placeholder="مثال: المالكي، شارع الجلاء، رقم 15"
-                          required
                           dir="rtl"
                           className="text-right"
                         />
@@ -373,8 +467,8 @@ const CreateListing = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {language === 'ar' 
-                        ? 'أدخل العنوان التفصيلي للعقار بكلا اللغتين' 
-                        : 'Enter the detailed address of the property in both languages'}
+                        ? 'يمكنك إدخال العنوان بلغة واحدة وسيتم ترجمته تلقائياً' 
+                        : 'You can enter the address in one language and it will be auto-translated'}
                     </p>
                   </div>
 
@@ -384,12 +478,12 @@ const CreateListing = () => {
                 {/* Bilingual Description Fields */}
                 <div className="space-y-4">
                   <h4 className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'وصف العقار (مطلوب بكلا اللغتين) *' : 'Listing Description (Required in both languages) *'}
+                    {language === 'ar' ? 'وصف العقار (يمكن إدخاله بلغة واحدة) *' : 'Listing Description (Can be entered in one language) *'}
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="description_en" className="text-sm">
-                        {language === 'ar' ? 'الوصف بالإنجليزية *' : 'Description in English *'}
+                        {language === 'ar' ? 'الوصف بالإنجليزية' : 'Description in English'}
                       </Label>
                       <Textarea
                         id="description_en"
@@ -398,14 +492,13 @@ const CreateListing = () => {
                         onChange={handleInputChange}
                         placeholder="Write an attractive description of your listing..."
                         rows={4}
-                        required
                         dir="ltr"
                         className="text-left"
                       />
                     </div>
                     <div>
                       <Label htmlFor="description_ar" className="text-sm">
-                        {language === 'ar' ? 'الوصف بالعربية *' : 'Description in Arabic *'}
+                        {language === 'ar' ? 'الوصف بالعربية' : 'Description in Arabic'}
                       </Label>
                       <Textarea
                         id="description_ar"
@@ -414,7 +507,6 @@ const CreateListing = () => {
                         onChange={handleInputChange}
                         placeholder="اكتب وصفاً جذاباً لعقارك..."
                         rows={4}
-                        required
                         dir="rtl"
                         className="text-right"
                       />
