@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Home, Calendar, Eye, Edit, ArrowLeft } from "lucide-react";
+import { HostAvailabilityManager } from "@/components/HostAvailabilityManager";
+import { Plus, Home, Calendar, Eye, Edit, ArrowLeft, Settings, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { getPublicImageUrl } from "@/lib/utils";
@@ -46,6 +47,7 @@ const HostDashboard = () => {
   const [listings, setListings] = useState<Listing[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const isRTL = language === 'ar';
@@ -177,7 +179,7 @@ const HostDashboard = () => {
         </div>
 
         <Tabs defaultValue="listings" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="listings" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               {language === 'ar' ? 'عقاراتي' : 'My Properties'} ({listings.length})
@@ -185,6 +187,10 @@ const HostDashboard = () => {
             <TabsTrigger value="bookings" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               {language === 'ar' ? 'الحجوزات' : 'Bookings'} ({bookings.length})
+            </TabsTrigger>
+            <TabsTrigger value="availability" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              {language === 'ar' ? 'إدارة التوفر' : 'Availability'}
             </TabsTrigger>
           </TabsList>
 
@@ -248,7 +254,7 @@ const HostDashboard = () => {
                           onClick={() => navigate(`/property/${listing.id}`)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
-                          {language === 'ar' ? 'احجز' : 'Book'}
+                          {language === 'ar' ? 'عرض' : 'View'}
                         </Button>
                         <Button 
                           variant="outline" 
@@ -258,6 +264,15 @@ const HostDashboard = () => {
                         >
                           <Edit className="h-4 w-4 mr-1" />
                           {language === 'ar' ? 'تعديل' : 'Edit'}
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => setSelectedListingId(listing.id)}
+                        >
+                          <Settings className="h-4 w-4 mr-1" />
+                          {language === 'ar' ? 'إدارة' : 'Manage'}
                         </Button>
                       </div>
                     </CardContent>
@@ -331,6 +346,86 @@ const HostDashboard = () => {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="availability" className="mt-6">
+            {listings.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    {language === 'ar' ? 'لا توجد عقارات للإدارة' : 'No properties to manage'}
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    {language === 'ar' ? 'أضف عقاراً أولاً لإدارة التوفر والأسعار' : 'Add a property first to manage availability and pricing'}
+                  </p>
+                  <Button onClick={() => navigate('/create-listing')}>
+                    {language === 'ar' ? 'إضافة عقار جديد' : 'Add New Listing'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : selectedListingId ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedListingId(null)}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    {language === 'ar' ? 'العودة لقائمة العقارات' : 'Back to Properties'}
+                  </Button>
+                </div>
+                
+                <HostAvailabilityManager
+                  listingId={selectedListingId}
+                  listing={listings.find(l => l.id === selectedListingId)!}
+                />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-2">
+                    {language === 'ar' ? 'اختر عقاراً لإدارة توفره' : 'Select a property to manage availability'}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {language === 'ar' ? 'يمكنك إدارة التوفر والأسعار وقواعد الحجز لكل عقار' : 'Manage availability, pricing, and booking rules for each property'}
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {listings.filter(listing => listing.status === 'approved').map((listing) => (
+                    <Card key={listing.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setSelectedListingId(listing.id)}>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base">{listing.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{listing.location}</p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium">
+                            ${listing.price_per_night_usd}/{language === 'ar' ? 'ليلة' : 'night'}
+                          </span>
+                          <Button size="sm">
+                            <Settings className="h-4 w-4 mr-1" />
+                            {language === 'ar' ? 'إدارة' : 'Manage'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                {listings.filter(listing => listing.status === 'approved').length === 0 && (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <AlertCircle className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                      <p className="text-muted-foreground">
+                        {language === 'ar' ? 'لا توجد عقارات معتمدة بعد. يجب الموافقة على العقار قبل إدارة التوفر.' : 'No approved properties yet. Properties must be approved before managing availability.'}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
           </TabsContent>

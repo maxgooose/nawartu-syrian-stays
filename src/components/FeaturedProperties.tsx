@@ -97,43 +97,60 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
   }
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-32 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Airbnb-style Section Header */}
-        <div className={`mb-12 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-gray-900 mb-6 leading-tight">
-            {language === 'ar' ? 'استكشف الإقامات القريبة' : 'Explore nearby stays'}
+        {/* Modern Section Header */}
+        <div className={`mb-20 text-center ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 mb-8 leading-tight">
+            {language === 'ar' ? 'استكشف الإقامات الاستثنائية' : 'Exceptional Stays'}
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl font-light leading-relaxed">
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed">
             {language === 'ar' 
-              ? 'اكتشف أماكن إقامة فريدة ومميزة في أجمل المناطق السورية'
-              : 'Discover unique accommodations in Syria\'s most beautiful destinations'
+              ? 'مجموعة مختارة من أفضل أماكن الإقامة التي تجمع بين الأصالة والحداثة'
+              : 'A curated collection of extraordinary accommodations blending authenticity with modern luxury'
             }
           </p>
+          
+          {/* Decorative line */}
+          <div className="mt-12 flex justify-center">
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+          </div>
         </div>
 
-        {/* Airbnb-style Property Grid - 2 cols on mobile like Airbnb */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10">
-          {listings.map((listing) => (
-            <PropertyCard 
+        {/* Modern Property Grid */}
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-12">
+          {listings.map((listing, index) => (
+            <div 
               key={listing.id}
-              property={formatListingForPropertyCard(listing)}
-              language={language}
-            />
+              className="group cursor-pointer"
+              style={{
+                animationDelay: `${index * 0.1}s`
+              }}
+            >
+              <PropertyCard 
+                property={formatListingForPropertyCard(listing)}
+                language={language}
+              />
+            </div>
           ))}
         </div>
 
-        {/* Clean CTA Button */}
-        <div className={`mt-16 ${isRTL ? 'text-right' : 'text-left'}`}>
-          <button 
-            onClick={() => window.location.href = '/browse'}
-            className="inline-flex items-center gap-2 text-lg font-medium text-gray-900 hover:text-gray-600 transition-colors group"
-          >
-            {language === 'ar' ? 'عرض جميع العقارات' : 'Show all stays'}
-            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </button>
+        {/* Elegant CTA Section */}
+        <div className="mt-24 text-center">
+          <div className="inline-flex flex-col items-center">
+            <button 
+              onClick={() => window.location.href = '/browse'}
+              className="group relative inline-flex items-center gap-3 px-12 py-4 bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white rounded-full font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              {language === 'ar' ? 'استكشف جميع العقارات' : 'Discover All Properties'}
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
+            <p className="mt-4 text-gray-500 text-sm font-light">
+              {language === 'ar' ? `${listings.length}+ عقار فريد ينتظرك` : `${listings.length}+ unique properties await you`}
+            </p>
+          </div>
         </div>
 
         {/* Removed secondary promo section to prioritize more listings */}

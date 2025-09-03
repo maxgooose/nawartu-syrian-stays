@@ -33,8 +33,7 @@ interface PropertyImageGalleryProps {
 export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
   images,
   propertyName,
-  className,
-  onClose
+  className
 }) => {
   const { language } = useLanguage();
   const isRTL = language === 'ar';
@@ -146,13 +145,13 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                 <Maximize2 className="h-4 w-4" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-none w-screen h-screen p-0 bg-black/95 border-0">
+            <DialogContent className="max-w-none w-screen h-screen p-0 bg-black/95 border-0 focus:outline-none">
               <div className="relative w-full h-full flex items-center justify-center">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsFullscreenOpen(false)}
-                  className="absolute top-4 right-4 z-10 bg-background/20 hover:bg-background/40 text-white rounded-full p-2 h-10 w-10"
+                  className="absolute top-4 right-4 z-10 bg-background/20 hover:bg-background/40 text-white rounded-full p-2 h-10 w-10 touch-manipulation"
                   aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
                 >
                   <X className="h-5 w-5" />
@@ -160,7 +159,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                 <img
                   src={getPublicImageUrl(images[0], 'listing-images', { width: 1200, quality: 90 }) || '/placeholder.svg'}
                   alt={propertyName}
-                  className="max-w-full max-h-full object-contain"
+                  className="max-w-full max-h-full object-contain select-none"
                 />
               </div>
             </DialogContent>
@@ -243,7 +242,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
               {language === 'ar' ? 'عرض جميع الصور' : 'View All Pictures'}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-none w-screen h-screen p-0 bg-black/95 border-0">
+          <DialogContent className="max-w-none w-screen h-screen p-0 bg-black/95 border-0 focus:outline-none touch-manipulation">
             <div className="relative w-full h-full">
               {/* Fullscreen Gallery Header */}
               <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-3 md:p-4">
@@ -258,7 +257,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsFullscreenOpen(false)}
-                    className="bg-background/20 hover:bg-background/40 text-white border-0 h-8 w-8 md:h-10 md:w-10"
+                    className="bg-background/20 hover:bg-background/40 text-white border-0 h-8 w-8 md:h-10 md:w-10 touch-manipulation"
                     aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
                   >
                     <X className="h-4 w-4 md:h-5 md:w-5" />
@@ -267,11 +266,16 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
               </div>
 
               {/* Fullscreen Image Display */}
-              <div className="w-full h-full flex items-center justify-center p-3 md:p-4">
+              <div 
+                className="w-full h-full flex items-center justify-center p-3 md:p-4"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
                 <img
                   src={getPublicImageUrl(images[currentImageIndex], 'listing-images', { width: 1200, quality: 90 }) || '/placeholder.svg'}
                   alt={`${propertyName} - Image ${currentImageIndex + 1}`}
-                  className="max-w-full max-h-full object-contain"
+                  className="max-w-full max-h-full object-contain select-none"
                 />
               </div>
 
@@ -282,7 +286,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                 onClick={() => setCurrentImageIndex(prev => Math.max(0, prev - 1))}
                 disabled={currentImageIndex === 0}
                 className={cn(
-                  "absolute top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-white border-0 rounded-full",
+                  "absolute top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-white border-0 rounded-full touch-manipulation",
                   isMobile ? "left-2 h-10 w-10" : "left-4 h-12 w-12"
                 )}
                 aria-label={language === 'ar' ? 'الصورة السابقة' : 'Previous image'}
@@ -296,7 +300,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                 onClick={() => setCurrentImageIndex(prev => Math.min(images.length - 1, prev + 1))}
                 disabled={currentImageIndex === images.length - 1}
                 className={cn(
-                  "absolute top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-white border-0 rounded-full",
+                  "absolute top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-white border-0 rounded-full touch-manipulation",
                   isMobile ? "right-2 h-10 w-10" : "right-4 h-12 w-12"
                 )}
                 aria-label={language === 'ar' ? 'الصورة التالية' : 'Next image'}

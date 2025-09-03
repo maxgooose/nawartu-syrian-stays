@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,28 @@ const CreateListing = () => {
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
+
+  // Redirect non-hosts to become host page
+  React.useEffect(() => {
+    if (!user) {
+      toast({
+        title: language === 'ar' ? "تسجيل الدخول مطلوب" : "Sign In Required",
+        description: language === 'ar' ? "يجب تسجيل الدخول لإضافة عقار" : "Please sign in to add a listing",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
+    
+    if (profile && profile.role !== 'host') {
+      toast({
+        title: language === 'ar' ? "ترقية مطلوبة" : "Host Upgrade Required",
+        description: language === 'ar' ? "يجب أن تصبح مضيفاً أولاً" : "You need to become a host first",
+      });
+      navigate('/become-host');
+      return;
+    }
+  }, [user, profile, navigate, toast, language]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -60,12 +82,23 @@ const CreateListing = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user || profile?.role !== 'host') {
+    if (!user) {
       toast({
         title: language === 'ar' ? "خطأ" : "Error",
-        description: language === 'ar' ? "يجب أن تكون مضيفاً لإضافة عقار" : "You must be a host to add a listing",
+        description: language === 'ar' ? "يجب تسجيل الدخول أولاً" : "Please sign in first",
         variant: "destructive",
       });
+      navigate('/auth');
+      return;
+    }
+    
+    if (profile?.role !== 'host') {
+      toast({
+        title: language === 'ar' ? "ترقية مطلوبة" : "Host Upgrade Required",
+        description: language === 'ar' ? "يجب أن تصبح مضيفاً أولاً لإضافة عقار" : "You need to become a host first to add a listing",
+        variant: "destructive",
+      });
+      navigate('/become-host');
       return;
     }
 
@@ -130,6 +163,18 @@ const CreateListing = () => {
       setLoading(false);
     }
   };
+
+  // Show loading while checking authentication
+  if (!user || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-6">

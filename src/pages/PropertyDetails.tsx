@@ -5,28 +5,18 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { GuestSelector } from "@/components/GuestSelector";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReviewsList } from "@/components/ReviewsList";
 import { StarRating } from "@/components/StarRating";
 import GoogleMap from "@/components/GoogleMap";
 import { PropertyImageGallery } from "@/components/PropertyImageGallery";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AirbnbCalendar } from "@/components/AirbnbCalendar";
+import { InstantBooking } from "@/components/InstantBooking";
 import { 
-  ArrowRight, 
   MapPin, 
   Users, 
   Bed, 
   Bath, 
-  Calendar as CalendarIcon,
-  CreditCard,
-  Banknote,
   Wifi,
   Car,
   Coffee,
@@ -40,7 +30,7 @@ import {
   Award,
   Key,
   CheckCircle,
-  Grid3X3,
+
   X,
   ChefHat,
   Utensils,
@@ -70,10 +60,8 @@ import {
   Building
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { format, differenceInDays, addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { getPublicImageUrl } from "@/lib/utils";
-import CardDetailsModern from "@/components/CardDetailsModern";
 
 interface Listing {
   id: string;
@@ -358,21 +346,9 @@ const PropertyDetails = () => {
   
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
-  const [bookingLoading, setBookingLoading] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>();
-  const [guests, setGuests] = useState({
-    adults: 2,
-    children: 0,
-    infants: 0
-  });
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
-  const [specialRequests, setSpecialRequests] = useState('');
-  const [showCardDetails, setShowCardDetails] = useState(false);
-  const [currentBookingId, setCurrentBookingId] = useState<string>('');
   const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
-  const [showAllPhotos, setShowAllPhotos] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showGuestSelector, setShowGuestSelector] = useState(false);
+
 
   const { language } = useLanguage();
   const isRTL = language === 'ar';
@@ -385,12 +361,7 @@ const PropertyDetails = () => {
 
 
 
-  // Reset check-out date when check-in date changes
-  useEffect(() => {
-    if (dateRange?.from && dateRange?.to && dateRange.to <= dateRange.from) {
-      setDateRange(prev => prev ? { ...prev, to: undefined } : prev);
-    }
-  }, [dateRange]);
+
 
   const fetchListing = async () => {
     try {
@@ -471,130 +442,7 @@ const PropertyDetails = () => {
     }
   };
 
-  const calculateTotalNights = () => {
-    if (!dateRange?.from || !dateRange?.to) return 0;
-    return differenceInDays(dateRange.to, dateRange.from);
-  };
 
-  const calculateTotalAmount = () => {
-    const nights = calculateTotalNights();
-    if (!listing || nights <= 0) return 0;
-    return nights * listing.price_per_night_usd;
-  };
-
-  const handleBooking = async () => {
-    if (!user || !profile || !listing) {
-      navigate('/auth');
-      return;
-    }
-
-    if (!dateRange?.from || !dateRange?.to) {
-      toast({
-        title: language === 'ar' ? "خطأ" : "Error",
-        description: language === 'ar' ? "يرجى اختيار تواريخ الإقامة" : "Please select check-in and check-out dates",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const nights = calculateTotalNights();
-    if (nights <= 0) {
-      toast({
-        title: language === 'ar' ? "خطأ" : "Error",
-        description: language === 'ar' ? "تاريخ المغادرة يجب أن يكون بعد تاريخ الوصول" : "Check-out date must be after check-in date",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setBookingLoading(true);
-
-    try {
-      const { data: bookingData, error } = await supabase
-        .from('bookings')
-        .insert({
-          guest_id: profile.id,
-          listing_id: listing.id,
-          check_in_date: format(dateRange.from, 'yyyy-MM-dd'),
-          check_out_date: format(dateRange.to, 'yyyy-MM-dd'),
-          total_nights: nights,
-          total_amount_usd: calculateTotalAmount(),
-          payment_method: paymentMethod === 'card' ? 'stripe' : 'cash',
-          special_requests: specialRequests || null,
-          status: 'pending'
-        })
-        .select('id')
-        .single();
-
-      if (error) throw error;
-
-      // Send booking confirmation email immediately
-      try {
-        await supabase.functions.invoke('send-booking-confirmation', {
-          body: {
-            guestEmail: profile.email,
-            guestName: profile.full_name || profile.email,
-            listingName: listing.name,
-            listingLocation: listing.location,
-            checkInDate: format(dateRange.from!, 'yyyy-MM-dd'),
-            checkOutDate: format(dateRange.to!, 'yyyy-MM-dd'),
-            totalNights: nights,
-            totalAmount: calculateTotalAmount(),
-            paymentMethod: paymentMethod,
-            bookingId: bookingData.id
-          }
-        });
-      } catch (emailError) {
-        console.error('Failed to send confirmation email:', emailError);
-        // Don't fail the booking if email fails
-      }
-
-      if (paymentMethod === 'card') {
-        // Show card details form for secure payment
-        setCurrentBookingId(bookingData.id);
-        setShowCardDetails(true);
-        setBookingLoading(false);
-      } else if (paymentMethod === 'cash') {
-        // Cash payment - booking confirmed, payment on arrival
-        toast({
-          title: language === 'ar' ? "تم تأكيد الحجز!" : "Booking Confirmed!",
-          description: language === 'ar' ? "تم تأكيد حجزك بنجاح. سيتم دفع المبلغ عند الوصول." : "Your booking is confirmed! Payment will be collected upon arrival.",
-        });
-
-        setDateRange(undefined);
-        setGuests({ adults: 2, children: 0, infants: 0 });
-        setSpecialRequests('');
-        setPaymentMethod('card');
-        setBookingLoading(false);
-      }
-
-    } catch (error: any) {
-      toast({
-        title: language === 'ar' ? "خطأ" : "Error",
-        description: error.message || (language === 'ar' ? "حدث خطأ في إرسال طلب الحجز" : "Error sending booking request"),
-        variant: "destructive",
-      });
-      setBookingLoading(false);
-    }
-  };
-
-  const handleCardPaymentSuccess = (paymentIntentId: string) => {
-    // Reset form
-    setDateRange(undefined);
-    setGuests({ adults: 2, children: 0, infants: 0 });
-    setSpecialRequests('');
-    setShowCardDetails(false);
-    setCurrentBookingId('');
-    
-    // Navigate to success page or show success message
-    navigate(`/payment-success?booking_id=${currentBookingId}`);
-  };
-
-  const handleCardPaymentClose = () => {
-    setShowCardDetails(false);
-    setCurrentBookingId('');
-    setBookingLoading(false);
-  };
 
 
 
@@ -760,74 +608,13 @@ const PropertyDetails = () => {
           </div>
         </div>
 
-        {/* Airbnb-Style Photo Gallery */}
-        <div className="mb-8 relative">
-          <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[480px] rounded-xl overflow-hidden">
-            {listing.images && listing.images.length > 0 ? (
-              <>
-                {/* Main large image */}
-                <div className="col-span-2 row-span-2 relative group">
-                  <img 
-                    src={getPublicImageUrl(listing.images[0])} 
-                    alt={listing.name}
-                    className="w-full h-full object-cover cursor-pointer transition-all duration-300 group-hover:brightness-90"
-                    onClick={() => setShowAllPhotos(true)}
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300"></div>
-                </div>
-                
-                {/* Four smaller images */}
-                {listing.images.slice(1, 5).map((image, index) => (
-                  <div key={index} className="relative group">
-                    <img 
-                      src={getPublicImageUrl(image)} 
-                      alt={`${listing.name} ${index + 2}`}
-                      className="w-full h-full object-cover cursor-pointer transition-all duration-300 group-hover:brightness-90"
-                      onClick={() => setShowAllPhotos(true)}
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300"></div>
-                    
-                    {/* Show all photos overlay on the last image */}
-                    {index === 3 && listing.images.length > 5 && (
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <button 
-                          className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-gray-50 transition-colors shadow-sm"
-                          onClick={() => setShowAllPhotos(true)}
-                        >
-                          <Grid3X3 className="h-4 w-4" />
-                          {language === 'ar' ? `عرض كل ${listing.images.length}` : `Show all ${listing.images.length}`}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                
-                {/* Fill remaining slots with placeholder if not enough images */}
-                {listing.images.length < 5 && Array.from({ length: 5 - listing.images.length }).map((_, index) => (
-                  <div key={`placeholder-${index}`} className="bg-gray-100 flex items-center justify-center">
-                    <div className="text-gray-400 text-sm">{language === 'ar' ? 'لا توجد صورة' : 'No image'}</div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <div className="col-span-4 row-span-2 bg-gray-100 flex items-center justify-center rounded-xl">
-                <div className="text-center text-gray-500">
-                  <div className="text-4xl mb-2">📷</div>
-                  <span>{language === 'ar' ? 'لا توجد صور متاحة' : 'No images available'}</span>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Show all photos button - positioned over the gallery */}
-          <Button 
-            variant="outline"
-            onClick={() => setShowAllPhotos(true)}
-            className="absolute bottom-4 right-4 bg-white/90 hover:bg-white backdrop-blur-sm border border-gray-300 shadow-md text-gray-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2"
-          >
-            <Grid3X3 className="h-4 w-4" />
-            {language === 'ar' ? 'عرض جميع الصور' : 'Show all photos'}
-          </Button>
+        {/* Mobile-Friendly Photo Gallery */}
+        <div className="mb-8">
+          <PropertyImageGallery 
+            images={listing.images || []}
+            propertyName={listing.name}
+            className="rounded-xl"
+          />
         </div>
 
         {/* Main Content Grid */}
@@ -1341,343 +1128,27 @@ const PropertyDetails = () => {
             )}
           </div>
 
-          {/* Right Column - Booking Card */}
+          {/* Right Column - Instant Booking System */}
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-              <Card className="border border-gray-300 shadow-xl rounded-2xl overflow-hidden bg-white">
-                <CardContent className="p-6">
-                  {/* Price and Rating */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-semibold">${listing.price_per_night_usd}</span>
-                      <span className="text-gray-600"> {language === 'ar' ? 'ليلة' : 'night'}</span>
-                    </div>
-                    {reviewSummary && (
-                      <div className="flex items-center gap-1 text-sm">
-                        <Star className="h-4 w-4 fill-current text-black" />
-                        <span className="font-medium">{reviewSummary.averageRating}</span>
-                        <span className="text-gray-600">({reviewSummary.totalReviews})</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Date and Guest Selection - Enhanced Airbnb Style */}
-                  <div className="border border-gray-300 rounded-xl mb-4 overflow-hidden">
-                    <div className="grid grid-cols-2 border-b border-gray-300">
-                      <button 
-                        className="p-4 border-r border-gray-300 text-left hover:bg-gray-50 transition-colors group"
-                        onClick={() => setShowDatePicker(true)}
-                      >
-                        <div className="text-xs font-semibold text-gray-900 mb-1 tracking-wide">
-                          {language === 'ar' ? 'تسجيل الدخول' : 'CHECK-IN'}
-                        </div>
-                        <div className="text-sm text-gray-600 font-medium">
-                          {dateRange?.from ? format(dateRange.from, 'MMM d, yyyy') : (language === 'ar' ? 'إضافة تاريخ' : 'Add date')}
-                        </div>
-                      </button>
-                      <button 
-                        className="p-4 text-left hover:bg-gray-50 transition-colors group"
-                        onClick={() => setShowDatePicker(true)}
-                      >
-                        <div className="text-xs font-semibold text-gray-900 mb-1 tracking-wide">
-                          {language === 'ar' ? 'تسجيل الخروج' : 'CHECKOUT'}
-                        </div>
-                        <div className="text-sm text-gray-600 font-medium">
-                          {dateRange?.to ? format(dateRange.to, 'MMM d, yyyy') : (language === 'ar' ? 'إضافة تاريخ' : 'Add date')}
-                        </div>
-                      </button>
-                    </div>
-                    <button 
-                      className="w-full p-4 text-left hover:bg-gray-50 transition-colors group"
-                      onClick={() => setShowGuestSelector(true)}
-                    >
-                      <div className="text-xs font-semibold text-gray-900 mb-1 tracking-wide">
-                        {language === 'ar' ? 'الضيوف' : 'GUESTS'}
-                      </div>
-                      <div className="text-sm text-gray-600 font-medium">
-                        {guests.adults + guests.children} {language === 'ar' ? 'ضيف' : 'guest'}
-                        {guests.adults + guests.children !== 1 && !isRTL && 's'}
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Hidden date picker and guest selector */}
-                  <div className="hidden">
-                    <DateRangePicker
-                      dateRange={dateRange}
-                      onDateRangeChange={setDateRange}
-                      language={language}
-                    />
-                    <GuestSelector
-                      value={guests}
-                      onChange={setGuests}
-                      maxGuests={listing.max_guests}
-                    />
-                  </div>
-
-                  {/* Payment Method Selection */}
-                  {dateRange?.from && dateRange?.to && (
-                    <div className="mb-6 bg-gray-50 rounded-xl p-4">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                        {language === 'ar' ? 'طريقة الدفع' : 'Payment method'}
-                      </h3>
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => setPaymentMethod('card')}
-                          className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                            paymentMethod === 'card'
-                              ? 'border-nawartu-green bg-nawartu-green/10 text-nawartu-green'
-                              : 'border-gray-200 bg-white hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <CreditCard className="h-5 w-5" />
-                            <div className="text-left">
-                              <div className="font-medium">
-                                {language === 'ar' ? 'بطاقة ائتمان' : 'Credit Card'}
-                              </div>
-                              <div className="text-xs opacity-75">
-                                {language === 'ar' ? 'دفع آمن فوري' : 'Secure instant payment'}
-                              </div>
-                            </div>
-                          </div>
-                          {paymentMethod === 'card' && (
-                            <CheckCircle className="h-5 w-5 text-nawartu-green" />
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => setPaymentMethod('cash')}
-                          className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                            paymentMethod === 'cash'
-                              ? 'border-nawartu-green bg-nawartu-green/10 text-nawartu-green'
-                              : 'border-gray-200 bg-white hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Banknote className="h-5 w-5" />
-                            <div className="text-left">
-                              <div className="font-medium">
-                                {language === 'ar' ? 'دفع نقدي' : 'Cash Payment'}
-                              </div>
-                              <div className="text-xs opacity-75">
-                                {language === 'ar' ? 'الدفع عند الوصول' : 'Pay upon arrival'}
-                              </div>
-                            </div>
-                          </div>
-                          {paymentMethod === 'cash' && (
-                            <CheckCircle className="h-5 w-5 text-nawartu-green" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Reserve Button - Airbnb Style */}
-                  <Button 
-                    onClick={handleBooking} 
-                    disabled={bookingLoading || !dateRange?.from || !dateRange?.to}
-                    className="w-full bg-gradient-to-r from-nawartu-green to-nawartu-green/90 hover:from-nawartu-green/90 hover:to-nawartu-green/80 text-white font-semibold py-4 rounded-xl mb-4 text-lg shadow-lg hover:shadow-xl transition-all"
-                  >
-                    {bookingLoading 
-                      ? (language === 'ar' ? "جاري الحجز..." : "Booking...") 
-                      : paymentMethod === 'card' 
-                        ? (language === 'ar' ? "ادفع واحجز" : "Pay & Reserve")
-                        : (language === 'ar' ? "أكد الحجز" : "Confirm Booking")
-                    }
-                  </Button>
-
-                  <p className="text-center text-gray-600 text-sm mb-4">
-                    {paymentMethod === 'card' 
-                      ? (language === 'ar' ? 'دفع آمن بالبطاقة الائتمانية' : 'Secure credit card payment')
-                      : (language === 'ar' ? 'ستدفع نقداً عند الوصول' : 'You\'ll pay cash upon arrival')
-                    }
-                  </p>
-
-                  {/* Enhanced Price Breakdown */}
-                  {dateRange?.from && dateRange?.to && (
-                    <div className="space-y-4 border-t border-gray-200 pt-6">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-900">
-                          ${listing.price_per_night_usd} x {calculateTotalNights()} {language === 'ar' ? 'ليالي' : 'nights'}
-                        </span>
-                        <span className="font-medium">${calculateTotalAmount()}</span>
-                      </div>
-                      
-                      {/* Payment method indicator */}
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600 flex items-center gap-2">
-                          {paymentMethod === 'card' ? (
-                            <>
-                              <CreditCard className="h-4 w-4" />
-                              {language === 'ar' ? 'الدفع بالبطاقة' : 'Card payment'}
-                            </>
-                          ) : (
-                            <>
-                              <Banknote className="h-4 w-4" />
-                              {language === 'ar' ? 'الدفع نقداً' : 'Cash payment'}
-                            </>
-                          )}
-                        </span>
-                        <span className="text-nawartu-green font-medium">
-                          {paymentMethod === 'cash' 
-                            ? (language === 'ar' ? 'عند الوصول' : 'At arrival')
-                            : (language === 'ar' ? 'فوري' : 'Now')
-                          }
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between font-semibold text-xl border-t border-gray-200 pt-4">
-                        <span>{language === 'ar' ? 'المجموع' : 'Total'}</span>
-                        <span>${calculateTotalAmount()}</span>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <InstantBooking
+                listing={{
+                  id: listing.id,
+                  name: listing.name,
+                  price_per_night_usd: listing.price_per_night_usd,
+                  max_guests: listing.max_guests,
+                  location: listing.location
+                }}
+                initialDateRange={dateRange}
+                onBookingSuccess={(bookingId) => {
+                  navigate(`/payment-success?booking_id=${bookingId}`);
+                }}
+              />
             </div>
           </div>
         </div>
 
-        {/* Photo Gallery Modal */}
-        {showAllPhotos && (
-          <PropertyImageGallery 
-            images={listing.images || []}
-            propertyName={listing.name}
-          />
-        )}
 
-        {/* Date Picker Modal */}
-        {showDatePicker && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-8">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-6"></div> {/* Spacer for centering */}
-                  <div></div> {/* Title is handled in AirbnbCalendar */}
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setShowDatePicker(false)}
-                    className="w-6 h-6 p-0 hover:bg-gray-100 rounded-full"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <AirbnbCalendar
-                  dateRange={dateRange}
-                  onDateRangeChange={setDateRange}
-                  language={language}
-                />
-
-                <div className="flex justify-end gap-3 mt-8">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setDateRange(undefined);
-                    }}
-                    className="px-6"
-                  >
-                    {language === 'ar' ? 'مسح التواريخ' : 'Clear dates'}
-                  </Button>
-                  <Button 
-                    onClick={() => setShowDatePicker(false)}
-                    disabled={!dateRange?.from || !dateRange?.to}
-                    className="px-6 bg-gray-900 hover:bg-gray-800"
-                  >
-                    {language === 'ar' ? 'إغلاق' : 'Close'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Guest Selector Modal */}
-        {showGuestSelector && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg max-w-md w-full">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold">
-                    {language === 'ar' ? 'الضيوف' : 'Guests'}
-                  </h2>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setShowGuestSelector(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <div className="mb-6">
-                  <GuestSelector
-                    value={guests}
-                    onChange={setGuests}
-                    maxGuests={listing.max_guests}
-                  />
-                </div>
-
-                <div className="flex justify-end">
-                  <Button onClick={() => setShowGuestSelector(false)}>
-                    {language === 'ar' ? 'إغلاق' : 'Close'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Card Details Modal */}
-        <CardDetailsModern
-          isOpen={showCardDetails}
-          onClose={handleCardPaymentClose}
-          onSuccess={handleCardPaymentSuccess}
-          amount={calculateTotalAmount()}
-          bookingId={currentBookingId}
-          listingName={listing?.name || ''}
-          nights={calculateTotalNights()}
-        />
-
-        {/* Property Image Gallery Modal */}
-        {showAllPhotos && (
-          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-            <div className="max-w-4xl max-h-[90vh] w-full h-full relative">
-              {/* Close button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowAllPhotos(false)}
-                className="absolute top-4 right-4 z-10 bg-white/20 hover:bg-white/30 text-white rounded-full"
-              >
-                <X className="h-6 w-6" />
-              </Button>
-              
-              {/* Image container */}
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-full overflow-y-auto p-4">
-                  {(listing.images || []).map((image, index) => (
-                    <div key={index} className="aspect-square relative group cursor-pointer">
-                      <img
-                        src={getPublicImageUrl(image) || '/placeholder.svg'}
-                        alt={`${listing.name} ${index + 1}`}
-                        className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-lg transition-colors duration-200" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Image counter */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
-                {listing.images?.length || 0} {language === 'ar' ? 'صورة' : 'photos'}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
