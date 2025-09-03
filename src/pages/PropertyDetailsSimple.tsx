@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { GuestSelector } from "@/components/GuestSelector";
 import { ReviewsList } from "@/components/ReviewsList";
-import GoogleMap from "@/components/GoogleMap";
+
 import { PropertyImageGallery } from "@/components/PropertyImageGallery";
 import { ArrowLeft, MapPin, Users, Bed, Bath, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -258,28 +258,17 @@ const PropertyDetailsSimple = () => {
             </Card>
 
             {/* Map */}
-            {listing.latitude && listing.longitude && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Location</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 rounded-lg overflow-hidden">
-                    <GoogleMap
-                      lat={listing.latitude}
-                      lng={listing.longitude}
-                      zoom={15}
-                      markers={[{
-                        lat: listing.latitude,
-                        lng: listing.longitude,
-                        title: listing.name,
-                        info: listing.description
-                      }]}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Location</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <MapPin className="h-4 w-4" />
+                  <span>{listing.location}</span>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Reviews */}
             <ReviewsList listingId={listing.id} />

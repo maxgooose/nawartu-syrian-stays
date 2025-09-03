@@ -9,14 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PropertyCard } from "@/components/PropertyCard";
 import { GuestSelector } from "@/components/GuestSelector";
-import { Search, Filter, MapPin, Calendar, Users, Heart, Star, Grid, Map, ArrowLeft, Navigation, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, MapPin, Calendar, Users, Grid, Map, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { getPublicImageUrl, openInGoogleMaps, toggleFavorite, getFavorites } from "@/lib/utils";
+import { getPublicImageUrl, toggleFavorite, getFavorites } from "@/lib/utils";
 
 interface Listing {
   id: string;
   name: string;
+  name_en?: string;
+  name_ar?: string;
   location: string;
   price_per_night_usd: number;
   price_per_night_syp: number | null;
@@ -27,6 +29,8 @@ interface Listing {
   images: string[];
   amenities: string[];
   description: string;
+  description_en?: string;
+  description_ar?: string;
   latitude?: number | null;
   longitude?: number | null;
   host: {
@@ -47,6 +51,32 @@ const PropertyBrowse = () => {
     e.stopPropagation(); // Prevent card click when clicking heart
     toggleFavorite(propertyId);
     setFavorites(getFavorites()); // Update local state
+  };
+
+  // Transform listing data to PropertyCard format (same as FeaturedProperties)
+  const formatListingForPropertyCard = (listing: Listing) => {
+    // Use language-specific name, fallback to old field, then to other language
+    const title = language === 'ar' 
+      ? (listing.name_ar || listing.name || listing.name_en)
+      : (listing.name_en || listing.name || listing.name_ar);
+      
+    // Use language-specific location, fallback to old field, then to other language
+    const location = language === 'ar' 
+      ? (listing.location_ar || listing.location || listing.location_en)
+      : (listing.location_en || listing.location || listing.location_ar);
+      
+    return {
+      id: listing.id,
+      title: title || 'Untitled Listing',
+      location: location || 'Location not available',
+      price: listing.price_per_night_usd,
+      currency: 'USD' as const,
+      rating: 4.8, // Default rating until we implement reviews
+      reviews: 0, // Default reviews count
+      image: getPublicImageUrl(listing.images?.[0]) || '/placeholder.svg',
+      type: language === 'ar' ? 'عقار' : 'Listing',
+      features: listing.amenities?.slice(0, 3) || []
+    };
   };
   const [searchParams] = useSearchParams();
   const [listings, setListings] = useState<Listing[]>([]);
@@ -312,91 +342,23 @@ const PropertyBrowse = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* Use same grid layout and PropertyCard component as homepage */}
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-12">
                   {filteredListings
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                    .map((listing) => (
-                  <Card 
-                    key={listing.id} 
-                    className="overflow-hidden cursor-pointer group bg-card border hover:shadow-md transition-shadow duration-200"
-                    onClick={() => navigate(`/property/${listing.id}`)}
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      {listing.images?.[0] ? (
-                        <img 
-                          src={getPublicImageUrl(listing.images[0]) || '/placeholder.svg'} 
-                          alt={listing.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <MapPin className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleFavoriteToggle(listing.id, e)}
-                        className="absolute top-3 right-3 bg-background/90 hover:bg-background text-foreground rounded-full p-2 h-8 w-8"
-                      >
-                        <Heart className={`h-4 w-4 ${favorites.includes(listing.id) ? 'fill-red-500 text-red-500' : ''}`} />
-                      </Button>
+                    .map((listing, index) => (
+                    <div 
+                      key={listing.id}
+                      className="group cursor-pointer"
+                      style={{
+                        animationDelay: `${index * 0.1}s`
+                      }}
+                    >
+                      <PropertyCard 
+                        property={formatListingForPropertyCard(listing)}
+                        language={language}
+                      />
                     </div>
-
-                    <CardContent className="p-5" dir={isRTL ? 'rtl' : 'ltr'}>
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className={`font-semibold text-lg text-foreground line-clamp-1 ${isRTL ? 'text-arabic' : 'text-latin'}`}>
-                          {listing.name}
-                        </h3>
-                        <div className={`flex items-center gap-1 ${isRTL ? 'rtl:flex-row-reverse' : ''}`}>
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">4.8</span>
-                        </div>
-                      </div>
-
-                      <div className={`flex items-center gap-1 ${isRTL ? 'rtl:flex-row-reverse' : ''} text-muted-foreground mb-4`}>
-                        <MapPin className="h-4 w-4" />
-                        <span className="text-sm">{listing.location}</span>
-                      </div>
-
-                      <div className={`flex items-center gap-2 ${isRTL ? 'rtl:flex-row-reverse' : ''} mb-4`}>
-                        <span className="text-xs bg-muted px-3 py-1 rounded-full">
-                          {listing.max_guests} {language === 'ar' ? 'ضيوف' : 'guests'}
-                        </span>
-                        <span className="text-xs bg-muted px-3 py-1 rounded-full">
-                          {listing.bedrooms} {language === 'ar' ? 'غرف' : 'bedrooms'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className={isRTL ? 'text-arabic' : 'text-latin'}>
-                          <span className="text-xl font-bold text-foreground">
-                            ${listing.price_per_night_usd}
-                          </span>
-                          <span className="text-sm text-muted-foreground ml-1">
-                            {language === 'ar' ? '/ ليلة' : '/ night'}
-                          </span>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="p-2 h-8 w-8"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openInGoogleMaps({
-                              latitude: listing.latitude,
-                              longitude: listing.longitude,
-                              address: listing.location,
-                              propertyName: listing.name
-                            });
-                          }}
-                          title={language === 'ar' ? 'عرض في خرائط جوجل' : 'View on Google Maps'}
-                        >
-                          <Navigation className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
                   ))}
                 </div>
 

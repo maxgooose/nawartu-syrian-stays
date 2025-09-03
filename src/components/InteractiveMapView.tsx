@@ -15,8 +15,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface Listing {
   id: string;
   name: string;
+  name_en?: string;
+  name_ar?: string;
   description: string;
+  description_en?: string;
+  description_ar?: string;
   location: string;
+  location_en?: string;
+  location_ar?: string;
   price_per_night_usd: number;
   latitude: number | null;
   longitude: number | null;
@@ -106,7 +112,9 @@ const InteractiveMapView: React.FC = () => {
       .map(listing => ({
         lat: listing.latitude!,
         lng: listing.longitude!,
-        title: listing.name,
+        title: language === 'ar' 
+          ? (listing.name_ar || listing.name || listing.name_en)
+          : (listing.name_en || listing.name || listing.name_ar),
         icon: selectedListing?.id === listing.id 
           ? 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
           : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
@@ -294,10 +302,18 @@ const InteractiveMapView: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2 text-muted-foreground mb-2">
                         <MapPin className="h-4 w-4" />
-                        <span>{selectedListing.location}</span>
+                        <span>
+                          {language === 'ar' 
+                            ? (selectedListing.location_ar || selectedListing.location || selectedListing.location_en)
+                            : (selectedListing.location_en || selectedListing.location || selectedListing.location_ar)
+                          }
+                        </span>
                       </div>
                       <p className="text-sm text-muted-foreground mb-4">
-                        {selectedListing.description.slice(0, 150)}...
+                        {(language === 'ar' 
+                          ? (selectedListing.description_ar || selectedListing.description || selectedListing.description_en)
+                          : (selectedListing.description_en || selectedListing.description || selectedListing.description_ar)
+                        )?.slice(0, 150)}...
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <Badge variant="secondary">
@@ -318,7 +334,10 @@ const InteractiveMapView: React.FC = () => {
                       <div className="aspect-video rounded-lg overflow-hidden">
                         <img 
                           src={selectedListing.images[0]} 
-                          alt={selectedListing.name}
+                          alt={language === 'ar' 
+                            ? (selectedListing.name_ar || selectedListing.name || selectedListing.name_en)
+                            : (selectedListing.name_en || selectedListing.name || selectedListing.name_ar)
+                          }
                           className="w-full h-full object-cover"
                         />
                       </div>

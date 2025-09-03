@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PropertyCard } from "@/components/PropertyCard";
 import { HostRegistrationButton } from "@/components/HostRegistrationButton";
 import { GuestSelector } from "@/components/GuestSelector";
-import { Search, Filter, MapPin, Calendar, Users, Heart, Star, ArrowLeft } from "lucide-react";
+import { Search, Filter, MapPin, Calendar, Heart, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { getPublicImageUrl, toggleFavorite, getFavorites } from "@/lib/utils";
@@ -19,7 +19,11 @@ import { getPublicImageUrl, toggleFavorite, getFavorites } from "@/lib/utils";
 interface Listing {
   id: string;
   name: string;
+  name_en?: string;
+  name_ar?: string;
   location: string;
+  location_en?: string;
+  location_ar?: string;
   price_per_night_usd: number;
   price_per_night_syp: number | null;
   status: 'pending' | 'approved' | 'rejected';
@@ -29,6 +33,8 @@ interface Listing {
   images: string[];
   amenities: string[];
   description: string;
+  description_en?: string;
+  description_ar?: string;
   host: {
     full_name: string;
   };
@@ -51,7 +57,12 @@ interface Booking {
 
 const GuestDashboard = () => {
   const { user, profile } = useAuth();
+  const { language } = useLanguage();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState<string[]>([]);
+
+  const isRTL = language === 'ar';
 
   // Initialize favorites
   useEffect(() => {
@@ -62,6 +73,32 @@ const GuestDashboard = () => {
     e.stopPropagation(); // Prevent card click when clicking heart
     toggleFavorite(propertyId);
     setFavorites(getFavorites()); // Update local state
+  };
+
+  // Transform listing data to PropertyCard format (same as other pages)
+  const formatListingForPropertyCard = (listing: Listing) => {
+    // Use language-specific name, fallback to old field, then to other language
+    const title = language === 'ar' 
+      ? (listing.name_ar || listing.name || listing.name_en)
+      : (listing.name_en || listing.name || listing.name_ar);
+      
+    // Use language-specific location, fallback to old field, then to other language
+    const location = language === 'ar' 
+      ? (listing.location_ar || listing.location || listing.location_en)
+      : (listing.location_en || listing.location || listing.location_ar);
+      
+    return {
+      id: listing.id,
+      title: title || 'Untitled Listing',
+      location: location || 'Location not available',
+      price: listing.price_per_night_usd,
+      currency: 'USD' as const,
+      rating: 4.8, // Default rating until we implement reviews
+      reviews: 0, // Default reviews count
+      image: getPublicImageUrl(listing.images?.[0]) || '/placeholder.svg',
+      type: language === 'ar' ? 'عقار' : 'Listing',
+      features: listing.amenities?.slice(0, 3) || []
+    };
   };
   const [listings, setListings] = useState<Listing[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -76,11 +113,6 @@ const GuestDashboard = () => {
     infants: 0
   });
   const [sortBy, setSortBy] = useState('price-low');
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
 
   useEffect(() => {
     if (!user) {
@@ -88,13 +120,13 @@ const GuestDashboard = () => {
       return;
     }
     fetchData();
-  }, [user]);
+  }, [user, navigate, fetchData]);
 
   useEffect(() => {
     filterAndSortListings();
-  }, [listings, searchQuery, priceRange, guestCount, guestDetails, sortBy]);
+  }, [filterAndSortListings]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       // Fetch approved listings
       const { data: listingsData, error: listingsError } = await supabase
@@ -131,9 +163,9 @@ const GuestDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [profile, toast, language]);
 
-  const filterAndSortListings = () => {
+  const filterAndSortListings = useCallback(() => {
     let filtered = [...listings];
 
     // Search filter
@@ -182,7 +214,7 @@ const GuestDashboard = () => {
     });
 
     setFilteredListings(filtered);
-  };
+  }, [listings, searchQuery, priceRange, guestCount, guestDetails, sortBy]);
 
   const getStatusBadge = (status: string) => {
     const labels = {
@@ -348,75 +380,20 @@ const GuestDashboard = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredListings.map((listing) => (
-                  <Card key={listing.id} className="overflow-hidden hover-lift cursor-pointer group pattern-subtle border border-primary/5 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up">
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      {listing.images?.[0] ? (
-                        <img 
-                          src={getPublicImageUrl(listing.images[0]) || '/placeholder.svg'} 
-                          alt={listing.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <MapPin className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleFavoriteToggle(listing.id, e)}
-                        className="absolute top-3 right-3 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
-                      >
-                        <Heart className={`h-4 w-4 ${favorites.includes(listing.id) ? 'fill-red-500 text-red-500' : ''}`} />
-                      </Button>
-                    </div>
-
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-lg text-foreground line-clamp-1">
-                          {listing.name}
-                        </h3>
-                        <div className="flex items-center space-x-1 rtl:space-x-reverse">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">4.8</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-1 rtl:space-x-reverse text-muted-foreground mb-3">
-                        <MapPin className="h-4 w-4" />
-                        <span className="text-sm">{listing.location}</span>
-                      </div>
-
-                      <div className="flex items-center space-x-2 rtl:space-x-reverse mb-3">
-                        <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
-                          {listing.max_guests} {language === 'ar' ? 'ضيوف' : 'guests'}
-                        </span>
-                        <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
-                          {listing.bedrooms} {language === 'ar' ? 'غرف' : 'rooms'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-lg font-bold text-foreground">
-                            ${listing.price_per_night_usd}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {language === 'ar' ? ' / ليلة' : ' / night'}
-                          </span>
-                        </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => navigate(`/property/${listing.id}`)}
-                        >
-                          {language === 'ar' ? 'احجز' : 'Book'}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-12">
+                {filteredListings.map((listing, index) => (
+                  <div 
+                    key={listing.id}
+                    className="group cursor-pointer"
+                    style={{
+                      animationDelay: `${index * 0.1}s`
+                    }}
+                  >
+                    <PropertyCard 
+                      property={formatListingForPropertyCard(listing)}
+                      language={language}
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -439,77 +416,20 @@ const GuestDashboard = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {listings.filter(listing => favorites.includes(listing.id)).map((listing) => (
-                  <Card key={listing.id} className="overflow-hidden hover-lift cursor-pointer group pattern-subtle border border-primary/5 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up">
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      {listing.images?.[0] ? (
-                        <img 
-                          src={getPublicImageUrl(listing.images[0]) || '/placeholder.svg'} 
-                          alt={listing.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <MapPin className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleFavoriteToggle(listing.id, e)}
-                        className="absolute top-3 right-3 bg-background/80 hover:bg-background text-foreground rounded-full p-2"
-                      >
-                        <Heart className="h-4 w-4 fill-red-500 text-red-500" />
-                      </Button>
-                    </div>
-
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-lg text-foreground line-clamp-1">
-                          {listing.name}
-                        </h3>
-                        <div className="flex items-center space-x-1 rtl:space-x-reverse">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">4.8</span>
-                          <span className="text-sm text-muted-foreground">(12)</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-1 rtl:space-x-reverse text-muted-foreground mb-3">
-                        <MapPin className="h-4 w-4" />
-                        <span className="text-sm">{listing.location}</span>
-                      </div>
-
-                      <div className="flex items-center space-x-2 rtl:space-x-reverse mb-3">
-                        <div className="flex items-center space-x-1 rtl:space-x-reverse">
-                          <Users className="h-4 w-4" />
-                          <span className="text-sm">
-                            {listing.max_guests} {language === 'ar' ? 'ضيوف' : 'guests'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-sm font-medium text-gray-400">
-                            ${listing.price_per_night_usd}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {language === 'ar' ? ' / ليلة' : ' / night'}
-                          </span>
-                        </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => navigate(`/property/${listing.id}`)}
-                          className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                        >
-                          {language === 'ar' ? 'احجز' : 'Book'}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-12">
+                {listings.filter(listing => favorites.includes(listing.id)).map((listing, index) => (
+                  <div 
+                    key={listing.id}
+                    className="group cursor-pointer"
+                    style={{
+                      animationDelay: `${index * 0.1}s`
+                    }}
+                  >
+                    <PropertyCard 
+                      property={formatListingForPropertyCard(listing)}
+                      language={language}
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -551,10 +471,10 @@ const GuestDashboard = () => {
                               <MapPin className="h-4 w-4" />
                               {booking.listing.location}
                             </p>
-                          </div>
-                        </div>
-                        {getStatusBadge(booking.status)}
                       </div>
+                    </div>
+                        {getStatusBadge(booking.status)}
+                  </div>
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
@@ -564,7 +484,7 @@ const GuestDashboard = () => {
                           <span className="font-medium">
                             {new Date(booking.check_in_date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                           </span>
-                        </div>
+                    </div>
                         <div>
                           <span className="text-muted-foreground block">
                             {language === 'ar' ? 'تاريخ المغادرة' : 'Check-out Date'}
@@ -572,20 +492,20 @@ const GuestDashboard = () => {
                           <span className="font-medium">
                             {new Date(booking.check_out_date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                           </span>
-                        </div>
+                    </div>
                         <div>
                           <span className="text-muted-foreground block">
                             {language === 'ar' ? 'عدد الليالي' : 'Number of Nights'}
                           </span>
                           <span className="font-medium">{booking.total_nights}</span>
-                        </div>
+                    </div>
                         <div>
                           <span className="text-muted-foreground block">
                             {language === 'ar' ? 'المبلغ الإجمالي' : 'Total Amount'}
                           </span>
                           <span className="font-medium">${booking.total_amount_usd}</span>
-                        </div>
-                      </div>
+                    </div>
+                  </div>
                     </CardContent>
                   </Card>
                 ))}

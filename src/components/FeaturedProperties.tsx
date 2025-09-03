@@ -10,7 +10,14 @@ interface FeaturedPropertiesProps {
 interface Listing {
   id: string;
   name: string;
+  name_en?: string;
+  name_ar?: string;
+  description?: string;
+  description_en?: string;
+  description_ar?: string;
   location: string;
+  location_en?: string;
+  location_ar?: string;
   price_per_night_usd: number;
   price_per_night_syp?: number;
   images: string[];
@@ -50,18 +57,30 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
     fetchFeaturedListings();
   }, []);
 
-  const formatListingForPropertyCard = (listing: Listing) => ({
-    id: listing.id,
-    title: listing.name,
-    location: listing.location,
-    price: listing.price_per_night_usd,
-    currency: 'USD' as const,
-    rating: 4.5, // Default rating until we implement reviews
-    reviews: 0, // Default reviews count
-    image: getPublicImageUrl(listing.images?.[0]) || '/placeholder.svg',
-    type: language === 'ar' ? 'عقار' : 'Listing',
-    features: listing.amenities?.slice(0, 3) || []
-  });
+  const formatListingForPropertyCard = (listing: Listing) => {
+    // Use language-specific name, fallback to old field, then to other language
+    const title = language === 'ar' 
+      ? (listing.name_ar || listing.name || listing.name_en)
+      : (listing.name_en || listing.name || listing.name_ar);
+      
+    // Use language-specific location, fallback to old field, then to other language
+    const location = language === 'ar' 
+      ? (listing.location_ar || listing.location || listing.location_en)
+      : (listing.location_en || listing.location || listing.location_ar);
+      
+    return {
+      id: listing.id,
+      title: title || 'Untitled Listing',
+      location: location || 'Location not available',
+      price: listing.price_per_night_usd,
+      currency: 'USD' as const,
+      rating: 4.5, // Default rating until we implement reviews
+      reviews: 0, // Default reviews count
+      image: getPublicImageUrl(listing.images?.[0]) || '/placeholder.svg',
+      type: language === 'ar' ? 'عقار' : 'Listing',
+      features: listing.amenities?.slice(0, 3) || []
+    };
+  };
 
   if (loading) {
     return (
@@ -148,7 +167,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
               </svg>
             </button>
             <p className="mt-4 text-gray-500 text-sm font-light">
-              {language === 'ar' ? `${listings.length}+ عقار فريد ينتظرك` : `${listings.length}+ unique properties await you`}
+              {language === 'ar' ? 'اكتشف ما يناسبك' : 'Discover what\'s yours'}
             </p>
           </div>
         </div>

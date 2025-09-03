@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ReviewsList } from "@/components/ReviewsList";
 import { StarRating } from "@/components/StarRating";
-import GoogleMap from "@/components/GoogleMap";
+
 import { PropertyImageGallery } from "@/components/PropertyImageGallery";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { InstantBooking } from "@/components/InstantBooking";
@@ -54,7 +54,6 @@ import {
   Bath as Shower,
   Shirt as ShirtIcon,
   Crown,
-  MapIcon,
   TreePine,
   Camera,
   Building
@@ -66,8 +65,14 @@ import { getPublicImageUrl } from "@/lib/utils";
 interface Listing {
   id: string;
   name: string;
+  name_en?: string;
+  name_ar?: string;
   description: string;
+  description_en?: string;
+  description_ar?: string;
   location: string;
+  location_en?: string;
+  location_ar?: string;
   price_per_night_usd: number;
   price_per_night_syp: number | null;
   max_guests: number;
@@ -341,23 +346,27 @@ const PropertyDetails = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-
+  const { language } = useLanguage();
   
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange>();
   const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
-
-
-  const { language } = useLanguage();
   const isRTL = language === 'ar';
 
   useEffect(() => {
     if (id) {
       fetchListing();
+    } else {
+      // If no ID is provided, redirect to home
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "معرف العقار مفقود" : "Property ID is missing",
+        variant: "destructive",
+      });
+      navigate('/');
     }
-  }, [id]);
+  }, [id, language, navigate, toast]);
 
 
 
@@ -508,7 +517,12 @@ const PropertyDetails = () => {
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Property Title and Rating */}
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-4 leading-tight">{listing.name}</h1>
+          <h1 className="text-3xl font-semibold text-gray-900 mb-4 leading-tight">
+            {language === 'ar' 
+              ? (listing.name_ar || listing.name || listing.name_en)
+              : (listing.name_en || listing.name || listing.name_ar)
+            }
+          </h1>
           
           {/* Badges Section */}
           <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -602,7 +616,10 @@ const PropertyDetails = () => {
             <div className="flex items-center gap-1 text-gray-600">
               <MapPin className="h-4 w-4" />
               <button className="underline decoration-1 underline-offset-2 hover:text-gray-900 transition-colors font-medium">
-                {listing.location}
+                {language === 'ar' 
+                  ? (listing.location_ar || listing.location || listing.location_en)
+                  : (listing.location_en || listing.location || listing.location_ar)
+                }
               </button>
             </div>
           </div>
@@ -612,7 +629,10 @@ const PropertyDetails = () => {
         <div className="mb-8">
           <PropertyImageGallery 
             images={listing.images || []}
-            propertyName={listing.name}
+            propertyName={language === 'ar' 
+              ? (listing.name_ar || listing.name || listing.name_en)
+              : (listing.name_en || listing.name || listing.name_ar)
+            }
             className="rounded-xl"
           />
         </div>
@@ -626,7 +646,10 @@ const PropertyDetails = () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                    {language === 'ar' ? 'بيت كامل في' : 'Entire home in'} {listing.location}
+                    {language === 'ar' ? 'بيت كامل في' : 'Entire home in'} {language === 'ar' 
+                      ? (listing.location_ar || listing.location || listing.location_en)
+                      : (listing.location_en || listing.location || listing.location_ar)
+                    }
                   </h2>
                   
                   {/* High-level property info with enhanced styling */}
@@ -726,7 +749,12 @@ const PropertyDetails = () => {
                 {language === 'ar' ? 'حول هذا المكان' : 'About this space'}
               </h2>
               <div className="prose prose-gray max-w-none">
-                <p className="text-gray-700 leading-relaxed text-lg">{listing.description}</p>
+                <p className="text-gray-700 leading-relaxed text-lg">
+                  {language === 'ar' 
+                    ? (listing.description_ar || listing.description || listing.description_en)
+                    : (listing.description_en || listing.description || listing.description_ar)
+                  }
+                </p>
               </div>
             </div>
 
@@ -966,28 +994,15 @@ const PropertyDetails = () => {
                   {language === 'ar' ? 'الموقع والمنطقة المحيطة' : 'Where you\'ll be'}
                 </h2>
                 
-                {/* Map with enhanced styling */}
+                {/* Location Description */}
                 <div className="bg-nawartu-beige/20 rounded-2xl p-6 mb-8">
-                  <div className="h-96 rounded-xl overflow-hidden shadow-md mb-6">
-                  <GoogleMap
-                    lat={listing.latitude}
-                    lng={listing.longitude}
-                    zoom={15}
-                    markers={[{
-                      lat: listing.latitude,
-                      lng: listing.longitude,
-                      title: listing.name,
-                      info: listing.description
-                    }]}
-                    showNearbyPlaces={true}
-                    showDistanceToMajorCities={true}
-                    enableGeocoding={true}
-                  />
-                </div>
-                  
-                  {/* Location Description */}
                   <div className="text-center">
-                    <h3 className="font-semibold text-gray-900 mb-2 text-lg">{listing.location}</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-lg">
+                      {language === 'ar' 
+                        ? (listing.location_ar || listing.location || listing.location_en)
+                        : (listing.location_en || listing.location || listing.location_ar)
+                      }
+                    </h3>
                     <p className="text-gray-600 leading-relaxed">
                       {language === 'ar'
                         ? 'موقع مثالي يوفر سهولة الوصول إلى المعالم المهمة والمرافق الأساسية'
@@ -1134,19 +1149,23 @@ const PropertyDetails = () => {
               <InstantBooking
                 listing={{
                   id: listing.id,
-                  name: listing.name,
+                  name: language === 'ar' 
+                    ? (listing.name_ar || listing.name || listing.name_en)
+                    : (listing.name_en || listing.name || listing.name_ar),
                   price_per_night_usd: listing.price_per_night_usd,
                   max_guests: listing.max_guests,
-                  location: listing.location
+                  location: language === 'ar' 
+                    ? (listing.location_ar || listing.location || listing.location_en)
+                    : (listing.location_en || listing.location || listing.location_ar)
                 }}
                 initialDateRange={dateRange}
                 onBookingSuccess={(bookingId) => {
                   navigate(`/payment-success?booking_id=${bookingId}`);
                 }}
-              />
-            </div>
-          </div>
-        </div>
+                  />
+                </div>
+                </div>
+              </div>
 
 
       </div>

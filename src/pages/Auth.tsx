@@ -181,9 +181,9 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <Card className="w-full max-w-md bg-background/95 backdrop-blur-sm shadow-elegant">
         <CardHeader className="text-center">
-                      <div className="mx-auto mb-4 w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-              <img src="/nawartu-logo.png" alt="Nawartu" className="w-10 h-10" />
-            </div>
+          <div className="mx-auto mb-4 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md border border-gray-100">
+            <img src="/lovable-uploads/224dce06-9efd-402a-93b9-01ef7b9f4add.png" alt="Nawartu" className="w-12 h-12" />
+          </div>
           <CardTitle className="text-2xl font-arabic">
             {language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu'}
           </CardTitle>

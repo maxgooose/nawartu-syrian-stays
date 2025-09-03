@@ -92,7 +92,6 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
           </h3>
           <div className="flex items-center gap-1 flex-shrink-0">
             <Star className="h-3 w-3 fill-black stroke-black" />
-            <span className="text-sm text-gray-900">{property.rating.toFixed(1)}</span>
           </div>
         </div>
 

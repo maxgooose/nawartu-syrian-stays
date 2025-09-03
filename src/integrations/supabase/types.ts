@@ -129,14 +129,20 @@ export type Database = {
           bedrooms: number | null
           created_at: string
           description: string
+          description_ar: string | null
+          description_en: string | null
           host_id: string
           id: string
           images: string[] | null
           latitude: number | null
           location: string
+          location_ar: string | null
+          location_en: string | null
           longitude: number | null
           max_guests: number
           name: string
+          name_ar: string | null
+          name_en: string | null
           price_per_night_syp: number | null
           price_per_night_usd: number
           status: Database["public"]["Enums"]["listing_status"]
@@ -148,15 +154,21 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           created_at?: string
-          description: string
+          description?: string
+          description_ar?: string | null
+          description_en?: string | null
           host_id: string
           id?: string
           images?: string[] | null
           latitude?: number | null
-          location: string
+          location?: string
+          location_ar?: string | null
+          location_en?: string | null
           longitude?: number | null
           max_guests?: number
-          name: string
+          name?: string
+          name_ar?: string | null
+          name_en?: string | null
           price_per_night_syp?: number | null
           price_per_night_usd: number
           status?: Database["public"]["Enums"]["listing_status"]
@@ -169,14 +181,20 @@ export type Database = {
           bedrooms?: number | null
           created_at?: string
           description?: string
+          description_ar?: string | null
+          description_en?: string | null
           host_id?: string
           id?: string
           images?: string[] | null
           latitude?: number | null
           location?: string
+          location_ar?: string | null
+          location_en?: string | null
           longitude?: number | null
           max_guests?: number
           name?: string
+          name_ar?: string | null
+          name_en?: string | null
           price_per_night_syp?: number | null
           price_per_night_usd?: number
           status?: Database["public"]["Enums"]["listing_status"]

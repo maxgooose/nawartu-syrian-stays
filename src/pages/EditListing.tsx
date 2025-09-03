@@ -28,9 +28,12 @@ const EditListing = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    location: '',
+    name_en: '',
+    name_ar: '',
+    description_en: '',
+    description_ar: '',
+    location_en: '',
+    location_ar: '',
     governorate: null as SyrianGovernorate | null,
     price_per_night_usd: '',
     price_per_night_syp: '',
@@ -74,9 +77,12 @@ const EditListing = () => {
       }
 
       setFormData({
-        name: data.name || '',
-        description: data.description || '',
-        location: data.location || '',
+        name_en: data.name_en || data.name || '',
+        name_ar: data.name_ar || data.name || '',
+        description_en: data.description_en || data.description || '',
+        description_ar: data.description_ar || data.description || '',
+        location_en: data.location_en || data.location || '',
+        location_ar: data.location_ar || data.location || '',
         governorate: null, // Will be populated based on location or coordinates
         price_per_night_usd: data.price_per_night_usd?.toString() || '',
         price_per_night_syp: data.price_per_night_syp?.toString() || '',
@@ -125,9 +131,16 @@ const EditListing = () => {
       const { error } = await supabase
         .from('listings')
         .update({
-          name: formData.name,
-          description: formData.description,
-          location: formData.location,
+          name_en: formData.name_en,
+          name_ar: formData.name_ar,
+          description_en: formData.description_en,
+          description_ar: formData.description_ar,
+          location_en: formData.location_en,
+          location_ar: formData.location_ar,
+          // Keep backward compatibility
+          name: formData.name_ar || formData.name_en,
+          description: formData.description_ar || formData.description_en,
+          location: formData.location_ar || formData.location_en,
           price_per_night_usd: parseFloat(formData.price_per_night_usd),
           price_per_night_syp: formData.price_per_night_syp ? parseFloat(formData.price_per_night_syp) : null,
           max_guests: parseInt(formData.max_guests),
@@ -135,7 +148,6 @@ const EditListing = () => {
           bathrooms: parseInt(formData.bathrooms),
           amenities: formData.amenities,
           images: sanitizedImages,
-
         })
         .eq('id', id)
         .eq('host_id', profile?.id);
@@ -208,21 +220,43 @@ const EditListing = () => {
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">
-                      {language === 'ar' ? 'اسم العقار *' : 'Listing Name *'}
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder={language === 'ar' 
-                        ? "مثال: شقة فاخرة في وسط المدينة" 
-                        : "Example: Luxury apartment in city center"
-                      }
-                      required
-                    />
+                  {/* Bilingual Name Fields */}
+                  <div className="md:col-span-2 space-y-4">
+                    <h4 className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'اسم العقار (مطلوب بكلا اللغتين) *' : 'Listing Name (Required in both languages) *'}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="name_en" className="text-sm">
+                          {language === 'ar' ? 'الاسم بالإنجليزية *' : 'Name in English *'}
+                        </Label>
+                        <Input
+                          id="name_en"
+                          name="name_en"
+                          value={formData.name_en}
+                          onChange={handleInputChange}
+                          placeholder="Example: Luxury apartment in city center"
+                          required
+                          dir="ltr"
+                          className="text-left"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="name_ar" className="text-sm">
+                          {language === 'ar' ? 'الاسم بالعربية *' : 'Name in Arabic *'}
+                        </Label>
+                        <Input
+                          id="name_ar"
+                          name="name_ar"
+                          value={formData.name_ar}
+                          onChange={handleInputChange}
+                          placeholder="مثال: شقة فاخرة في وسط المدينة"
+                          required
+                          dir="rtl"
+                          className="text-right"
+                        />
+                      </div>
+                    </div>
                   </div>
                   
                   <div>
@@ -231,7 +265,9 @@ const EditListing = () => {
                         setFormData(prev => ({
                           ...prev,
                           governorate: governorate,
-                          location: `${governorate.nameAr}, ${governorate.majorCities[0]}`
+                          // Set bilingual location with governorate info
+                          location_en: `${governorate.nameEn}, ${governorate.majorCities[0]}`,
+                          location_ar: `${governorate.nameAr}, ${governorate.majorCities[0]}`
                         }));
                       }}
                       selectedGovernorate={formData.governorate}
@@ -246,41 +282,90 @@ const EditListing = () => {
                     </p>
                   </div>
                   
-                  <div>
-                    <Label htmlFor="location">{language === 'ar' ? 'العنوان التفصيلي *' : 'Detailed Address *'}</Label>
-                    <Input
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      placeholder={language === 'ar' ? 'مثال: المالكي، شارع الجلاء، رقم 15' : 'Example: Malki, Jalaa Street, No. 15'}
-                      required
-                      className="mt-1"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
+                  {/* Bilingual Location Fields */}
+                  <div className="md:col-span-2 space-y-4">
+                    <h4 className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'العنوان التفصيلي (مطلوب بكلا اللغتين) *' : 'Detailed Address (Required in both languages) *'}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="location_en" className="text-sm">
+                          {language === 'ar' ? 'العنوان بالإنجليزية *' : 'Address in English *'}
+                        </Label>
+                        <Input
+                          id="location_en"
+                          name="location_en"
+                          value={formData.location_en}
+                          onChange={handleInputChange}
+                          placeholder="Example: Malki, Jalaa Street, No. 15"
+                          required
+                          dir="ltr"
+                          className="text-left"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="location_ar" className="text-sm">
+                          {language === 'ar' ? 'العنوان بالعربية *' : 'Address in Arabic *'}
+                        </Label>
+                        <Input
+                          id="location_ar"
+                          name="location_ar"
+                          value={formData.location_ar}
+                          onChange={handleInputChange}
+                          placeholder="مثال: المالكي، شارع الجلاء، رقم 15"
+                          required
+                          dir="rtl"
+                          className="text-right"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
                       {language === 'ar' 
-                        ? 'أدخل العنوان التفصيلي للعقار' 
-                        : 'Enter the detailed address of the property'}
+                        ? 'أدخل العنوان التفصيلي للعقار بكلا اللغتين' 
+                        : 'Enter the detailed address of the property in both languages'}
                     </p>
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="description">
-                    {language === 'ar' ? 'الوصف *' : 'Description *'}
-                  </Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder={language === 'ar'
-                      ? "اكتب وصفاً مفصلاً لعقارك..."
-                      : "Write a detailed description of your listing..."
-                    }
-                    rows={5}
-                    required
-                  />
+                {/* Bilingual Description Fields */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'وصف العقار (مطلوب بكلا اللغتين) *' : 'Listing Description (Required in both languages) *'}
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="description_en" className="text-sm">
+                        {language === 'ar' ? 'الوصف بالإنجليزية *' : 'Description in English *'}
+                      </Label>
+                      <Textarea
+                        id="description_en"
+                        name="description_en"
+                        value={formData.description_en}
+                        onChange={handleInputChange}
+                        placeholder="Write a detailed description of your listing..."
+                        rows={5}
+                        required
+                        dir="ltr"
+                        className="text-left"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="description_ar" className="text-sm">
+                        {language === 'ar' ? 'الوصف بالعربية *' : 'Description in Arabic *'}
+                      </Label>
+                      <Textarea
+                        id="description_ar"
+                        name="description_ar"
+                        value={formData.description_ar}
+                        onChange={handleInputChange}
+                        placeholder="اكتب وصفاً مفصلاً لعقارك..."
+                        rows={5}
+                        required
+                        dir="rtl"
+                        className="text-right"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
