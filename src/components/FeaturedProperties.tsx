@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PropertyCard } from "./PropertyCard";
 import { getPublicImageUrl } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { getTranslatedContent } from "@/lib/translation";
 
 interface FeaturedPropertiesProps {
   language: 'ar' | 'en';
@@ -58,20 +59,13 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
   }, []);
 
   const formatListingForPropertyCard = (listing: Listing) => {
-    // Use language-specific name, fallback to old field, then to other language
-    const title = language === 'ar' 
-      ? (listing.name_ar || listing.name || listing.name_en)
-      : (listing.name_en || listing.name || listing.name_ar);
-      
-    // Use language-specific location, fallback to old field, then to other language
-    const location = language === 'ar' 
-      ? (listing.location_ar || listing.location || listing.location_en)
-      : (listing.location_en || listing.location || listing.location_ar);
-      
+    // Get translated content based on current language
+    const translatedContent = getTranslatedContent(listing, language);
+    
     return {
       id: listing.id,
-      title: title || 'Untitled Listing',
-      location: location || 'Location not available',
+      title: translatedContent.name,
+      location: translatedContent.location,
       price: listing.price_per_night_usd,
       currency: 'USD' as const,
       rating: 4.5, // Default rating until we implement reviews

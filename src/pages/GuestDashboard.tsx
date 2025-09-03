@@ -15,6 +15,7 @@ import { Search, Filter, MapPin, Calendar, Heart, ArrowLeft } from "lucide-react
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { getPublicImageUrl, toggleFavorite, getFavorites } from "@/lib/utils";
+import { getTranslatedContent } from "@/lib/translation";
 
 interface Listing {
   id: string;
@@ -75,22 +76,15 @@ const GuestDashboard = () => {
     setFavorites(getFavorites()); // Update local state
   };
 
-  // Transform listing data to PropertyCard format (same as other pages)
+  // Transform listing data to PropertyCard format with proper language handling
   const formatListingForPropertyCard = (listing: Listing) => {
-    // Use language-specific name, fallback to old field, then to other language
-    const title = language === 'ar' 
-      ? (listing.name_ar || listing.name || listing.name_en)
-      : (listing.name_en || listing.name || listing.name_ar);
-      
-    // Use language-specific location, fallback to old field, then to other language
-    const location = language === 'ar' 
-      ? (listing.location_ar || listing.location || listing.location_en)
-      : (listing.location_en || listing.location || listing.location_ar);
-      
+    // Get translated content based on current language
+    const translatedContent = getTranslatedContent(listing, language);
+    
     return {
       id: listing.id,
-      title: title || 'Untitled Listing',
-      location: location || 'Location not available',
+      title: translatedContent.name,
+      location: translatedContent.location,
       price: listing.price_per_night_usd,
       currency: 'USD' as const,
       rating: 4.8, // Default rating until we implement reviews

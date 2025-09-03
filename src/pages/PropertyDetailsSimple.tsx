@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { GuestSelector } from "@/components/GuestSelector";
 import { ReviewsList } from "@/components/ReviewsList";
-
 import { PropertyImageGallery } from "@/components/PropertyImageGallery";
 import { ArrowLeft, MapPin, Users, Bed, Bath, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +15,7 @@ import { format, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { getPublicImageUrl } from "@/lib/utils";
 import CardDetails from "@/components/CardDetails";
+import { getTranslatedContent } from "@/lib/translation";
 
 interface Listing {
   id: string;
@@ -221,21 +221,20 @@ const PropertyDetailsSimple = () => {
 
         {/* Property Title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold mb-2">
-            {language === 'ar' 
-              ? (listing.name_ar || listing.name || listing.name_en)
-              : (listing.name_en || listing.name || listing.name_ar)
-            }
-          </h1>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="h-4 w-4" />
-            <span>
-              {language === 'ar' 
-                ? (listing.location_ar || listing.location || listing.location_en)
-                : (listing.location_en || listing.location || listing.location_ar)
-              }
-            </span>
-          </div>
+          {(() => {
+            const translatedContent = getTranslatedContent(listing, language);
+            return (
+              <>
+                <h1 className="text-2xl font-semibold mb-2">
+                  {translatedContent.name}
+                </h1>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <MapPin className="h-4 w-4" />
+                  <span>{translatedContent.location}</span>
+                </div>
+              </>
+            );
+          })()}
         </div>
 
         {/* Photo Gallery */}
@@ -270,10 +269,10 @@ const PropertyDetailsSimple = () => {
                   </div>
                 </div>
                 <p className="text-gray-700">
-                  {language === 'ar' 
-                    ? (listing.description_ar || listing.description || listing.description_en)
-                    : (listing.description_en || listing.description || listing.description_ar)
-                  }
+                  {(() => {
+                    const translatedContent = getTranslatedContent(listing, language);
+                    return translatedContent.description;
+                  })()}
                 </p>
               </CardContent>
             </Card>
@@ -287,10 +286,10 @@ const PropertyDetailsSimple = () => {
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin className="h-4 w-4" />
                   <span>
-                    {language === 'ar' 
-                      ? (listing.location_ar || listing.location || listing.location_en)
-                      : (listing.location_en || listing.location || listing.location_ar)
-                    }
+                    {(() => {
+                      const translatedContent = getTranslatedContent(listing, language);
+                      return translatedContent.location;
+                    })()}
                   </span>
                 </div>
               </CardContent>
