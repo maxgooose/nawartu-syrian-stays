@@ -114,18 +114,6 @@ const GuestDashboard = () => {
   });
   const [sortBy, setSortBy] = useState('price-low');
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-    fetchData();
-  }, [user, navigate, fetchData]);
-
-  useEffect(() => {
-    filterAndSortListings();
-  }, [filterAndSortListings]);
-
   const fetchData = useCallback(async () => {
     try {
       // Fetch approved listings
@@ -215,6 +203,18 @@ const GuestDashboard = () => {
 
     setFilteredListings(filtered);
   }, [listings, searchQuery, priceRange, guestCount, guestDetails, sortBy]);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    fetchData();
+  }, [user, navigate, fetchData]);
+
+  useEffect(() => {
+    filterAndSortListings();
+  }, [filterAndSortListings]);
 
   const getStatusBadge = (status: string) => {
     const labels = {

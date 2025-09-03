@@ -157,11 +157,8 @@ export const HostAvailabilityManager: React.FC<HostAvailabilityManagerProps> = (
         notes: notes || null
       }));
 
-      const { error } = await supabase
-        .from('property_availability')
-        .upsert(updates, { onConflict: 'listing_id,date' });
-
-      if (error) throw error;
+      // Temporarily disabled until property_availability table is available
+      throw new Error('Property availability management temporarily disabled');
 
       toast({
         title: language === 'ar' ? "تم التحديث بنجاح" : "Updated Successfully",
@@ -245,11 +242,8 @@ export const HostAvailabilityManager: React.FC<HostAvailabilityManagerProps> = (
       }
 
       if (updates.length > 0) {
-        const { error } = await supabase
-          .from('property_availability')
-          .upsert(updates, { onConflict: 'listing_id,date' });
-
-        if (error) throw error;
+        // Temporarily disabled until property_availability table is available
+        throw new Error('Property availability management temporarily disabled');
 
         toast({
           title: language === 'ar' ? "تم التطبيق بنجاح" : "Applied Successfully",

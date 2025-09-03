@@ -42,16 +42,8 @@ export const useAvailability = (listingId: string, startDate?: string, endDate?:
     try {
       const { start, end } = getDefaultDateRange();
       
-      const { data, error: rpcError } = await supabase
-        .rpc('get_listing_availability', {
-          p_listing_id: listingId,
-          p_start_date: start,
-          p_end_date: end
-        });
-
-      if (rpcError) throw rpcError;
-      
-      setAvailability(data || []);
+      // Temporarily disable availability functions until database functions are created
+      setAvailability([]);
     } catch (err: any) {
       console.error('Error fetching availability:', err);
       setError(err.message);
@@ -73,17 +65,8 @@ export const useAvailability = (listingId: string, startDate?: string, endDate?:
     if (!listingId) return null;
     
     try {
-      const { data, error } = await supabase
-        .rpc('check_availability', {
-          p_listing_id: listingId,
-          p_check_in: checkIn,
-          p_check_out: checkOut,
-          p_guests: guests
-        });
-
-      if (error) throw error;
-      
-      return data?.[0] || null;
+      // Temporarily return null until database functions are created
+      return null;
     } catch (err: any) {
       console.error('Error checking availability:', err);
       toast({
@@ -104,23 +87,7 @@ export const useAvailability = (listingId: string, startDate?: string, endDate?:
     if (!listingId) return false;
     
     try {
-      const { data, error } = await supabase
-        .rpc('reserve_dates', {
-          p_listing_id: listingId,
-          p_check_in: checkIn,
-          p_check_out: checkOut,
-          p_user_id: userId,
-          p_hold_duration_minutes: holdDurationMinutes
-        });
-
-      if (error) throw error;
-      
-      if (data) {
-        // Refresh availability after successful reservation
-        fetchAvailability();
-        return true;
-      }
-      
+      // Temporarily return false until database functions are created
       return false;
     } catch (err: any) {
       console.error('Error reserving dates:', err);
@@ -141,18 +108,8 @@ export const useAvailability = (listingId: string, startDate?: string, endDate?:
     if (!listingId) return;
     
     try {
-      const { error } = await supabase
-        .rpc('release_reservation', {
-          p_listing_id: listingId,
-          p_check_in: checkIn,
-          p_check_out: checkOut,
-          p_user_id: userId || null
-        });
-
-      if (error) throw error;
-      
-      // Refresh availability after releasing reservation
-      fetchAvailability();
+      // Temporarily do nothing until database functions are created
+      return;
     } catch (err: any) {
       console.error('Error releasing reservation:', err);
       toast({
@@ -171,19 +128,8 @@ export const useAvailability = (listingId: string, startDate?: string, endDate?:
     if (!listingId) return false;
     
     try {
-      const { data, error } = await supabase
-        .rpc('confirm_booking', {
-          p_booking_id: bookingId,
-          p_listing_id: listingId,
-          p_check_in: checkIn,
-          p_check_out: checkOut
-        });
-
-      if (error) throw error;
-      
-      // Refresh availability after confirming booking
-      fetchAvailability();
-      return true;
+      // Temporarily return false until database functions are created
+      return false;
     } catch (err: any) {
       console.error('Error confirming booking:', err);
       toast({

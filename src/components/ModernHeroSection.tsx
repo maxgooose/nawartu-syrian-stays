@@ -148,11 +148,10 @@ export const ModernHeroSection = ({ language }: ModernHeroSectionProps) => {
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50">
                     <SyrianGovernorateDropdown
                       selectedGovernorate={searchData.governorate}
-                      onGovernorateChange={(governorate) => {
+                      onGovernorateSelect={(governorate) => {
                         setSearchData(prev => ({ ...prev, governorate }));
                         setActiveSection(null);
                       }}
-                      language={language}
                     />
                   </div>
                 )}
@@ -185,10 +184,11 @@ export const ModernHeroSection = ({ language }: ModernHeroSectionProps) => {
                 {activeSection === 'when' && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50">
                     <DateRangePicker
-                      date={searchData.dateRange}
-                      onDateChange={(dateRange) => {
+                      dateRange={searchData.dateRange}
+                      onDateRangeChange={(dateRange) => {
                         setSearchData(prev => ({ ...prev, dateRange }));
                       }}
+                      language={language}
                     />
                   </div>
                 )}
@@ -224,9 +224,8 @@ export const ModernHeroSection = ({ language }: ModernHeroSectionProps) => {
                 {activeSection === 'who' && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50">
                     <GuestSelector
-                      guests={searchData.guests}
+                      value={searchData.guests}
                       onChange={(guests) => setSearchData(prev => ({ ...prev, guests }))}
-                      language={language}
                     />
                   </div>
                 )}

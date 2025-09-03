@@ -148,7 +148,7 @@ const CreateListing = () => {
             hostEmail: profile.email,
             hostName: profile.full_name || profile.email,
             listingName: formData.name_ar || formData.name_en,
-            listingLocation: formData.location,
+            listingLocation: formData.location_ar || formData.location_en,
             listingId: `${Date.now()}` // Simple ID for reference
           }
         });

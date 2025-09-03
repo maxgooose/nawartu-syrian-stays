@@ -62,8 +62,8 @@ const PropertyBrowse = () => {
       
     // Use language-specific location, fallback to old field, then to other language
     const location = language === 'ar' 
-      ? (listing.location_ar || listing.location || listing.location_en)
-      : (listing.location_en || listing.location || listing.location_ar);
+      ? (listing.location || listing.location || listing.location)
+      : (listing.location || listing.location || listing.location);
       
     return {
       id: listing.id,

@@ -20,8 +20,14 @@ import CardDetails from "@/components/CardDetails";
 interface Listing {
   id: string;
   name: string;
+  name_ar?: string;
+  name_en?: string;
   description: string;
+  description_ar?: string;
+  description_en?: string;
   location: string;
+  location_ar?: string;
+  location_en?: string;
   price_per_night_usd: number;
   price_per_night_syp: number | null;
   max_guests: number;
@@ -215,10 +221,20 @@ const PropertyDetailsSimple = () => {
 
         {/* Property Title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold mb-2">{listing.name}</h1>
+          <h1 className="text-2xl font-semibold mb-2">
+            {language === 'ar' 
+              ? (listing.name_ar || listing.name || listing.name_en)
+              : (listing.name_en || listing.name || listing.name_ar)
+            }
+          </h1>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <MapPin className="h-4 w-4" />
-            <span>{listing.location}</span>
+            <span>
+              {language === 'ar' 
+                ? (listing.location_ar || listing.location || listing.location_en)
+                : (listing.location_en || listing.location || listing.location_ar)
+              }
+            </span>
           </div>
         </div>
 
@@ -253,7 +269,12 @@ const PropertyDetailsSimple = () => {
                     <span>{listing.bathrooms} bathrooms</span>
                   </div>
                 </div>
-                <p className="text-gray-700">{listing.description}</p>
+                <p className="text-gray-700">
+                  {language === 'ar' 
+                    ? (listing.description_ar || listing.description || listing.description_en)
+                    : (listing.description_en || listing.description || listing.description_ar)
+                  }
+                </p>
               </CardContent>
             </Card>
 
@@ -265,7 +286,12 @@ const PropertyDetailsSimple = () => {
               <CardContent>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin className="h-4 w-4" />
-                  <span>{listing.location}</span>
+                  <span>
+                    {language === 'ar' 
+                      ? (listing.location_ar || listing.location || listing.location_en)
+                      : (listing.location_en || listing.location || listing.location_ar)
+                    }
+                  </span>
                 </div>
               </CardContent>
             </Card>
