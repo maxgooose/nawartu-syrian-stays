@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Home, Save } from "lucide-react";
+import { ArrowLeft, Home, Save, Languages } from "lucide-react";
 
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageUpload } from "@/components/ImageUpload";
@@ -17,6 +17,7 @@ import { AMENITIES } from "@/lib/amenities";
 import { getPublicImageUrl } from "@/lib/utils";
 import SyrianGovernorateDropdown from "@/components/SyrianGovernorateDropdown";
 import { SyrianGovernorate } from "@/lib/syrianGovernorates";
+import { translateText } from "@/lib/autoTranslation";
 
 const EditListing = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,7 @@ const EditListing = () => {
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const [formData, setFormData] = useState({
     name_en: '',
     name_ar: '',
@@ -118,29 +120,107 @@ const EditListing = () => {
     }));
   };
 
+  // Auto-translate missing fields
+  const handleAutoTranslate = async () => {
+    setTranslating(true);
+    try {
+      const updates: any = {};
+
+      // Translate name
+      if (formData.name_en && !formData.name_ar) {
+        updates.name_ar = await translateText(formData.name_en, 'ar', 'en');
+      } else if (formData.name_ar && !formData.name_en) {
+        updates.name_en = await translateText(formData.name_ar, 'en', 'ar');
+      }
+
+      // Translate description
+      if (formData.description_en && !formData.description_ar) {
+        updates.description_ar = await translateText(formData.description_en, 'ar', 'en');
+      } else if (formData.description_ar && !formData.description_en) {
+        updates.description_en = await translateText(formData.description_ar, 'en', 'ar');
+      }
+
+      // Translate location
+      if (formData.location_en && !formData.location_ar) {
+        updates.location_ar = await translateText(formData.location_en, 'ar', 'en');
+      } else if (formData.location_ar && !formData.location_en) {
+        updates.location_en = await translateText(formData.location_ar, 'en', 'ar');
+      }
+
+      setFormData(prev => ({ ...prev, ...updates }));
+      
+      toast({
+        title: language === 'ar' ? "تمت الترجمة" : "Translation Complete",
+        description: language === 'ar' 
+          ? "تمت ترجمة الحقول الفارغة تلقائياً" 
+          : "Empty fields have been auto-translated",
+      });
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast({
+        title: language === 'ar' ? "خطأ في الترجمة" : "Translation Error",
+        description: language === 'ar' 
+          ? "حدث خطأ أثناء الترجمة التلقائية" 
+          : "An error occurred during auto-translation",
+        variant: "destructive",
+      });
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
     try {
+      // Auto-translate missing fields before submission
+      let finalFormData = { ...formData };
+      
+      // Check and translate missing fields
+      if (finalFormData.name_en && !finalFormData.name_ar) {
+        finalFormData.name_ar = await translateText(finalFormData.name_en, 'ar', 'en');
+      } else if (finalFormData.name_ar && !finalFormData.name_en) {
+        finalFormData.name_en = await translateText(finalFormData.name_ar, 'en', 'ar');
+      }
+
+      if (finalFormData.description_en && !finalFormData.description_ar) {
+        finalFormData.description_ar = await translateText(finalFormData.description_en, 'ar', 'en');
+      } else if (finalFormData.description_ar && !finalFormData.description_en) {
+        finalFormData.description_en = await translateText(finalFormData.description_ar, 'en', 'ar');
+      }
+
+      if (finalFormData.location_en && !finalFormData.location_ar) {
+        finalFormData.location_ar = await translateText(finalFormData.location_en, 'ar', 'en');
+      } else if (finalFormData.location_ar && !finalFormData.location_en) {
+        finalFormData.location_en = await translateText(finalFormData.location_ar, 'en', 'ar');
+      }
+
       // Sanitize images before saving: remove blob: URLs and normalize to public URLs
-      const sanitizedImages = (formData.images || [])
+      const sanitizedImages = (finalFormData.images || [])
         .map((img) => getPublicImageUrl(img) || '')
         .filter((u) => !!u);
 
       const { error } = await supabase
         .from('listings')
         .update({
-          name_en: formData.name_en,
-          name_ar: formData.name_ar,
-          description_en: formData.description_en,
-          description_ar: formData.description_ar,
-          location_en: formData.location_en,
-          location_ar: formData.location_ar,
+          name_en: finalFormData.name_en,
+          name_ar: finalFormData.name_ar,
+          description_en: finalFormData.description_en,
+          description_ar: finalFormData.description_ar,
+          location_en: finalFormData.location_en,
+          location_ar: finalFormData.location_ar,
+          // Mark auto-translated fields
+          name_en_auto_translated: formData.name_en ? false : true,
+          name_ar_auto_translated: formData.name_ar ? false : true,
+          description_en_auto_translated: formData.description_en ? false : true,
+          description_ar_auto_translated: formData.description_ar ? false : true,
+          location_en_auto_translated: formData.location_en ? false : true,
+          location_ar_auto_translated: formData.location_ar ? false : true,
           // Keep backward compatibility
-          name: formData.name_ar || formData.name_en,
-          description: formData.description_ar || formData.description_en,
-          location: formData.location_ar || formData.location_en,
+          name: finalFormData.name_ar || finalFormData.name_en,
+          description: finalFormData.description_ar || finalFormData.description_en,
+          location: finalFormData.location_ar || finalFormData.location_en,
           price_per_night_usd: parseFloat(formData.price_per_night_usd),
           price_per_night_syp: formData.price_per_night_syp ? parseFloat(formData.price_per_night_syp) : null,
           max_guests: parseInt(formData.max_guests),

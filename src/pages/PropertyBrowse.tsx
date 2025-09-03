@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { getPublicImageUrl, toggleFavorite, getFavorites } from "@/lib/utils";
 import { getTranslatedContent } from "@/lib/translation";
+import { getTranslatedContentWithAuto } from "@/lib/autoTranslation";
 
 interface Listing {
   id: string;
@@ -55,14 +56,14 @@ const PropertyBrowse = () => {
   };
 
   // Transform listing data to PropertyCard format with proper language handling
-  const formatListingForPropertyCard = (listing: Listing) => {
-    // Get translated content based on current language
-    const translatedContent = getTranslatedContent(listing, language);
+  const formatListingForPropertyCard = (listing: Listing, translatedContent?: any) => {
+    // Use provided translated content or fall back to basic translation
+    const content = translatedContent || getTranslatedContent(listing, language);
     
     return {
       id: listing.id,
-      title: translatedContent.name,
-      location: translatedContent.location,
+      title: content.name,
+      location: content.location,
       price: listing.price_per_night_usd,
       currency: 'USD' as const,
       rating: 4.8, // Default rating until we implement reviews
@@ -75,6 +76,7 @@ const PropertyBrowse = () => {
   const [searchParams] = useSearchParams();
   const [listings, setListings] = useState<Listing[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  const [translatedListings, setTranslatedListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || '');
   const [priceRange, setPriceRange] = useState('all');
@@ -101,6 +103,30 @@ const PropertyBrowse = () => {
     filterAndSortListings();
     setCurrentPage(1); // Reset to first page when filters change
   }, [listings, searchQuery, priceRange, guestCount, guestDetails, sortBy]);
+
+  // Translate listings when language or filtered listings change
+  useEffect(() => {
+    const translateListings = async () => {
+      if (filteredListings.length === 0) {
+        setTranslatedListings([]);
+        return;
+      }
+
+      const translations = await Promise.all(
+        filteredListings.map(async (listing) => {
+          const translatedContent = await getTranslatedContentWithAuto(listing, language, true);
+          return {
+            listing,
+            translatedContent,
+            formattedCard: formatListingForPropertyCard(listing, translatedContent)
+          };
+        })
+      );
+      setTranslatedListings(translations);
+    };
+
+    translateListings();
+  }, [filteredListings, language]);
 
   const fetchListings = async () => {
     try {
@@ -300,7 +326,7 @@ const PropertyBrowse = () => {
         {/* Properties Grid */}
         {viewMode === 'grid' && (
           <>
-            {filteredListings.length === 0 ? (
+            {translatedListings.length === 0 ? (
               <div className="text-center py-16">
                 <div className="max-w-md mx-auto">
                   <div className="w-24 h-24 mx-auto mb-6 bg-muted rounded-full flex items-center justify-center">
@@ -338,18 +364,18 @@ const PropertyBrowse = () => {
               <>
                 {/* Use same grid layout and PropertyCard component as homepage */}
                 <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-12">
-                  {filteredListings
+                  {translatedListings
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                    .map((listing, index) => (
+                    .map((item, index) => (
                     <div 
-                      key={listing.id}
+                      key={item.listing.id}
                       className="group cursor-pointer"
                       style={{
                         animationDelay: `${index * 0.1}s`
                       }}
                     >
                       <PropertyCard 
-                        property={formatListingForPropertyCard(listing)}
+                        property={item.formattedCard}
                         language={language}
                       />
                     </div>
@@ -357,7 +383,7 @@ const PropertyBrowse = () => {
                 </div>
 
                 {/* Pagination */}
-                {Math.ceil(filteredListings.length / itemsPerPage) > 1 && (
+                {Math.ceil(translatedListings.length / itemsPerPage) > 1 && (
                   <div className="flex justify-center items-center gap-2 mt-12" dir={isRTL ? 'rtl' : 'ltr'}>
                     <Button
                       variant="outline"
@@ -371,7 +397,7 @@ const PropertyBrowse = () => {
                     </Button>
                     
                     <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.ceil(filteredListings.length / itemsPerPage) }, (_, i) => (
+                      {Array.from({ length: Math.ceil(translatedListings.length / itemsPerPage) }, (_, i) => (
                         <Button
                           key={i + 1}
                           variant={currentPage === i + 1 ? 'default' : 'outline'}
@@ -388,7 +414,7 @@ const PropertyBrowse = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredListings.length / itemsPerPage)))}
-                      disabled={currentPage === Math.ceil(filteredListings.length / itemsPerPage)}
+                      disabled={currentPage === Math.ceil(translatedListings.length / itemsPerPage)}
                       className="flex items-center gap-2"
                     >
                       {language === 'ar' ? 'التالي' : 'Next'}
