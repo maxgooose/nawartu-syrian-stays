@@ -36,17 +36,17 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
           <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0">
             <img src="/nawartu-logo.png" alt="Nawartu Logo" className="h-8 w-8" />
             <span className="text-xl font-semibold tracking-normal" style={{ color: '#0F5E2B' }}>
-              {language === 'ar' ? 'نورتوا' : 'Nawartu'}
+              {language === 'ar' ? 'نورتوا' : 'nawartu'}
             </span>
           </div>
 
           {/* Center Navigation - Minimal Airbnb Style */}
           <nav className="hidden lg:flex items-center space-x-1 rtl:space-x-reverse">
-            <Link to="/" className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 font-medium">
-              {language === 'ar' ? 'الرئيسية' : 'Stays'}
-            </Link>
             <Link to="/browse" className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 font-medium">
-              {language === 'ar' ? 'تصفح' : 'Experiences'}
+              {language === 'ar' ? 'تصفح' : 'Explore'}
+            </Link>
+            <Link to="/contact" className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 font-medium">
+              {language === 'ar' ? 'تواصل معنا' : 'Contact'}
             </Link>
             {profile?.role !== 'host' && (
               <Link to="/become-host" className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 font-medium">
@@ -94,13 +94,9 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
                       {language === 'ar' ? 'لوحة المضيف' : 'Host Dashboard'}
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={() => navigate('/')} className="lg:hidden">
-                    <Home className="mr-2 h-4 w-4" />
-                    {language === 'ar' ? 'الرئيسية' : 'Home'}
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/browse')}>
                     <Search className="mr-2 h-4 w-4" />
-                    {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+                    {language === 'ar' ? 'تصفح' : 'Explore'}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/map')}>
                     <MapPin className="mr-2 h-4 w-4" />
@@ -150,25 +146,18 @@ export const Header = ({ language, onLanguageChange }: HeaderProps) => {
           <div className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-sm animate-slide-up z-40">
             <nav className="flex flex-col space-y-3 px-4" dir={isRTL ? 'rtl' : 'ltr'}>
               <Link 
-                to="/" 
-                className="text-foreground hover:text-primary transition-colors py-2 border-b border-border/50"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {language === 'ar' ? 'الرئيسية' : 'Home'}
-              </Link>
-              <Link 
                 to="/browse" 
                 className="text-foreground hover:text-primary transition-colors py-2 border-b border-border/50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+                {language === 'ar' ? 'تصفح' : 'Explore'}
               </Link>
               <Link 
-                to="/map" 
+                to="/contact" 
                 className="text-foreground hover:text-primary transition-colors py-2 border-b border-border/50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {language === 'ar' ? 'الخريطة التفاعلية' : 'Interactive Map'}
+                {language === 'ar' ? 'تواصل معنا' : 'Contact'}
               </Link>
               {profile?.role === 'host' && (
                 <Link 

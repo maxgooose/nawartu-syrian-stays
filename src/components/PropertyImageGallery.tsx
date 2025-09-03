@@ -112,6 +112,11 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreenOpen, images.length]);
 
+  const openFullscreenAt = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsFullscreenOpen(true);
+  };
+
   if (!images || images.length === 0) {
     return (
       <Card className={cn("overflow-hidden", className)}>
@@ -133,6 +138,9 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
             src={getPublicImageUrl(images[0], 'listing-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
             alt={propertyName}
             className="w-full h-full object-cover"
+            loading="eager"
+            onClick={() => openFullscreenAt(0)}
+            role="button"
           />
           <Dialog open={isFullscreenOpen} onOpenChange={setIsFullscreenOpen}>
             <DialogTrigger asChild>
@@ -169,79 +177,151 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
     );
   }
 
+  // Desktop grid (Airbnb-style): show when not mobile
+  const hasMore = images.length > 5;
+  const remaining = Math.max(images.length - 5, 0);
+
+  const DesktopGrid = (
+    <div className="hidden md:grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
+      {/* Left: Main large image */}
+      <div className="col-span-1 row-span-2 relative overflow-hidden rounded-l-xl">
+        <img
+          src={getPublicImageUrl(images[0], 'listing-images', { width: 1200, quality: 85 }) || '/placeholder.svg'}
+          alt={`${propertyName} - Image 1`}
+          className="w-full h-full object-cover aspect-[4/3] md:aspect-auto"
+          loading="eager"
+          onClick={() => openFullscreenAt(0)}
+          role="button"
+        />
+      </div>
+
+      {/* Right: 2x2 supporting images */}
+      <div className="grid grid-cols-2 grid-rows-2 gap-2 sm:gap-3 lg:gap-4">
+        {images.slice(1, 5).map((image, idx) => {
+          const absoluteIndex = idx + 1;
+          const showOverlay = hasMore && idx === 3; // last visible tile
+          return (
+            <div key={absoluteIndex} className="relative overflow-hidden rounded-xl">
+              <img
+                src={getPublicImageUrl(image, 'listing-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
+                alt={`${propertyName} - Image ${absoluteIndex + 1}`}
+                className="w-full h-full object-cover aspect-[4/3]"
+                loading="lazy"
+                onClick={() => openFullscreenAt(absoluteIndex)}
+                role="button"
+              />
+              {showOverlay && (
+                <button
+                  onClick={() => openFullscreenAt(absoluteIndex)}
+                  className="absolute inset-0 bg-black/40 hover:bg-black/50 transition-colors flex items-center justify-center"
+                  aria-label={language === 'ar' ? 'عرض جميع الصور' : 'View all photos'}
+                >
+                  <span className="text-white font-medium text-sm sm:text-base md:text-lg">
+                    {remaining > 0
+                      ? (language === 'ar' ? `+${remaining} المزيد` : `+${remaining} more`)
+                      : (language === 'ar' ? 'عرض كل الصور' : 'View all photos')}
+                  </span>
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // Mobile carousel (kept from existing implementation)
+  const MobileCarousel = (
+    <div className="md:hidden relative">
+      <Carousel
+        className="w-full"
+        setApi={(api) => {
+          if (api) {
+            api.on("select", () => {
+              setCurrentImageIndex(api.selectedScrollSnap());
+            });
+          }
+        }}
+        opts={{
+          loop: false,
+          align: "start",
+          skipSnaps: false,
+        }}
+      >
+        <CarouselContent>
+          {images.map((image, index) => (
+            <CarouselItem key={index}>
+              <div 
+                className="aspect-[16/10] relative"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
+                <img
+                  src={getPublicImageUrl(image, 'listing-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
+                  alt={`${propertyName} - Image ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  onClick={() => openFullscreenAt(index)}
+                  role="button"
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+
+        {/* Navigation Arrows - Responsive positioning */}
+        <CarouselPrevious 
+          className={cn(
+            "h-8 w-8 md:h-10 md:w-10 bg-background/80 hover:bg-background text-foreground border-0 shadow-lg",
+            isMobile ? "left-2" : "left-3"
+          )} 
+        />
+        <CarouselNext 
+          className={cn(
+            "h-8 w-8 md:h-10 md:w-10 bg-background/80 hover:bg-background text-foreground border-0 shadow-lg",
+            isMobile ? "right-2" : "right-3"
+          )} 
+        />
+      </Carousel>
+
+      {/* Image Counter */}
+      <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm text-foreground px-2 py-1 rounded-full text-xs md:text-sm font-medium">
+        {currentImageIndex + 1} / {images.length}
+      </div>
+
+      {/* View All Pictures Button */}
+      <Dialog open={isFullscreenOpen} onOpenChange={setIsFullscreenOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="secondary"
+            size={isMobile ? "sm" : "default"}
+            className={cn(
+              "absolute bottom-3 right-3 bg-background/90 hover:bg-background text-foreground border shadow-lg",
+              isMobile ? "text-xs px-2 py-1 h-7" : "px-3 py-2"
+            )}
+          >
+            {language === 'ar' ? 'عرض جميع الصور' : 'View All Pictures'}
+          </Button>
+        </DialogTrigger>
+        {/* Fullscreen dialog content will be shared below */}
+      </Dialog>
+    </div>
+  );
+
   return (
     <Card className={cn("overflow-hidden", className)}>
       <div className="relative">
-        {/* Main Carousel */}
-        <Carousel
-          className="w-full"
-          setApi={(api) => {
-            if (api) {
-              api.on("select", () => {
-                setCurrentImageIndex(api.selectedScrollSnap());
-              });
-            }
-          }}
-          opts={{
-            loop: false,
-            align: "start",
-            skipSnaps: false,
-          }}
-        >
-          <CarouselContent>
-            {images.map((image, index) => (
-              <CarouselItem key={index}>
-                <div 
-                  className="aspect-[16/10] relative"
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-                >
-                  <img
-                    src={getPublicImageUrl(image, 'listing-images', { width: 800, quality: 80 }) || '/placeholder.svg'}
-                    alt={`${propertyName} - Image ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    loading={index === 0 ? "eager" : "lazy"}
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+        {DesktopGrid}
+        {MobileCarousel}
 
-          {/* Navigation Arrows - Responsive positioning */}
-          <CarouselPrevious 
-            className={cn(
-              "h-8 w-8 md:h-10 md:w-10 bg-background/80 hover:bg-background text-foreground border-0 shadow-lg",
-              isMobile ? "left-2" : "left-3"
-            )} 
-          />
-          <CarouselNext 
-            className={cn(
-              "h-8 w-8 md:h-10 md:w-10 bg-background/80 hover:bg-background text-foreground border-0 shadow-lg",
-              isMobile ? "right-2" : "right-3"
-            )} 
-          />
-        </Carousel>
-
-        {/* Image Counter */}
-        <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm text-foreground px-2 py-1 rounded-full text-xs md:text-sm font-medium">
-          {currentImageIndex + 1} / {images.length}
-        </div>
-
-        {/* View All Pictures Button */}
+        {/* Fullscreen Dialog (shared) */}
         <Dialog open={isFullscreenOpen} onOpenChange={setIsFullscreenOpen}>
-          <DialogTrigger asChild>
-            <Button
-              variant="secondary"
-              size={isMobile ? "sm" : "default"}
-              className={cn(
-                "absolute bottom-3 right-3 bg-background/90 hover:bg-background text-foreground border shadow-lg",
-                isMobile ? "text-xs px-2 py-1 h-7" : "px-3 py-2"
-              )}
-            >
-              {language === 'ar' ? 'عرض جميع الصور' : 'View All Pictures'}
-            </Button>
-          </DialogTrigger>
+          {!isMobile && (
+            <DialogTrigger asChild>
+              <button className="hidden" />
+            </DialogTrigger>
+          )}
           <DialogContent className="max-w-none w-screen h-screen p-0 bg-black/95 border-0 focus:outline-none touch-manipulation">
             <div className="relative w-full h-full">
               {/* Fullscreen Gallery Header */}
@@ -328,6 +408,7 @@ export const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                         src={getPublicImageUrl(image, 'listing-images', { width: 100, quality: 60 }) || '/placeholder.svg'}
                         alt={`Thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     </button>
                   ))}

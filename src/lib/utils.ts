@@ -86,3 +86,71 @@ export const toggleFavorite = (propertyId: string) => {
     localStorage.setItem('favorites', JSON.stringify([...favorites, propertyId]));
   }
 };
+
+// Google Maps integration utilities
+export const generateGoogleMapsUrls = (propertyData: {
+  name: string;
+  location: string;
+  latitude?: number;
+  longitude?: number;
+}) => {
+  const { name, location, latitude, longitude } = propertyData;
+  
+  // If we have coordinates, use them for more accurate results
+  if (latitude && longitude) {
+    return {
+      mobile: `geo:${latitude},${longitude}?q=${latitude},${longitude}(${encodeURIComponent(name)})`,
+      web: `https://www.google.com/maps?q=${latitude},${longitude}&t=m&z=15`,
+      universal: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+    };
+  }
+  
+  // Fallback to address-based search - use just the location/address for better accuracy
+  const searchQuery = location;
+  return {
+    mobile: `geo:0,0?q=${encodeURIComponent(searchQuery)}`,
+    web: `https://www.google.com/maps/search/${encodeURIComponent(searchQuery)}`,
+    universal: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`
+  };
+};
+
+export const openInGoogleMaps = (propertyData: {
+  name: string;
+  location: string;
+  latitude?: number;
+  longitude?: number;
+}) => {
+  try {
+    const urls = generateGoogleMapsUrls(propertyData);
+    
+    // Check if we're on a mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Try to open Google Maps app first
+      const appUrl = urls.mobile;
+      const fallbackUrl = urls.universal;
+      
+      // Create a temporary link to try the app
+      const link = document.createElement('a');
+      link.href = appUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Fallback to web version after a short delay
+      setTimeout(() => {
+        window.open(fallbackUrl, '_blank');
+      }, 1000);
+    } else {
+      // Desktop - open web version directly
+      window.open(urls.universal, '_blank');
+    }
+  } catch (error) {
+    console.error('Error opening Google Maps:', error);
+    // Final fallback - use just the location/address
+    const searchQuery = propertyData.location;
+    window.open(`https://www.google.com/maps/search/${encodeURIComponent(searchQuery)}`, '_blank');
+  }
+};

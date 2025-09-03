@@ -33,6 +33,7 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
   const [listings, setListings] = useState<Listing[]>([]);
   const [translatedListings, setTranslatedListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [translating, setTranslating] = useState(false);
   const isRTL = language === 'ar';
 
   useEffect(() => {
@@ -68,7 +69,20 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
         return;
       }
 
-      const translations = await Promise.all(
+      // Show properties immediately with basic translation, then enhance with auto-translation
+      const basicTranslations = listings.map((listing) => {
+        const basicContent = getTranslatedContent(listing, language);
+        return {
+          listing,
+          translatedContent: basicContent,
+          formattedCard: formatListingForPropertyCard(listing, basicContent)
+        };
+      });
+      setTranslatedListings(basicTranslations);
+
+      // Then enhance with auto-translation in the background
+      setTranslating(true);
+      const enhancedTranslations = await Promise.all(
         listings.map(async (listing) => {
           const translatedContent = await getTranslatedContentWithAuto(listing, language, true);
           return {
@@ -78,7 +92,8 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
           };
         })
       );
-      setTranslatedListings(translations);
+      setTranslatedListings(enhancedTranslations);
+      setTranslating(false);
     };
 
     translateListings();
@@ -140,9 +155,17 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Modern Section Header */}
         <div className={`mb-20 text-center ${isRTL ? 'text-arabic' : 'text-latin'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 mb-8 leading-tight">
-            {language === 'ar' ? 'استكشف الإقامات الاستثنائية' : 'Exceptional Stays'}
-          </h2>
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 leading-tight">
+              {language === 'ar' ? 'استكشف الإقامات الاستثنائية' : 'Exceptional Stays'}
+            </h2>
+            {translating && (
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                <span>{language === 'ar' ? 'جاري التحسين...' : 'Enhancing...'}</span>
+              </div>
+            )}
+          </div>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed">
             {language === 'ar' 
               ? 'مجموعة مختارة من أفضل أماكن الإقامة التي تجمع بين الأصالة والحداثة'

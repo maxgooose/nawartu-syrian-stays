@@ -78,6 +78,7 @@ const PropertyBrowse = () => {
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
   const [translatedListings, setTranslatedListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [translating, setTranslating] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || '');
   const [priceRange, setPriceRange] = useState('all');
   const [guestCount, setGuestCount] = useState(searchParams.get('guests') || 'all');
@@ -112,7 +113,20 @@ const PropertyBrowse = () => {
         return;
       }
 
-      const translations = await Promise.all(
+      // Show properties immediately with basic translation, then enhance with auto-translation
+      const basicTranslations = filteredListings.map((listing) => {
+        const basicContent = getTranslatedContent(listing, language);
+        return {
+          listing,
+          translatedContent: basicContent,
+          formattedCard: formatListingForPropertyCard(listing, basicContent)
+        };
+      });
+      setTranslatedListings(basicTranslations);
+
+      // Then enhance with auto-translation in the background
+      setTranslating(true);
+      const enhancedTranslations = await Promise.all(
         filteredListings.map(async (listing) => {
           const translatedContent = await getTranslatedContentWithAuto(listing, language, true);
           return {
@@ -122,7 +136,8 @@ const PropertyBrowse = () => {
           };
         })
       );
-      setTranslatedListings(translations);
+      setTranslatedListings(enhancedTranslations);
+      setTranslating(false);
     };
 
     translateListings();
@@ -233,9 +248,17 @@ const PropertyBrowse = () => {
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
-              </h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-foreground">
+                  {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
+                </h1>
+                {translating && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                    <span>{language === 'ar' ? 'جاري التحسين...' : 'Enhancing...'}</span>
+                  </div>
+                )}
+              </div>
               <p className="text-muted-foreground">
                 {language === 'ar' 
                   ? `${filteredListings.length} عقار متاح للحجز`

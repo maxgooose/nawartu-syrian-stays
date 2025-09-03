@@ -11,7 +11,9 @@ import { StarRating } from "@/components/StarRating";
 
 import { PropertyImageGallery } from "@/components/PropertyImageGallery";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { InstantBooking } from "@/components/InstantBooking";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { GuestSelector } from "@/components/GuestSelector";
+import CardDetails from "@/components/CardDetails";
 import { 
   MapPin, 
   Users, 
@@ -30,7 +32,8 @@ import {
   Award,
   Key,
   CheckCircle,
-
+  CreditCard,
+  Banknote,
   X,
   ChefHat,
   Utensils,
@@ -60,7 +63,10 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DateRange } from "react-day-picker";
-import { getPublicImageUrl } from "@/lib/utils";
+import { getPublicImageUrl, openInGoogleMaps } from "@/lib/utils";
+import { format, differenceInDays } from "date-fns";
+import { getTranslatedContent } from "@/lib/translation";
+import { getTranslatedContentWithAuto } from "@/lib/autoTranslation";
 
 interface Listing {
   id: string;
@@ -349,9 +355,19 @@ const PropertyDetails = () => {
   const { language } = useLanguage();
   
   const [listing, setListing] = useState<Listing | null>(null);
+  const [translatedContent, setTranslatedContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [bookingLoading, setBookingLoading] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>();
+  const [guests, setGuests] = useState({
+    adults: 2,
+    children: 0,
+    infants: 0
+  });
+  const [showCardDetails, setShowCardDetails] = useState(false);
+  const [currentBookingId, setCurrentBookingId] = useState<string>('');
   const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
   const isRTL = language === 'ar';
 
   useEffect(() => {
@@ -367,6 +383,26 @@ const PropertyDetails = () => {
       navigate('/');
     }
   }, [id, language, navigate, toast]);
+
+  // Handle translation when listing or language changes
+  useEffect(() => {
+    const translateListing = async () => {
+      if (!listing) {
+        setTranslatedContent(null);
+        return;
+      }
+
+      // Show basic translation immediately
+      const basicContent = getTranslatedContent(listing, language);
+      setTranslatedContent(basicContent);
+
+      // Then enhance with auto-translation in the background
+      const enhancedContent = await getTranslatedContentWithAuto(listing, language, true);
+      setTranslatedContent(enhancedContent);
+    };
+
+    translateListing();
+  }, [listing, language]);
 
 
 
@@ -451,6 +487,99 @@ const PropertyDetails = () => {
     }
   };
 
+  const calculateTotalNights = () => {
+    if (!dateRange?.from || !dateRange?.to) return 0;
+    return differenceInDays(dateRange.to, dateRange.from);
+  };
+
+  const calculateTotalAmount = () => {
+    const nights = calculateTotalNights();
+    if (!listing || nights <= 0) return 0;
+    return nights * listing.price_per_night_usd;
+  };
+
+  const handleBooking = async () => {
+    if (!user || !profile || !listing) {
+      navigate('/auth');
+      return;
+    }
+
+    if (!dateRange?.from || !dateRange?.to) {
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "يرجى اختيار تواريخ الإقامة" : "Please select check-in and check-out dates",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const nights = calculateTotalNights();
+    if (nights <= 0) {
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "تاريخ المغادرة يجب أن يكون بعد تاريخ الوصول" : "Check-out date must be after check-in date",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setBookingLoading(true);
+
+    try {
+      const { data: bookingData, error } = await supabase
+        .from('bookings')
+        .insert({
+          guest_id: profile.id,
+          listing_id: listing.id,
+          check_in_date: format(dateRange.from, 'yyyy-MM-dd'),
+          check_out_date: format(dateRange.to, 'yyyy-MM-dd'),
+          total_nights: nights,
+          total_amount_usd: calculateTotalAmount(),
+          payment_method: paymentMethod === 'card' ? 'stripe' : 'cash',
+          status: paymentMethod === 'cash' ? 'confirmed' : 'pending'
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
+      if (paymentMethod === 'card') {
+        setCurrentBookingId(bookingData.id);
+        setShowCardDetails(true);
+        setBookingLoading(false);
+      } else {
+        // Cash payment - booking is confirmed immediately
+        toast({
+          title: language === 'ar' ? "تم تأكيد الحجز!" : "Booking Confirmed!",
+          description: language === 'ar' ? "تم تأكيد حجزك. سيتم الدفع عند الوصول." : "Your booking is confirmed. Payment due upon arrival.",
+        });
+        navigate(`/payment-success?booking_id=${bookingData.id}`);
+      }
+
+    } catch (error: any) {
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: error.message || (language === 'ar' ? "حدث خطأ في إرسال طلب الحجز" : "Error sending booking request"),
+        variant: "destructive",
+      });
+      setBookingLoading(false);
+    }
+  };
+
+  const handleCardPaymentSuccess = () => {
+    setDateRange(undefined);
+    setGuests({ adults: 2, children: 0, infants: 0 });
+    setShowCardDetails(false);
+    setCurrentBookingId('');
+    navigate(`/payment-success?booking_id=${currentBookingId}`);
+  };
+
+  const handleCardPaymentClose = () => {
+    setShowCardDetails(false);
+    setCurrentBookingId('');
+    setBookingLoading(false);
+  };
+
 
 
 
@@ -480,10 +609,10 @@ const PropertyDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-slate-50" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header with Navigation */}
-      <div className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="border-b border-gray-200 bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-center justify-between">
             <Button 
               variant="ghost" 
@@ -514,14 +643,11 @@ const PropertyDetails = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         {/* Property Title and Rating */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-4 leading-tight">
-            {language === 'ar' 
-              ? (listing.name_ar || listing.name || listing.name_en)
-              : (listing.name_en || listing.name || listing.name_ar)
-            }
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-3 sm:mb-4 leading-tight">
+            {translatedContent?.name || listing?.name || (language === 'ar' ? 'عقار بدون عنوان' : 'Untitled Listing')}
           </h1>
           
           {/* Badges Section */}
@@ -562,36 +688,36 @@ const PropertyDetails = () => {
 
             {/* Additional trust badges based on property features */}
             {listing.amenities?.includes('security') && (
-              <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg">
-                <Shield className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-600">
+              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl">
+                <Shield className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-600">
                   {language === 'ar' ? 'آمن ومحمي' : 'Safe & Secure'}
                 </span>
               </div>
             )}
 
             {listing.amenities?.includes('workspace') && (
-              <div className="flex items-center gap-1.5 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-lg">
-                <Laptop className="h-4 w-4 text-purple-600" />
-                <span className="text-sm font-medium text-purple-600">
+              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl">
+                <Laptop className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-600">
                   {language === 'ar' ? 'مناسب للعمل عن بُعد' : 'Remote work friendly'}
                 </span>
               </div>
             )}
 
             {listing.amenities?.includes('pets_allowed') && (
-              <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-lg">
-                <PawPrint className="h-4 w-4 text-orange-600" />
-                <span className="text-sm font-medium text-orange-600">
+              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl">
+                <PawPrint className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-600">
                   {language === 'ar' ? 'مرحب بالحيوانات الأليفة' : 'Pet friendly'}
                 </span>
               </div>
             )}
 
             {(listing.amenities?.includes('baby_safety_gates') || listing.amenities?.includes('high_chair')) && (
-              <div className="flex items-center gap-1.5 bg-pink-50 border border-pink-200 px-3 py-1.5 rounded-lg">
-                <Baby className="h-4 w-4 text-pink-600" />
-                <span className="text-sm font-medium text-pink-600">
+              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl">
+                <Baby className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-600">
                   {language === 'ar' ? 'مناسب للعائلات' : 'Family friendly'}
                 </span>
               </div>
@@ -615,11 +741,16 @@ const PropertyDetails = () => {
             )}
             <div className="flex items-center gap-1 text-gray-600">
               <MapPin className="h-4 w-4" />
-              <button className="underline decoration-1 underline-offset-2 hover:text-gray-900 transition-colors font-medium">
-                {language === 'ar' 
-                  ? (listing.location_ar || listing.location || listing.location_en)
-                  : (listing.location_en || listing.location || listing.location_ar)
-                }
+              <button 
+                onClick={() => openInGoogleMaps({
+                  name: translatedContent?.name || listing?.name,
+                  location: translatedContent?.location || listing?.location,
+                  latitude: listing.latitude,
+                  longitude: listing.longitude
+                })}
+                className="underline decoration-1 underline-offset-2 hover:text-gray-900 transition-colors font-medium"
+              >
+                {translatedContent?.location || listing?.location || (language === 'ar' ? 'موقع غير متاح' : 'Location not available')}
               </button>
             </div>
           </div>
@@ -629,33 +760,38 @@ const PropertyDetails = () => {
         <div className="mb-8">
           <PropertyImageGallery 
             images={listing.images || []}
-            propertyName={language === 'ar' 
-              ? (listing.name_ar || listing.name || listing.name_en)
-              : (listing.name_en || listing.name || listing.name_ar)
-            }
+            propertyName={translatedContent?.name || listing?.name || (language === 'ar' ? 'عقار بدون عنوان' : 'Untitled Listing')}
             className="rounded-xl"
           />
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
           {/* Left Column - Property Details */}
           <div className="lg:col-span-2 space-y-8">
             {/* Property Overview */}
-            <div className="border-b border-gray-100 pb-8">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                    {language === 'ar' ? 'بيت كامل في' : 'Entire home in'} {language === 'ar' 
-                      ? (listing.location_ar || listing.location || listing.location_en)
-                      : (listing.location_en || listing.location || listing.location_ar)
-                    }
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">
+                    {language === 'ar' ? 'بيت كامل في' : 'Entire home in'}{' '}
+                    <button 
+                      onClick={() => openInGoogleMaps({
+                        name: translatedContent?.name || listing?.name,
+                        location: translatedContent?.location || listing?.location,
+                        latitude: listing.latitude,
+                        longitude: listing.longitude
+                      })}
+                      className="underline decoration-1 underline-offset-2 hover:text-gray-700 transition-colors"
+                    >
+                      {translatedContent?.location || listing?.location || (language === 'ar' ? 'موقع غير متاح' : 'Location not available')}
+                    </button>
                   </h2>
                   
                   {/* High-level property info with enhanced styling */}
-                  <div className="flex flex-wrap items-center gap-4 text-gray-700 mb-4">
+                  <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-6">
                     <div className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-nawartu-green" />
+                      <Users className="h-5 w-5 text-emerald-600" />
                       <span className="font-medium">{listing.max_guests}</span>
                       <span>{language === 'ar' ? 'ضيوف' : 'guests'}</span>
                   </div>
@@ -663,7 +799,7 @@ const PropertyDetails = () => {
                     <span className="text-gray-300">·</span>
                     
                     <div className="flex items-center gap-2">
-                      <Bed className="h-5 w-5 text-nawartu-green" />
+                      <Bed className="h-5 w-5 text-emerald-600" />
                       <span className="font-medium">{listing.bedrooms}</span>
                       <span>{listing.bedrooms === 1 ? (language === 'ar' ? 'غرفة نوم' : 'bedroom') : (language === 'ar' ? 'غرف نوم' : 'bedrooms')}</span>
                 </div>
@@ -671,7 +807,7 @@ const PropertyDetails = () => {
                     <span className="text-gray-300">·</span>
                     
                     <div className="flex items-center gap-2">
-                      <Bath className="h-5 w-5 text-nawartu-green" />
+                      <Bath className="h-5 w-5 text-emerald-600" />
                       <span className="font-medium">{listing.bathrooms}</span>
                       <span>{listing.bathrooms === 1 ? (language === 'ar' ? 'حمام' : 'bath') : (language === 'ar' ? 'حمامات' : 'baths')}</span>
                     </div>
@@ -744,24 +880,21 @@ const PropertyDetails = () => {
             </div>
 
             {/* About this space */}
-            <div className="border-b border-gray-100 pb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">
                 {language === 'ar' ? 'حول هذا المكان' : 'About this space'}
               </h2>
               <div className="prose prose-gray max-w-none">
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  {language === 'ar' 
-                    ? (listing.description_ar || listing.description || listing.description_en)
-                    : (listing.description_en || listing.description || listing.description_ar)
-                  }
+                <p className="text-gray-500 leading-relaxed text-base sm:text-lg">
+                  {translatedContent?.description || listing?.description || (language === 'ar' ? 'لا يوجد وصف متاح' : 'No description available')}
                 </p>
               </div>
             </div>
 
             {/* What this place offers - Enhanced Airbnb Style */}
             {listing.amenities && listing.amenities.length > 0 && (
-              <div className="border-b border-gray-100 pb-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-8">
                   {language === 'ar' ? 'ما يقدمه هذا المكان' : 'What this place offers'}
                 </h2>
                 
@@ -859,22 +992,16 @@ const PropertyDetails = () => {
                   })()}
                 </div>
                 
-                {/* Show all amenities button */}
-                <Button 
-                  variant="outline" 
-                  className="mt-8 px-8 py-3 border-2 border-gray-900 text-gray-900 hover:bg-gray-50 font-semibold rounded-xl transition-all hover:shadow-md"
-                >
-                  {language === 'ar' ? `عرض جميع المرافق (${listing.amenities.length})` : `Show all ${listing.amenities.length} amenities`}
-                </Button>
+
               </div>
             )}
 
             {/* Reviews - Enhanced Airbnb Style */}
             {reviewSummary && (
-              <div className="border-b border-gray-100 pb-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
                 <div className="flex items-center gap-3 mb-8">
                   <Star className="h-6 w-6 fill-current text-black" />
-                  <h2 className="text-2xl font-semibold text-gray-900">
+                  <h2 className="text-2xl font-bold text-gray-800">
                     {reviewSummary.averageRating} · {reviewSummary.totalReviews} {language === 'ar' ? 'تقييم' : 'reviews'}
                   </h2>
                 </div>
@@ -989,8 +1116,8 @@ const PropertyDetails = () => {
 
             {/* Location - Enhanced Airbnb Style */}
             {listing.latitude && listing.longitude && (
-              <div className="border-b border-gray-100 pb-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-8">
                   {language === 'ar' ? 'الموقع والمنطقة المحيطة' : 'Where you\'ll be'}
                 </h2>
                 
@@ -998,10 +1125,7 @@ const PropertyDetails = () => {
                 <div className="bg-nawartu-beige/20 rounded-2xl p-6 mb-8">
                   <div className="text-center">
                     <h3 className="font-semibold text-gray-900 mb-2 text-lg">
-                      {language === 'ar' 
-                        ? (listing.location_ar || listing.location || listing.location_en)
-                        : (listing.location_en || listing.location || listing.location_ar)
-                      }
+                      {translatedContent?.location || listing?.location || (language === 'ar' ? 'موقع غير متاح' : 'Location not available')}
                     </h3>
                     <p className="text-gray-600 leading-relaxed">
                       {language === 'ar'
@@ -1124,14 +1248,14 @@ const PropertyDetails = () => {
 
             {/* Host */}
             {listing.host && (
-              <div className="border-b border-gray-200 pb-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
                 <div className="flex items-center gap-4 mb-6">
                   <Avatar className="h-16 w-16">
                     <AvatarImage src={listing.host.avatar_url || ''} />
                     <AvatarFallback className="text-lg">{listing.host.full_name?.charAt(0) || 'H'}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="text-xl font-medium text-gray-900">
+                    <h2 className="text-xl font-bold text-gray-800">
                       {language === 'ar' ? `استضافة من ${listing.host.full_name}` : `Hosted by ${listing.host.full_name}`}
                     </h2>
                     <p className="text-gray-600">
@@ -1143,31 +1267,127 @@ const PropertyDetails = () => {
             )}
           </div>
 
-          {/* Right Column - Instant Booking System */}
+          {/* Right Column - Simple Booking Card */}
           <div className="lg:col-span-1">
-            <div className="sticky top-6">
-              <InstantBooking
-                listing={{
-                  id: listing.id,
-                  name: language === 'ar' 
-                    ? (listing.name_ar || listing.name || listing.name_en)
-                    : (listing.name_en || listing.name || listing.name_ar),
-                  price_per_night_usd: listing.price_per_night_usd,
-                  max_guests: listing.max_guests,
-                  location: language === 'ar' 
-                    ? (listing.location_ar || listing.location || listing.location_en)
-                    : (listing.location_en || listing.location || listing.location_ar)
-                }}
-                initialDateRange={dateRange}
-                onBookingSuccess={(bookingId) => {
-                  navigate(`/payment-success?booking_id=${bookingId}`);
-                }}
+            <Card className="sticky top-4 sm:top-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>${listing.price_per_night_usd}</span>
+                  <span className="text-sm font-normal">/ night</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Date Selection */}
+                <div>
+                  <DateRangePicker
+                    dateRange={dateRange}
+                    onDateRangeChange={setDateRange}
+                    language={language}
                   />
                 </div>
+
+                {/* Guest Selection */}
+                <div>
+                  <GuestSelector
+                    value={guests}
+                    onChange={setGuests}
+                    maxGuests={listing.max_guests}
+                  />
                 </div>
+
+                {/* Payment Method Selection */}
+                {dateRange?.from && dateRange?.to && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-gray-900">
+                      {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
+                    </h4>
+                    <div className="grid gap-2">
+                      <button
+                        onClick={() => setPaymentMethod('card')}
+                        className={`flex items-center gap-3 p-3 sm:p-4 rounded-xl border-2 transition-all min-h-[44px] ${
+                          paymentMethod === 'card'
+                            ? 'border-emerald-500 bg-emerald-50 shadow-sm'
+                            : 'border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/30'
+                        }`}
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        <div className="text-left">
+                          <div className="text-sm font-medium">
+                            {language === 'ar' ? 'بطاقة ائتمان' : 'Credit Card'}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {language === 'ar' ? 'دفع آمن فوري' : 'Secure instant payment'}
+                          </div>
+                        </div>
+                        {paymentMethod === 'card' && (
+                          <CheckCircle className="h-4 w-4 text-emerald-600 ml-auto" />
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => setPaymentMethod('cash')}
+                        className={`flex items-center gap-3 p-3 sm:p-4 rounded-xl border-2 transition-all min-h-[44px] ${
+                          paymentMethod === 'cash'
+                            ? 'border-emerald-500 bg-emerald-50 shadow-sm'
+                            : 'border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/30'
+                        }`}
+                      >
+                        <Banknote className="h-4 w-4" />
+                        <div className="text-left">
+                          <div className="text-sm font-medium">
+                            {language === 'ar' ? 'دفع نقدي' : 'Cash Payment'}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {language === 'ar' ? 'الدفع عند الوصول' : 'Pay upon arrival'}
+                          </div>
+                        </div>
+                        {paymentMethod === 'cash' && (
+                          <CheckCircle className="h-4 w-4 text-emerald-600 ml-auto" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Total */}
+                {dateRange?.from && dateRange?.to && (
+                  <div className="pt-4 border-t">
+                    <div className="flex justify-between text-lg font-semibold">
+                      <span>Total ({calculateTotalNights()} nights)</span>
+                      <span>${calculateTotalAmount()}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Book Button */}
+                <Button 
+                  onClick={handleBooking} 
+                  disabled={bookingLoading || !dateRange?.from || !dateRange?.to}
+                  className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl min-h-[48px] mt-4 sm:mt-0"
+                  size="lg"
+                >
+                  {bookingLoading 
+                    ? (language === 'ar' ? "جاري الحجز..." : "Booking...") 
+                    : paymentMethod === 'card' 
+                      ? (language === 'ar' ? "ادفع واحجز" : "Pay & Book")
+                      : (language === 'ar' ? "أكد الحجز" : "Confirm Booking")
+                  }
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
               </div>
 
-
+        {/* Card Details Modal */}
+        <CardDetails
+          isOpen={showCardDetails}
+          onClose={handleCardPaymentClose}
+          onSuccess={handleCardPaymentSuccess}
+          amount={calculateTotalAmount()}
+          bookingId={currentBookingId}
+          listingName={listing?.name || ''}
+          nights={calculateTotalNights()}
+        />
       </div>
     </div>
   );

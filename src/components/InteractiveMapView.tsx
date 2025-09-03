@@ -11,6 +11,8 @@ import { GuestSelector } from '@/components/GuestSelector';
 import { MapPin, Filter, Search, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslatedContent } from '@/lib/translation';
+import { getTranslatedContentWithAuto } from '@/lib/autoTranslation';
 
 interface Listing {
   id: string;
@@ -51,6 +53,7 @@ const InteractiveMapView: React.FC = () => {
   const { language } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  const [translatedListings, setTranslatedListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [mapCenter, setMapCenter] = useState({ lat: 33.5138, lng: 36.2765 });
@@ -138,6 +141,40 @@ const InteractiveMapView: React.FC = () => {
   useEffect(() => {
     fetchListings();
   }, [fetchListings]);
+
+  // Handle translation when filtered listings or language changes
+  useEffect(() => {
+    const translateListings = async () => {
+      if (filteredListings.length === 0) {
+        setTranslatedListings([]);
+        return;
+      }
+
+      // Show basic translation immediately
+      const basicTranslations = filteredListings.map((listing) => {
+        const basicContent = getTranslatedContent(listing, language);
+        return {
+          listing,
+          translatedContent: basicContent
+        };
+      });
+      setTranslatedListings(basicTranslations);
+
+      // Then enhance with auto-translation in the background
+      const enhancedTranslations = await Promise.all(
+        filteredListings.map(async (listing) => {
+          const translatedContent = await getTranslatedContentWithAuto(listing, language, true);
+          return {
+            listing,
+            translatedContent
+          };
+        })
+      );
+      setTranslatedListings(enhancedTranslations);
+    };
+
+    translateListings();
+  }, [filteredListings, language]);
 
   useEffect(() => {
     applyFilters();
@@ -303,17 +340,17 @@ const InteractiveMapView: React.FC = () => {
                       <div className="flex items-center gap-2 text-muted-foreground mb-2">
                         <MapPin className="h-4 w-4" />
                         <span>
-                          {language === 'ar' 
-                            ? (selectedListing.location_ar || selectedListing.location || selectedListing.location_en)
-                            : (selectedListing.location_en || selectedListing.location || selectedListing.location_ar)
-                          }
+                          {(() => {
+                            const translatedContent = getTranslatedContent(selectedListing, language);
+                            return translatedContent.location;
+                          })()}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground mb-4">
-                        {(language === 'ar' 
-                          ? (selectedListing.description_ar || selectedListing.description || selectedListing.description_en)
-                          : (selectedListing.description_en || selectedListing.description || selectedListing.description_ar)
-                        )?.slice(0, 150)}...
+                        {(() => {
+                          const translatedContent = getTranslatedContent(selectedListing, language);
+                          return translatedContent.description?.slice(0, 150) + '...';
+                        })()}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <Badge variant="secondary">

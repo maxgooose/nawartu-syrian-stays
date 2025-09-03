@@ -63,19 +63,27 @@ export const ModernHeroSection = ({ language }: ModernHeroSectionProps) => {
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background with modern house aesthetic */}
       <div className="absolute inset-0">
-        {/* Gradient background inspired by the twilight sky */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900"></div>
+        {/* Sophisticated gradient background with warm tones */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-gray-700 to-slate-900"></div>
         
-        {/* Overlay pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-white/20 blur-xl"></div>
-          <div className="absolute bottom-32 right-16 w-24 h-24 rounded-full bg-orange-400/30 blur-lg"></div>
-          <div className="absolute top-1/2 right-1/4 w-16 h-16 rounded-full bg-white/20 blur-md"></div>
+        {/* Elegant overlay system with warm undertones */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/30 via-gray-800/20 to-slate-800/25"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-amber-900/15 via-transparent to-slate-700/10"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-slate-800/8 to-gray-900/12"></div>
+        
+        {/* Subtle backdrop blur with warm tint */}
+        <div className="absolute inset-0 backdrop-blur-[0.3px] bg-amber-900/2"></div>
+        
+        {/* Luxury ambient lighting effects */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-white/10 blur-2xl animate-pulse"></div>
+          <div className="absolute bottom-32 right-16 w-32 h-32 rounded-full bg-amber-400/20 blur-xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 right-1/4 w-24 h-24 rounded-full bg-white/15 blur-lg animate-pulse" style={{animationDelay: '2s'}}></div>
         </div>
         
-        {/* Geometric elements inspired by modern architecture */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/30 to-transparent"></div>
-        <div className="absolute top-1/4 right-0 w-1 h-64 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
+        {/* Refined geometric elements */}
+        <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div className="absolute top-1/4 right-0 w-px h-80 bg-gradient-to-b from-transparent via-white/30 to-transparent"></div>
       </div>
 
       {/* Main content */}
@@ -87,12 +95,12 @@ export const ModernHeroSection = ({ language }: ModernHeroSectionProps) => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-12"
         >
-          <h1 className={`text-5xl md:text-7xl lg:text-8xl font-light text-white leading-tight mb-6 ${
-            isRTL ? 'font-arabic' : 'font-light'
+          <h1 className={`text-5xl md:text-7xl lg:text-8xl font-medium leading-tight mb-6 drop-shadow-md [text-shadow:_0_1px_4px_rgb(0_0_0_/_50%)] ${
+            isRTL ? 'font-arabic' : 'font-medium'
           }`} dir={isRTL ? 'rtl' : 'ltr'}>
             {language === 'ar' ? 
-              <>نورتوا<br /><span className="text-3xl md:text-4xl lg:text-5xl opacity-80">سوريا الاستثنائية</span></> : 
-              <>Nawartu<br /><span className="text-3xl md:text-4xl lg:text-5xl opacity-80">Exceptional Syria</span></>
+              <>نورتوا<br /><span className="text-3xl md:text-4xl lg:text-5xl text-amber-50/90 drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">سوريا الاستثنائية</span></> : 
+              <>Nawartu<br /><span className="text-3xl md:text-4xl lg:text-5xl text-amber-50/90 drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">Exceptional Syria</span></>
             }
           </h1>
           <p className={`text-xl md:text-2xl text-white/90 font-light max-w-4xl mx-auto leading-relaxed ${

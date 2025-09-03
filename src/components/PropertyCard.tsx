@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Heart, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toggleFavorite, getFavorites } from "@/lib/utils";
+import { toggleFavorite, getFavorites, openInGoogleMaps } from "@/lib/utils";
 
 interface PropertyCardProps {
   property: {
@@ -96,9 +96,15 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
         </div>
 
         {/* Property Location */}
-        <p className={`text-gray-600 text-sm line-clamp-2 sm:line-clamp-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>
+        <button 
+          onClick={() => openInGoogleMaps({
+            name: property.title,
+            location: property.location
+          })}
+          className={`text-gray-600 text-sm line-clamp-2 sm:line-clamp-1 underline decoration-1 underline-offset-2 hover:text-gray-900 transition-colors ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}
+        >
           {property.location}
-        </p>
+        </button>
 
         {/* Price */}
         <div className={`pt-1 ${isRTL ? 'text-arabic text-right' : 'text-latin text-left'}`}>

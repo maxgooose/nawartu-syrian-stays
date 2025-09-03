@@ -5,6 +5,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Vogue-inspired luxury animations and effects */
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.95;
+    }
+  }
+  
+  .bg-gradient-radial {
+    background: radial-gradient(circle at center, var(--tw-gradient-stops));
+  }
+  
+  .shadow-3xl {
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+  }
+}
+
 /* Nawartu Design System - Syrian Property Rental App */
 
 @layer base {

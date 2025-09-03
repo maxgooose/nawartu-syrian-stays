@@ -6,6 +6,19 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Utility functions for language detection
+function isArabic(text: string): boolean {
+  if (!text) return false;
+  // Extended Arabic character range check
+  return /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/.test(text);
+}
+
+function isEnglish(text: string): boolean {
+  if (!text) return false;
+  // Simple heuristic: if it contains Latin characters and no predominant Arabic characters
+  return /[a-zA-Z]/.test(text) && !isArabic(text);
+}
+
 // Replace with your Supabase URL and anon key
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
@@ -56,89 +69,103 @@ async function translateListing(listing: Listing): Promise<Partial<Listing>> {
   const updates: Partial<Listing> = {};
   let hasUpdates = false;
 
-  // Translate name
-  if (listing.name_en && (!listing.name_ar || listing.name_ar === '')) {
-    console.log(`Translating name to Arabic for listing ${listing.id}`);
-    updates.name_ar = await translateText(listing.name_en, 'ar', 'en');
-    updates.name_ar_auto_translated = true;
-    hasUpdates = true;
-  } else if (listing.name_ar && (!listing.name_en || listing.name_en === '')) {
-    console.log(`Translating name to English for listing ${listing.id}`);
-    updates.name_en = await translateText(listing.name_ar, 'en', 'ar');
-    updates.name_en_auto_translated = true;
-    hasUpdates = true;
-  }
+  // Helper to determine the best source for translation
+  const getPrimarySource = (enField?: string, arField?: string, genericField?: string) => {
+    if (enField && isEnglish(enField)) return { text: enField, lang: 'en' };
+    if (arField && isArabic(arField)) return { text: arField, lang: 'ar' };
+    if (genericField && isEnglish(genericField)) return { text: genericField, lang: 'en' };
+    if (genericField && isArabic(genericField)) return { text: genericField, lang: 'ar' };
+    return null;
+  };
 
-  // Translate description
-  if (listing.description_en && (!listing.description_ar || listing.description_ar === '')) {
-    console.log(`Translating description to Arabic for listing ${listing.id}`);
-    updates.description_ar = await translateText(listing.description_en, 'ar', 'en');
-    updates.description_ar_auto_translated = true;
-    hasUpdates = true;
-  } else if (listing.description_ar && (!listing.description_en || listing.description_en === '')) {
-    console.log(`Translating description to English for listing ${listing.id}`);
-    updates.description_en = await translateText(listing.description_ar, 'en', 'ar');
-    updates.description_en_auto_translated = true;
-    hasUpdates = true;
-  }
+  // Process 'name' field - fix the logic completely
+  let nameSource = getPrimarySource(listing.name_en, listing.name_ar, listing.name);
 
-  // Translate location
-  if (listing.location_en && (!listing.location_ar || listing.location_ar === '')) {
-    console.log(`Translating location to Arabic for listing ${listing.id}`);
-    updates.location_ar = await translateText(listing.location_en, 'ar', 'en');
-    updates.location_ar_auto_translated = true;
-    hasUpdates = true;
-  } else if (listing.location_ar && (!listing.location_en || listing.location_en === '')) {
-    console.log(`Translating location to English for listing ${listing.id}`);
-    updates.location_en = await translateText(listing.location_ar, 'en', 'ar');
-    updates.location_en_auto_translated = true;
-    hasUpdates = true;
-  }
+  if (nameSource) {
+    // Only translate if the target field is missing OR contains wrong language content
+    const needsArabicTranslation = !listing.name_ar || listing.name_ar === '' || isEnglish(listing.name_ar);
+    const needsEnglishTranslation = !listing.name_en || listing.name_en === '' || isArabic(listing.name_en);
 
-  // Handle fallback from old fields if new bilingual fields are empty
-  if (!listing.name_en && !listing.name_ar && listing.name) {
-    // Detect language of the name field
-    const isArabic = /[\u0600-\u06FF]/.test(listing.name);
-    if (isArabic) {
-      updates.name_ar = listing.name;
-      updates.name_en = await translateText(listing.name, 'en', 'ar');
-      updates.name_en_auto_translated = true;
-    } else {
-      updates.name_en = listing.name;
-      updates.name_ar = await translateText(listing.name, 'ar', 'en');
+    if (needsArabicTranslation && nameSource.lang === 'en') {
+      console.log(`Translating name to Arabic for listing ${listing.id}`);
+      updates.name_ar = await translateText(nameSource.text, 'ar', 'en');
       updates.name_ar_auto_translated = true;
+      hasUpdates = true;
+    } else if (needsArabicTranslation && nameSource.lang === 'ar') {
+      // Source is already Arabic, just copy it
+      updates.name_ar = nameSource.text;
+      hasUpdates = true;
     }
-    hasUpdates = true;
+
+    if (needsEnglishTranslation && nameSource.lang === 'ar') {
+      console.log(`Translating name to English for listing ${listing.id}`);
+      updates.name_en = await translateText(nameSource.text, 'en', 'ar');
+      updates.name_en_auto_translated = true;
+      hasUpdates = true;
+    } else if (needsEnglishTranslation && nameSource.lang === 'en') {
+      // Source is already English, just copy it
+      updates.name_en = nameSource.text;
+      hasUpdates = true;
+    }
   }
 
-  if (!listing.description_en && !listing.description_ar && listing.description) {
-    const isArabic = /[\u0600-\u06FF]/.test(listing.description);
-    if (isArabic) {
-      updates.description_ar = listing.description;
-      updates.description_en = await translateText(listing.description, 'en', 'ar');
-      updates.description_en_auto_translated = true;
-    } else {
-      updates.description_en = listing.description;
-      updates.description_ar = await translateText(listing.description, 'ar', 'en');
+  // Process 'description' field - fix the logic completely
+  let descriptionSource = getPrimarySource(listing.description_en, listing.description_ar, listing.description);
+
+  if (descriptionSource) {
+    const needsArabicTranslation = !listing.description_ar || listing.description_ar === '' || isEnglish(listing.description_ar);
+    const needsEnglishTranslation = !listing.description_en || listing.description_en === '' || isArabic(listing.description_en);
+
+    if (needsArabicTranslation && descriptionSource.lang === 'en') {
+      console.log(`Translating description to Arabic for listing ${listing.id}`);
+      updates.description_ar = await translateText(descriptionSource.text, 'ar', 'en');
       updates.description_ar_auto_translated = true;
+      hasUpdates = true;
+    } else if (needsArabicTranslation && descriptionSource.lang === 'ar') {
+      updates.description_ar = descriptionSource.text;
+      hasUpdates = true;
     }
-    hasUpdates = true;
+
+    if (needsEnglishTranslation && descriptionSource.lang === 'ar') {
+      console.log(`Translating description to English for listing ${listing.id}`);
+      updates.description_en = await translateText(descriptionSource.text, 'en', 'ar');
+      updates.description_en_auto_translated = true;
+      hasUpdates = true;
+    } else if (needsEnglishTranslation && descriptionSource.lang === 'en') {
+      updates.description_en = descriptionSource.text;
+      hasUpdates = true;
+    }
   }
 
-  if (!listing.location_en && !listing.location_ar && listing.location) {
-    const isArabic = /[\u0600-\u06FF]/.test(listing.location);
-    if (isArabic) {
-      updates.location_ar = listing.location;
-      updates.location_en = await translateText(listing.location, 'en', 'ar');
-      updates.location_en_auto_translated = true;
-    } else {
-      updates.location_en = listing.location;
-      updates.location_ar = await translateText(listing.location, 'ar', 'en');
+  // Process 'location' field - fix the logic completely
+  let locationSource = getPrimarySource(listing.location_en, listing.location_ar, listing.location);
+
+  if (locationSource) {
+    const needsArabicTranslation = !listing.location_ar || listing.location_ar === '' || isEnglish(listing.location_ar);
+    const needsEnglishTranslation = !listing.location_en || listing.location_en === '' || isArabic(listing.location_en);
+
+    if (needsArabicTranslation && locationSource.lang === 'en') {
+      console.log(`Translating location to Arabic for listing ${listing.id}`);
+      updates.location_ar = await translateText(locationSource.text, 'ar', 'en');
       updates.location_ar_auto_translated = true;
+      hasUpdates = true;
+    } else if (needsArabicTranslation && locationSource.lang === 'ar') {
+      updates.location_ar = locationSource.text;
+      hasUpdates = true;
     }
-    hasUpdates = true;
-  }
 
+    if (needsEnglishTranslation && locationSource.lang === 'ar') {
+      console.log(`Translating location to English for listing ${listing.id}`);
+      updates.location_en = await translateText(locationSource.text, 'en', 'ar');
+      updates.location_en_auto_translated = true;
+      hasUpdates = true;
+    } else if (needsEnglishTranslation && locationSource.lang === 'en') {
+      updates.location_en = locationSource.text;
+      hasUpdates = true;
+    }
+  }
+  
+  // Update last_translation_update if any changes were made
   if (hasUpdates) {
     updates.last_translation_update = new Date().toISOString();
   }

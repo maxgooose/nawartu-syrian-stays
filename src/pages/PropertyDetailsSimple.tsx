@@ -13,7 +13,7 @@ import { ArrowLeft, MapPin, Users, Bed, Bath, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { getPublicImageUrl } from "@/lib/utils";
+import { getPublicImageUrl, openInGoogleMaps } from "@/lib/utils";
 import CardDetails from "@/components/CardDetails";
 import { getTranslatedContent } from "@/lib/translation";
 
@@ -230,7 +230,17 @@ const PropertyDetailsSimple = () => {
                 </h1>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <MapPin className="h-4 w-4" />
-                  <span>{translatedContent.location}</span>
+                  <button 
+                    onClick={() => openInGoogleMaps({
+                      name: listing.name,
+                      location: listing.location_en || listing.location || listing.location_ar,
+                      latitude: listing.latitude,
+                      longitude: listing.longitude
+                    })}
+                    className="underline decoration-1 underline-offset-2 hover:text-gray-900 transition-colors"
+                  >
+                    {listing.location_en || listing.location || listing.location_ar}
+                  </button>
                 </div>
               </>
             );
@@ -285,12 +295,17 @@ const PropertyDetailsSimple = () => {
               <CardContent>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin className="h-4 w-4" />
-                  <span>
-                    {(() => {
-                      const translatedContent = getTranslatedContent(listing, language);
-                      return translatedContent.location;
-                    })()}
-                  </span>
+                  <button 
+                    onClick={() => openInGoogleMaps({
+                      name: listing.name,
+                      location: listing.location_en || listing.location || listing.location_ar,
+                      latitude: listing.latitude,
+                      longitude: listing.longitude
+                    })}
+                    className="underline decoration-1 underline-offset-2 hover:text-gray-900 transition-colors"
+                  >
+                    {listing.location_en || listing.location || listing.location_ar}
+                  </button>
                 </div>
               </CardContent>
             </Card>

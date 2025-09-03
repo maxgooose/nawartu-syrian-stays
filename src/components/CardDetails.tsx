@@ -152,15 +152,15 @@ const CardDetails = ({
   const getCardIcon = (type: string) => {
     switch (type) {
       case 'visa':
-        return '💳';
+        return '';
       case 'mastercard':
-        return '💳';
+        return '';
       case 'amex':
-        return '💳';
+        return '';
       case 'discover':
-        return '💳';
+        return '';
       default:
-        return '💳';
+        return '';
     }
   };
 

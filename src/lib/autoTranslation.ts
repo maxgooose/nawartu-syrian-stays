@@ -192,21 +192,27 @@ export async function getTranslatedContentWithAuto(
     }
   };
 
+  // Helper function to detect if text is Arabic
+  const isArabicText = (text: string) => /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/.test(text);
+  
+  // Collect all texts that need translation
+  const textsToTranslate: Array<{text: string, field: 'name' | 'description' | 'location', sourceLang: 'en' | 'ar'}> = [];
+  
   // Get name
   if (isArabic) {
     result.name = content.name_ar || '';
-    if (!result.name && content.name_en && autoTranslate) {
-      result.name = await translateText(content.name_en, 'ar', 'en');
-      result.isAutoTranslated.name = true;
+    // If name_ar is empty OR contains English text, translate from name_en
+    if ((!result.name || !isArabicText(result.name)) && content.name_en && autoTranslate) {
+      textsToTranslate.push({text: content.name_en, field: 'name', sourceLang: 'en'});
     }
     if (!result.name) {
       result.name = content.name || content.name_en || 'عقار بدون عنوان';
     }
   } else {
     result.name = content.name_en || '';
-    if (!result.name && content.name_ar && autoTranslate) {
-      result.name = await translateText(content.name_ar, 'en', 'ar');
-      result.isAutoTranslated.name = true;
+    // If name_en is empty OR contains Arabic text, translate from name_ar
+    if ((!result.name || isArabicText(result.name)) && content.name_ar && autoTranslate) {
+      textsToTranslate.push({text: content.name_ar, field: 'name', sourceLang: 'ar'});
     }
     if (!result.name) {
       result.name = content.name || content.name_ar || 'Untitled Listing';
@@ -216,18 +222,18 @@ export async function getTranslatedContentWithAuto(
   // Get description
   if (isArabic) {
     result.description = content.description_ar || '';
-    if (!result.description && content.description_en && autoTranslate) {
-      result.description = await translateText(content.description_en, 'ar', 'en');
-      result.isAutoTranslated.description = true;
+    // If description_ar is empty OR contains English text, translate from description_en
+    if ((!result.description || !isArabicText(result.description)) && content.description_en && autoTranslate) {
+      textsToTranslate.push({text: content.description_en, field: 'description', sourceLang: 'en'});
     }
     if (!result.description) {
       result.description = content.description || content.description_en || 'لا يوجد وصف متاح';
     }
   } else {
     result.description = content.description_en || '';
-    if (!result.description && content.description_ar && autoTranslate) {
-      result.description = await translateText(content.description_ar, 'en', 'ar');
-      result.isAutoTranslated.description = true;
+    // If description_en is empty OR contains Arabic text, translate from description_ar
+    if ((!result.description || isArabicText(result.description)) && content.description_ar && autoTranslate) {
+      textsToTranslate.push({text: content.description_ar, field: 'description', sourceLang: 'ar'});
     }
     if (!result.description) {
       result.description = content.description || content.description_ar || 'No description available';
@@ -237,22 +243,38 @@ export async function getTranslatedContentWithAuto(
   // Get location
   if (isArabic) {
     result.location = content.location_ar || '';
-    if (!result.location && content.location_en && autoTranslate) {
-      result.location = await translateText(content.location_en, 'ar', 'en');
-      result.isAutoTranslated.location = true;
+    // If location_ar is empty OR contains English text, translate from location_en
+    if ((!result.location || !isArabicText(result.location)) && content.location_en && autoTranslate) {
+      textsToTranslate.push({text: content.location_en, field: 'location', sourceLang: 'en'});
     }
     if (!result.location) {
       result.location = content.location || content.location_en || 'موقع غير متاح';
     }
   } else {
     result.location = content.location_en || '';
-    if (!result.location && content.location_ar && autoTranslate) {
-      result.location = await translateText(content.location_ar, 'en', 'ar');
-      result.isAutoTranslated.location = true;
+    // If location_en is empty OR contains Arabic text, translate from location_ar
+    if ((!result.location || isArabicText(result.location)) && content.location_ar && autoTranslate) {
+      textsToTranslate.push({text: content.location_ar, field: 'location', sourceLang: 'ar'});
     }
     if (!result.location) {
       result.location = content.location || content.location_ar || 'Location not available';
     }
+  }
+
+  // Batch translate all texts that need translation
+  if (textsToTranslate.length > 0) {
+    const translationPromises = textsToTranslate.map(async ({text, field, sourceLang}) => {
+      const translated = await translateText(text, language, sourceLang);
+      return {field, translated};
+    });
+    
+    const translations = await Promise.all(translationPromises);
+    
+    // Apply translations to result
+    translations.forEach(({field, translated}) => {
+      result[field] = translated;
+      result.isAutoTranslated[field] = true;
+    });
   }
 
   // If content has an ID and was auto-translated, update the database

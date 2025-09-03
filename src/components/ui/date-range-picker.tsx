@@ -207,17 +207,17 @@ export function DateRangePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-full max-w-sm md:max-w-none p-0 bg-white border border-gray-200 shadow-xl z-50 rounded-3xl" 
+          className="w-full max-w-sm md:max-w-none p-0 bg-white border border-gray-200 shadow-xl z-50 rounded-3xl mx-4 sm:mx-0" 
           align="center"
           side="bottom"
           sideOffset={4}
         >
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {/* Calendar Header */}
             <div className="flex items-center justify-between mb-6">
               <button
                 onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -231,7 +231,7 @@ export function DateRangePicker({
               </div>
               <button
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
@@ -272,15 +272,9 @@ export function DateRangePicker({
                         {(inRange || inPreview) && !isStart && !isEnd && (
                           <span className="absolute inset-0 bg-gray-100" />
                         )}
-                        {(isStart && (hasCompleteRange || hoveredDate)) && (
-                          <span className="absolute inset-y-0 left-1/2 right-0 bg-gray-100 rounded-r-full" />
-                        )}
-                        {(isEnd || (hoveredDate && isSameDay(date, hoveredDate) && !hasCompleteRange)) && (
-                          <span className="absolute inset-y-0 left-0 right-1/2 bg-gray-100 rounded-l-full" />
-                        )}
                         <span className={cn(
-                          "relative z-10 w-10 h-10 flex items-center justify-center rounded-full",
-                          (isStart || isEnd) ? "bg-gray-900 text-white" : "",
+                          "relative z-10 w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full min-w-[44px] min-h-[44px]",
+                          (isStart || isEnd) ? "bg-emerald-600 text-white" : "",
                         )}>
                           {date.getDate()}
                         </span>
@@ -323,15 +317,9 @@ export function DateRangePicker({
                         {(inRange || inPreview) && !isStart && !isEnd && (
                           <span className="absolute inset-0 bg-gray-100" />
                         )}
-                        {(isStart && (hasCompleteRange || hoveredDate)) && (
-                          <span className="absolute inset-y-0 left-1/2 right-0 bg-gray-100 rounded-r-full" />
-                        )}
-                        {(isEnd || (hoveredDate && isSameDay(date, hoveredDate) && !hasCompleteRange)) && (
-                          <span className="absolute inset-y-0 left-0 right-1/2 bg-gray-100 rounded-l-full" />
-                        )}
                         <span className={cn(
-                          "relative z-10 w-10 h-10 flex items-center justify-center rounded-full",
-                          (isStart || isEnd) ? "bg-gray-900 text-white" : "",
+                          "relative z-10 w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full min-w-[44px] min-h-[44px]",
+                          (isStart || isEnd) ? "bg-emerald-600 text-white" : "",
                         )}>
                           {date.getDate()}
                         </span>
@@ -354,9 +342,9 @@ export function DateRangePicker({
                       key={option.value}
                       onClick={() => setFlexibility(option.value)}
                       className={cn(
-                        "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
+                        "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-h-[44px] flex items-center justify-center",
                         flexibility === option.value
-                          ? "bg-gray-900 text-white"
+                          ? "bg-emerald-600 text-white"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       )}
                     >

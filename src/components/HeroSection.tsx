@@ -166,8 +166,18 @@ export const HeroSection = ({
     <section className="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center bg-no-repeat" style={{
       backgroundImage: `url(${heroImage})`
     }}>
-      {/* Subtle overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20"></div>
+      {/* Sophisticated color overlay system */}
+      {/* Primary overlay with warm, elegant tones */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/30 via-gray-800/20 to-slate-800/25"></div>
+      
+      {/* Secondary overlay with subtle warmth */}
+      <div className="absolute inset-0 bg-gradient-to-t from-amber-900/15 via-transparent to-slate-700/10"></div>
+      
+      {/* Elegant radial gradient with warm undertones */}
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-slate-800/8 to-gray-900/12"></div>
+      
+      {/* Subtle backdrop blur with warm tint */}
+      <div className="absolute inset-0 backdrop-blur-[0.3px] bg-amber-900/2"></div>
 
       {/* Airbnb-style Search Bar */}
       <div className="absolute top-4 sm:top-6 left-2 right-2 sm:left-4 sm:right-4 z-30" ref={searchRef}>
@@ -598,17 +608,17 @@ export const HeroSection = ({
         <div className="max-w-2xl animate-slide-up mobile-optimized">
           {/* Main Headline - Clean Airbnb Style */}
           <div className={`${isRTL ? 'text-arabic text-right' : 'text-latin text-left'} mb-8`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-semibold text-white mb-6 leading-tight tracking-tight mobile-text">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium mb-6 leading-tight tracking-tight mobile-text drop-shadow-md [text-shadow:_0_1px_4px_rgb(0_0_0_/_50%)]">
               {language === 'ar' ? (
                 <>
-                  <span className="block leading-none">نورتوا</span>
-                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-white/90 mt-2 leading-tight">الضيافة السورية</span>
+                  <span className="block leading-none text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_50%)]">نورتوا</span>
+                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-amber-50/90 mt-2 leading-tight drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">الضيافة السورية</span>
                 </>
               ) : (
                 <>
-                  <span className="block leading-none">Not sure</span>
-                  <span className="block leading-none">where to go?</span>
-                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-white/90 mt-2 leading-tight">Perfect.</span>
+                  <span className="block leading-none text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_50%)]">Not sure</span>
+                  <span className="block leading-none text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_50%)]">where to go?</span>
+                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-amber-50/90 mt-2 leading-tight drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">Perfect.</span>
                 </>
               )}
             </h1>
@@ -618,7 +628,7 @@ export const HeroSection = ({
           <div className={`${isRTL ? 'text-right' : 'text-left'} mb-12`}>
             <button 
               onClick={() => navigate('/browse')}
-              className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-4 sm:px-8 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-gray-100 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 min-h-[44px] min-w-[44px]"
+              className="inline-flex items-center gap-3 bg-amber-50/95 backdrop-blur-sm text-slate-800 px-6 py-4 sm:px-8 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-amber-50 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 min-h-[44px] min-w-[44px] border border-amber-100/40"
             >
               {language === 'ar' ? 'اكتشف سوريا' : 'Discover Syria'}
               <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
