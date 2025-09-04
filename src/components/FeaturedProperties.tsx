@@ -125,10 +125,10 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
             <div className="h-12 bg-gray-200 rounded w-1/2 mb-6 animate-pulse"></div>
             <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
           </div>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-10">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 gap-y-3 md:gap-x-6 md:gap-y-10">
             {[...Array(16)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="aspect-square bg-gray-200 rounded-xl mb-3"></div>
+                <div className="aspect-[4/5] md:aspect-square bg-gray-200 rounded-2xl md:rounded-xl mb-3"></div>
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
                     <div className="h-4 bg-gray-200 rounded w-2/3"></div>
@@ -159,12 +159,6 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 leading-tight">
               {language === 'ar' ? 'استكشف الإقامات الاستثنائية' : 'Exceptional Stays'}
             </h2>
-            {translating && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                <span>{language === 'ar' ? 'جاري التحسين...' : 'Enhancing...'}</span>
-              </div>
-            )}
           </div>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto font-light leading-relaxed">
             {language === 'ar' 
@@ -180,11 +174,11 @@ export const FeaturedProperties = ({ language }: FeaturedPropertiesProps) => {
         </div>
 
         {/* Modern Property Grid */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-12">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-3 gap-y-3 md:gap-x-6 md:gap-y-12">
           {translatedListings.map((item, index) => (
             <div 
               key={item.listing.id}
-              className="group cursor-pointer"
+              className="group cursor-pointer rounded-2xl shadow-md border border-gray-100 bg-white overflow-hidden md:shadow-none md:rounded-none md:border-0"
               style={{
                 animationDelay: `${index * 0.1}s`
               }}

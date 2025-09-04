@@ -252,12 +252,6 @@ const PropertyBrowse = () => {
                 <h1 className="text-3xl font-bold text-foreground">
                   {language === 'ar' ? 'تصفح العقارات' : 'Browse Properties'}
                 </h1>
-                {translating && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                    <span>{language === 'ar' ? 'جاري التحسين...' : 'Enhancing...'}</span>
-                  </div>
-                )}
               </div>
               <p className="text-muted-foreground">
                 {language === 'ar' 

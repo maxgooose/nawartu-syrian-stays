@@ -182,7 +182,7 @@ export const HeroSection = ({
       {/* Airbnb-style Search Bar */}
       <div className="absolute top-4 sm:top-6 left-2 right-2 sm:left-4 sm:right-4 z-30" ref={searchRef}>
         <div className="bg-white rounded-full shadow-2xl border border-gray-200 overflow-hidden">
-          <div className="flex items-center divide-x divide-gray-300">
+          <div className="flex items-center">
             {/* Where Section */}
             <div 
               className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-gray-50 transition-all duration-200 rounded-l-full ${
@@ -198,8 +198,8 @@ export const HeroSection = ({
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-12 bg-gray-300"></div>
+            {/* Divider between Where and When */}
+            <div className="w-px h-8 bg-gray-200"></div>
 
             {/* When Section */}
             <div 
@@ -216,33 +216,39 @@ export const HeroSection = ({
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-12 bg-gray-300"></div>
+            {/* Divider between When and Who */}
+            <div className="w-px h-8 bg-gray-200"></div>
 
-            {/* Who Section */}
+            {/* Who Section with Search Button */}
             <div 
-              className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${
+              className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 rounded-r-full ${
                 activeSection === 'who' ? 'bg-gray-50' : ''
               }`}
               onClick={() => handleSectionClick('who')}
             >
-              <div className="text-xs font-semibold text-gray-800 mb-1">
-                {language === 'ar' ? 'من' : 'Who'}
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-xs font-semibold text-gray-800 mb-1">
+                    {language === 'ar' ? 'من' : 'Who'}
+                  </div>
+                  <div className="text-sm text-gray-600 truncate">
+                    {getGuestText()}
+                  </div>
+                </div>
+                {/* Search Button inside Who section */}
+                <div className="ml-2">
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSearch();
+                    }}
+                    size="sm" 
+                    className="h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full bg-primary hover:bg-primary/90"
+                  >
+                    <Search className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="text-sm text-gray-600 truncate">
-                {getGuestText()}
-              </div>
-            </div>
-
-            {/* Search Button */}
-            <div className="px-1 sm:px-2 py-2">
-              <Button 
-                onClick={handleSearch}
-                size="sm" 
-                className="h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full bg-primary hover:bg-primary/90"
-              >
-                <Search className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
             </div>
           </div>
         </div>
@@ -437,6 +443,7 @@ export const HeroSection = ({
               placeholder={language === 'ar' ? 'اختر التواريخ' : 'Select dates'}
               variant="default"
               autoOpen={true}
+              onRequestClose={() => setActiveSection(null)}
             />
           </div>
         )}
@@ -608,17 +615,17 @@ export const HeroSection = ({
         <div className="max-w-2xl animate-slide-up mobile-optimized">
           {/* Main Headline - Clean Airbnb Style */}
           <div className={`${isRTL ? 'text-arabic text-right' : 'text-latin text-left'} mb-8`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium mb-6 leading-tight tracking-tight mobile-text drop-shadow-md [text-shadow:_0_1px_4px_rgb(0_0_0_/_50%)]">
+            <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl font-medium mb-6 leading-tight tracking-tight mobile-text drop-shadow-md [text-shadow:_0_1px_4px_rgb(0_0_0_/_50%)]">
               {language === 'ar' ? (
                 <>
-                  <span className="block leading-none text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_50%)]">نورتوا</span>
-                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-amber-50/90 mt-2 leading-tight drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">الضيافة السورية</span>
+                  <span className="block leading-none text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_50%)]">نورتوا…</span>
+                  <span className="block text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-amber-50/90 mt-2 leading-tight drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">الراحة صارت عنوان</span>
                 </>
               ) : (
                 <>
                   <span className="block leading-none text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_50%)]">Not sure</span>
                   <span className="block leading-none text-white/95 [text-shadow:_0_1px_3px_rgb(0_0_0_/_50%)]">where to go?</span>
-                  <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-amber-50/90 mt-2 leading-tight drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">Perfect.</span>
+                  <span className="block text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-normal text-amber-50/90 mt-2 leading-tight drop-shadow-sm [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">Perfect.</span>
                 </>
               )}
             </h1>

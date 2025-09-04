@@ -368,6 +368,8 @@ const PropertyDetails = () => {
   const [currentBookingId, setCurrentBookingId] = useState<string>('');
   const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
+  const [idDocType, setIdDocType] = useState<'passport' | 'national_id' | 'driver_license' | ''>('');
+  const [idDocNumber, setIdDocNumber] = useState('');
   const isRTL = language === 'ar';
 
   useEffect(() => {
@@ -523,6 +525,16 @@ const PropertyDetails = () => {
       return;
     }
 
+    // Require ID document before booking
+    if (!idDocType || !idDocNumber.trim()) {
+      toast({
+        title: language === 'ar' ? 'معلومات الهوية مطلوبة' : 'ID information required',
+        description: language === 'ar' ? 'يرجى إدخال نوع ورقم الهوية قبل المتابعة' : 'Please provide ID document type and number before continuing',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setBookingLoading(true);
 
     try {
@@ -536,7 +548,9 @@ const PropertyDetails = () => {
           total_nights: nights,
           total_amount_usd: calculateTotalAmount(),
           payment_method: paymentMethod === 'card' ? 'stripe' : 'cash',
-          status: paymentMethod === 'cash' ? 'confirmed' : 'pending'
+          status: paymentMethod === 'cash' ? 'confirmed' : 'pending',
+          id_document_type: idDocType,
+          id_document_number: idDocNumber.trim()
         })
         .select('id')
         .single();
@@ -855,10 +869,10 @@ const PropertyDetails = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">
-                      {language === 'ar' ? 'تسجيل دخول ذاتي' : 'Self check-in'}
+                      {language === 'ar' ? 'تسليم المفاتيح' : 'Key Handover'}
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
-                      {language === 'ar' ? 'تحقق بنفسك من خلال صندوق الأقفال.' : 'Check yourself in with the lockbox.'}
+                      {language === 'ar' ? 'ممثل نورتوا سيقوم بتسليمك المفاتيح شخصياً عند وصولك.' : 'A Nawartu representative will personally hand over the keys upon your arrival.'}
                     </p>
                   </div>
                 </div>
@@ -1294,6 +1308,50 @@ const PropertyDetails = () => {
                     maxGuests={listing.max_guests}
                   />
                 </div>
+
+                {/* ID Document Requirement */}
+                {dateRange?.from && dateRange?.to && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-gray-900">
+                      {language === 'ar' ? 'معلومات الهوية' : 'ID Information'}
+                    </h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIdDocType('passport')}
+                        className={`px-3 py-2 rounded-lg border text-sm ${idDocType === 'passport' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                      >
+                        {language === 'ar' ? 'جواز سفر' : 'Passport'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIdDocType('national_id')}
+                        className={`px-3 py-2 rounded-lg border text-sm ${idDocType === 'national_id' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                      >
+                        {language === 'ar' ? 'الهوية الشخصية' : 'National ID'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIdDocType('driver_license')}
+                        className={`px-3 py-2 rounded-lg border text-sm ${idDocType === 'driver_license' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                      >
+                        {language === 'ar' ? 'رخصة القيادة' : 'Driver License'}
+                      </button>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        value={idDocNumber}
+                        onChange={(e) => setIdDocNumber(e.target.value)}
+                        placeholder={language === 'ar' ? 'رقم الوثيقة' : 'Document number'}
+                        className="w-full h-11 rounded-lg border-2 border-gray-200 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        {language === 'ar' ? 'مطلوب وفقاً للوائح المحلية.' : 'Required per local regulations.'}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Payment Method Selection */}
                 {dateRange?.from && dateRange?.to && (

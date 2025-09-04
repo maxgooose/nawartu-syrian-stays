@@ -58,6 +58,8 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
   const [guests, setGuests] = useState({ adults: 2, children: 0, infants: 0 });
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
   const [specialRequests, setSpecialRequests] = useState('');
+  const [idDocType, setIdDocType] = useState<'passport' | 'national_id' | 'driver_license' | ''>('');
+  const [idDocNumber, setIdDocNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [availabilityCheck, setAvailabilityCheck] = useState<AvailabilityCheck | null>(null);
   const [reservationTimer, setReservationTimer] = useState<number>(0);
@@ -174,6 +176,16 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
       return;
     }
 
+    // Require ID document
+    if (!idDocType || !idDocNumber.trim()) {
+      toast({
+        title: language === 'ar' ? 'معلومات الهوية مطلوبة' : 'ID information required',
+        description: language === 'ar' ? 'يرجى إدخال نوع ورقم الهوية قبل المتابعة' : 'Please provide ID document type and number before continuing',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -194,7 +206,9 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
           total_amount_usd: totalAmount,
           payment_method: paymentMethod === 'card' ? 'stripe' : 'cash',
           special_requests: specialRequests || null,
-          status: paymentMethod === 'cash' ? 'confirmed' : 'pending' // Cash bookings confirmed immediately
+          status: paymentMethod === 'cash' ? 'confirmed' : 'pending', // Cash bookings confirmed immediately
+          id_document_type: idDocType,
+          id_document_number: idDocNumber.trim()
         })
         .select('id')
         .single();
@@ -319,6 +333,68 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
           />
         </CardContent>
       </Card>
+
+      {/* ID Document Requirement */}
+      {showBookingStep && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">
+              {language === 'ar' ? 'معلومات الهوية' : 'ID Information'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIdDocType('passport')}
+                  className={cn(
+                    'px-3 py-2 rounded-lg border text-sm',
+                    idDocType === 'passport' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'
+                  )}
+                >
+                  {language === 'ar' ? 'جواز سفر' : 'Passport'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIdDocType('national_id')}
+                  className={cn(
+                    'px-3 py-2 rounded-lg border text-sm',
+                    idDocType === 'national_id' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'
+                  )}
+                >
+                  {language === 'ar' ? 'الهوية الشخصية' : 'National ID'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIdDocType('driver_license')}
+                  className={cn(
+                    'px-3 py-2 rounded-lg border text-sm',
+                    idDocType === 'driver_license' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'
+                  )}
+                >
+                  {language === 'ar' ? 'رخصة القيادة' : 'Driver License'}
+                </button>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">
+                  {language === 'ar' ? 'رقم الوثيقة' : 'Document Number'}
+                </label>
+                <input
+                  type="text"
+                  value={idDocNumber}
+                  onChange={(e) => setIdDocNumber(e.target.value)}
+                  placeholder={language === 'ar' ? 'أدخل رقم الوثيقة' : 'Enter document number'}
+                  className="w-full h-11 rounded-lg border-2 border-gray-200 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                {language === 'ar' ? 'مطلوب وفقاً للوائح المحلية.' : 'Required per local regulations.'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Availability Check Results */}
       {availabilityCheck && (

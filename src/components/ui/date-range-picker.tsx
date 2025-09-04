@@ -17,6 +17,7 @@ interface DateRangePickerProps {
   placeholder?: string;
   variant?: 'default' | 'hero';
   autoOpen?: boolean;
+  onRequestClose?: () => void;
 }
 
 export function DateRangePicker({
@@ -27,7 +28,8 @@ export function DateRangePicker({
   className,
   placeholder,
   variant = 'default',
-  autoOpen = false
+  autoOpen = false,
+  onRequestClose
 }: DateRangePickerProps) {
   const isRTL = language === 'ar';
   const locale = language === 'ar' ? ar : enUS;
@@ -116,7 +118,7 @@ export function DateRangePicker({
   const getDayClassName = (date: Date, isCurrentMonth: boolean) => {
     const isPast = isBefore(date, startOfDay(new Date()));
     return cn(
-      "relative w-10 h-10 flex items-center justify-center text-sm transition-all duration-200 cursor-pointer",
+      "relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center text-sm transition-all duration-200 cursor-pointer",
       !isCurrentMonth && "text-gray-300",
       isCurrentMonth && !isPast && "hover:bg-gray-100",
       isPast && "text-gray-300 cursor-not-allowed"
@@ -212,7 +214,21 @@ export function DateRangePicker({
           side="bottom"
           sideOffset={4}
         >
-          <div className="p-4 sm:p-6">
+          <div className="p-4 sm:p-6 relative">
+            {/* Mobile Close Button */}
+            <button
+              onClick={() => {
+                if (onRequestClose) {
+                  onRequestClose();
+                } else {
+                  setIsOpen(false);
+                }
+              }}
+              className="md:hidden absolute top-2 right-2 p-2 rounded-full border text-gray-700 bg-white/90 shadow min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label={language === 'ar' ? 'إغلاق التقويم' : 'Close calendar'}
+            >
+              <X className="h-4 w-4" />
+            </button>
             {/* Calendar Header */}
             <div className="flex items-center justify-between mb-6">
               <button
@@ -221,12 +237,17 @@ export function DateRangePicker({
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <div className="flex gap-8">
+              <div className="hidden md:flex gap-8">
                 <h3 className="text-lg font-semibold">
                   {format(currentMonth, 'MMMM yyyy', { locale })}
                 </h3>
                 <h3 className="text-lg font-semibold">
                   {format(addMonths(currentMonth, 1), 'MMMM yyyy', { locale })}
+                </h3>
+              </div>
+              <div className="md:hidden">
+                <h3 className="text-lg font-semibold">
+                  {format(currentMonth, 'MMMM yyyy', { locale })}
                 </h3>
               </div>
               <button
@@ -243,7 +264,7 @@ export function DateRangePicker({
               <div className="flex-1">
                 <div className="grid grid-cols-7 gap-0 mb-2">
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
-                    <div key={day} className="w-10 h-8 flex items-center justify-center text-xs font-medium text-gray-500">
+                    <div key={day} className="w-9 h-7 md:w-10 md:h-8 flex items-center justify-center text-xs font-medium text-gray-500">
                       {day}
                     </div>
                   ))}
@@ -251,7 +272,7 @@ export function DateRangePicker({
                 <div className="grid grid-cols-7 gap-0" onMouseLeave={() => setHoveredDate(undefined)}>
                   {generateMonthCells(currentMonth).map((cell, index) => {
                     if (!cell) {
-                      return <div key={index} className="w-10 h-10" />;
+                      return <div key={index} className="w-9 h-9 md:w-10 md:h-10" />;
                     }
                     const date = cell;
                     const isCurrentMonth = true;
@@ -273,7 +294,7 @@ export function DateRangePicker({
                           <span className="absolute inset-0 bg-gray-100" />
                         )}
                         <span className={cn(
-                          "relative z-10 w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full min-w-[44px] min-h-[44px]",
+                          "relative z-10 w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full min-w-[40px] min-h-[40px] md:min-w-[44px] md:min-h-[44px]",
                           (isStart || isEnd) ? "bg-emerald-600 text-white" : "",
                         )}>
                           {date.getDate()}

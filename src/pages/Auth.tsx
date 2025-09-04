@@ -180,23 +180,20 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <Card className="w-full max-w-md bg-background/95 backdrop-blur-sm shadow-elegant">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md border border-gray-100">
-            <img src="/lovable-uploads/224dce06-9efd-402a-93b9-01ef7b9f4add.png" alt="Nawartu" className="w-12 h-12" />
-          </div>
-          <CardTitle className="text-2xl font-arabic">
+        <CardHeader className="text-center pb-8">
+          <CardTitle className="text-3xl font-light mb-2">
             {language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu'}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm text-muted-foreground">
             {language === 'ar' ? 'منصة الإقامة السورية' : 'Syrian Hospitality Platform'}
           </CardDescription>
           
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-6">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleLanguageChange(language === 'ar' ? 'en' : 'ar')}
-              className="gap-2"
+              className="gap-2 text-sm hover:bg-gray-100 transition-colors"
               title={language === 'ar' ? 'تغيير إلى الإنجليزية' : 'Switch to Arabic'}
             >
               <Languages className="h-4 w-4" />
@@ -205,20 +202,26 @@ const Auth = () => {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-8 pb-8">
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-xl">
+              <TabsTrigger 
+                value="signin" 
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-200"
+              >
                 {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
               </TabsTrigger>
-              <TabsTrigger value="signup">
+              <TabsTrigger 
+                value="signup"
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-200"
+              >
                 {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="signin-email">
+            <TabsContent value="signin" className="space-y-6 mt-8">
+              <div className="space-y-3">
+                <Label htmlFor="signin-email" className="text-sm font-medium text-gray-700">
                   {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                 </Label>
                 <div className="relative">
@@ -229,14 +232,14 @@ const Auth = () => {
                     placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
                     disabled={isLoading}
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="signin-password">
+              <div className="space-y-3">
+                <Label htmlFor="signin-password" className="text-sm font-medium text-gray-700">
                   {language === 'ar' ? 'كلمة المرور' : 'Password'}
                 </Label>
                 <div className="relative">
@@ -247,7 +250,7 @@ const Auth = () => {
                     placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter your password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
                     disabled={isLoading}
                   />
                   <Button
@@ -268,7 +271,7 @@ const Auth = () => {
               </div>
 
               <Button 
-                className="w-full"
+                className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg"
                 onClick={() => handleEmailAuth('signin')}
                 disabled={isLoading || !email || !password}
               >
@@ -277,9 +280,9 @@ const Auth = () => {
               </Button>
             </TabsContent>
 
-            <TabsContent value="signup" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="signup-name">
+            <TabsContent value="signup" className="space-y-6 mt-8">
+              <div className="space-y-3">
+                <Label htmlFor="signup-name" className="text-sm font-medium text-gray-700">
                   {language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
                 </Label>
                 <Input
@@ -288,12 +291,13 @@ const Auth = () => {
                   placeholder={language === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
+                  className="h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
                   disabled={isLoading}
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="signup-email">
+              <div className="space-y-3">
+                <Label htmlFor="signup-email" className="text-sm font-medium text-gray-700">
                   {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                 </Label>
                 <div className="relative">
@@ -304,27 +308,29 @@ const Auth = () => {
                     placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
                     disabled={isLoading}
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="signup-phone">
+              <div className="space-y-3">
+                <Label htmlFor="signup-phone" className="text-sm font-medium text-gray-700">
                   {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
                 </Label>
-                <PhoneInputComponent
-                  value={phone}
-                  onChange={(value) => setPhone(value || '')}
-                  placeholder={language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
-                  disabled={isLoading}
-                  defaultCountry="SY"
-                />
+                <div className="[&_.react-tel-input]:h-12 [&_.react-tel-input]:rounded-xl [&_.react-tel-input]:border-gray-200 [&_.react-tel-input]:focus-within:border-blue-400 [&_.react-tel-input]:focus-within:ring-2 [&_.react-tel-input]:focus-within:ring-blue-100 [&_.react-tel-input]:transition-all [&_.react-tel-input]:duration-200">
+                  <PhoneInputComponent
+                    value={phone}
+                    onChange={(value) => setPhone(value || '')}
+                    placeholder={language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
+                    disabled={isLoading}
+                    defaultCountry="SY"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="signup-password">
+              <div className="space-y-3">
+                <Label htmlFor="signup-password" className="text-sm font-medium text-gray-700">
                   {language === 'ar' ? 'كلمة المرور' : 'Password'}
                 </Label>
                 <div className="relative">
@@ -335,7 +341,7 @@ const Auth = () => {
                     placeholder={language === 'ar' ? 'أنشئ كلمة المرور' : 'Create your password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
                     disabled={isLoading}
                   />
                   <Button
@@ -356,7 +362,7 @@ const Auth = () => {
               </div>
 
               <Button 
-                className="w-full"
+                className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg"
                 onClick={() => handleEmailAuth('signup')}
                 disabled={isLoading || !email || !password || !fullName}
               >
@@ -366,12 +372,21 @@ const Auth = () => {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-6">
-            <Separator />
+          <div className="mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  {language === 'ar' ? 'أو' : 'or'}
+                </span>
+              </div>
+            </div>
             <div className="mt-6">
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                 onClick={handleGoogleAuth}
                 disabled={isLoading}
               >

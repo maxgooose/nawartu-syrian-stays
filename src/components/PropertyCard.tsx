@@ -23,7 +23,6 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
   const isRTL = language === 'ar';
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
-  const guestFavorite = property.rating >= 4.8;
 
   // Initialize favorite state
   useEffect(() => {
@@ -48,11 +47,11 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
   return (
     <div 
       onClick={() => navigate(`/property/${property.id}`)}
-      className="cursor-pointer group"
+      className="cursor-pointer group md:shadow-none md:rounded-none md:border-0"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Image Container - Airbnb Style */}
-      <div className="relative aspect-square mb-3 overflow-hidden rounded-xl">
+      <div className="relative aspect-[4/5] md:aspect-square mb-3 overflow-hidden rounded-2xl md:rounded-xl">
         <img 
           src={property.image} 
           alt={property.title}
@@ -75,12 +74,6 @@ export const PropertyCard = ({ property, language }: PropertyCardProps) => {
           />
         </button>
 
-        {/* Guest Favorite Badge */}
-        {guestFavorite && (
-          <div className="absolute top-3 left-3 bg-white text-gray-900 px-2 py-1 rounded-full text-xs font-medium shadow-sm">
-            {language === 'ar' ? 'مفضل الضيوف' : 'Guest favorite'}
-          </div>
-        )}
       </div>
 
       {/* Content - Airbnb Style */}
