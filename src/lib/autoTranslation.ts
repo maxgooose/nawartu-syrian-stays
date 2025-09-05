@@ -34,7 +34,7 @@ export async function translateText(
     }
 
     // Skip translation if text is already in target language (basic check)
-    if (sourceLang === targetLang && sourceLang !== 'auto') {
+    if (sourceLang === targetLang) {
       return text;
     }
 
@@ -275,53 +275,6 @@ export async function getTranslatedContentWithAuto(
       result[field] = translated;
       result.isAutoTranslated[field] = true;
     });
-  }
-
-  // If content has an ID and was auto-translated, update the database
-  if (content.id && autoTranslate && (result.isAutoTranslated.name || result.isAutoTranslated.description || result.isAutoTranslated.location)) {
-    try {
-      const updates: any = {};
-      
-      if (result.isAutoTranslated.name) {
-        if (isArabic) {
-          updates.name_ar = result.name;
-          updates.name_ar_auto_translated = true;
-        } else {
-          updates.name_en = result.name;
-          updates.name_en_auto_translated = true;
-        }
-      }
-
-      if (result.isAutoTranslated.description) {
-        if (isArabic) {
-          updates.description_ar = result.description;
-          updates.description_ar_auto_translated = true;
-        } else {
-          updates.description_en = result.description;
-          updates.description_en_auto_translated = true;
-        }
-      }
-
-      if (result.isAutoTranslated.location) {
-        if (isArabic) {
-          updates.location_ar = result.location;
-          updates.location_ar_auto_translated = true;
-        } else {
-          updates.location_en = result.location;
-          updates.location_en_auto_translated = true;
-        }
-      }
-
-      updates.last_translation_update = new Date().toISOString();
-
-      // Update the database with translated content
-      await supabase
-        .from('listings')
-        .update(updates)
-        .eq('id', content.id);
-    } catch (error) {
-      console.error('Failed to save auto-translated content:', error);
-    }
   }
 
   return result;
