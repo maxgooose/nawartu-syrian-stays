@@ -252,10 +252,15 @@ export const ImageUpload = ({
                 />
               </div>
               <Button
+                type="button"
                 size="sm"
                 variant="destructive"
                 className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => removeImage(index)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  removeImage(index);
+                }}
               >
                 <X className="h-3 w-3" />
               </Button>
