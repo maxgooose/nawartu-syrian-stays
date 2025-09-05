@@ -125,20 +125,39 @@ export const ImageUpload = ({
     const imageUrl = images[index];
     
     try {
-      // Extract path from URL
-      const urlParts = imageUrl.split(`/storage/v1/object/public/${bucketName}/`);
-      if (urlParts.length > 1) {
-        const imagePath = urlParts[1];
-        
+      // Extract path from URL - handle both Supabase URL formats
+      let imagePath = '';
+      
+      // Try different URL patterns
+      if (imageUrl.includes('/storage/v1/object/public/')) {
+        const urlParts = imageUrl.split(`/storage/v1/object/public/${bucketName}/`);
+        if (urlParts.length > 1) {
+          imagePath = urlParts[1];
+        }
+      } else if (imageUrl.includes('.supabase.co/storage/v1/object/public/')) {
+        const urlParts = imageUrl.split(`/storage/v1/object/public/${bucketName}/`);
+        if (urlParts.length > 1) {
+          imagePath = urlParts[1];
+        }
+      }
+
+      // Only try to delete from storage if we have a valid path
+      if (imagePath) {
         const { error } = await supabase.storage
           .from(bucketName)
           .remove([imagePath]);
 
         if (error) {
           console.warn('Failed to delete file from storage:', error);
+          // Don't throw error - still remove from UI even if storage deletion fails
+        } else {
+          console.log('Successfully deleted file from storage:', imagePath);
         }
+      } else {
+        console.warn('Could not extract file path from URL:', imageUrl);
       }
 
+      // Always update the UI state regardless of storage deletion success
       const newImages = images.filter((_, i) => i !== index);
       setImages(newImages);
       onImagesUploaded(newImages);
@@ -149,10 +168,16 @@ export const ImageUpload = ({
       });
 
     } catch (error) {
+      console.error('Error removing image:', error);
+      
+      // Still remove from UI even if there was an error
+      const newImages = images.filter((_, i) => i !== index);
+      setImages(newImages);
+      onImagesUploaded(newImages);
+      
       toast({
-        title: "Remove Error",
-        description: "Failed to remove image. Please try again.",
-        variant: "destructive",
+        title: "Image Removed",
+        description: "Image removed from listing (storage cleanup may have failed).",
       });
     }
   };
