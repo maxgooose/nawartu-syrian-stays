@@ -6,9 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Label } from "@/components/ui/label";
 import { GuestSelector } from "@/components/GuestSelector";
 import { ReviewsList } from "@/components/ReviewsList";
 import { PropertyImageGallery } from "@/components/PropertyImageGallery";
+import { PhoneInputComponent } from "@/components/PhoneInput";
 import { ArrowLeft, MapPin, Users, Bed, Bath, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInDays } from "date-fns";
@@ -59,6 +61,7 @@ const PropertyDetailsSimple = () => {
     children: 0,
     infants: 0
   });
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [idDocType, setIdDocType] = useState<'passport' | 'national_id' | 'driver_license' | ''>('');
   const [idDocNumber, setIdDocNumber] = useState('');
   const [showCardDetails, setShowCardDetails] = useState(false);
@@ -71,6 +74,13 @@ const PropertyDetailsSimple = () => {
       fetchListing();
     }
   }, [id]);
+
+  // Initialize phone number from user profile
+  useEffect(() => {
+    if (profile?.phone) {
+      setPhoneNumber(profile.phone);
+    }
+  }, [profile]);
 
   const fetchListing = async () => {
     try {
@@ -134,14 +144,23 @@ const PropertyDetailsSimple = () => {
       return;
     }
 
-    // Require phone number on profile before booking
-    if (!profile?.phone || profile.phone.trim() === '') {
+    // Require phone number in booking form
+    if (!phoneNumber || phoneNumber.trim() === '') {
       toast({
         title: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number required',
-        description: language === 'ar' ? 'يرجى إضافة رقم الهاتف في الملف الشخصي قبل إتمام الحجز' : 'Please add your phone number in your profile before booking',
+        description: language === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number',
         variant: 'destructive',
       });
-      navigate('/profile');
+      return;
+    }
+
+    // Validate phone number length (basic validation)
+    if (phoneNumber.replace(/[^0-9]/g, '').length < 8) {
+      toast({
+        title: language === 'ar' ? 'رقم هاتف غير صحيح' : 'Invalid phone number',
+        description: language === 'ar' ? 'يرجى إدخال رقم هاتف صحيح' : 'Please enter a valid phone number',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -158,6 +177,19 @@ const PropertyDetailsSimple = () => {
     setBookingLoading(true);
 
     try {
+      // Update profile phone number if it's different or missing
+      if (profile.phone !== phoneNumber) {
+        const { error: profileUpdateError } = await supabase
+          .from('profiles')
+          .update({ phone: phoneNumber })
+          .eq('id', profile.id);
+
+        if (profileUpdateError) {
+          console.error('Error updating profile phone:', profileUpdateError);
+          // Don't fail booking for profile update error, just log it
+        }
+      }
+
       const { data: bookingData, error } = await supabase
         .from('bookings')
         .insert({
@@ -367,6 +399,22 @@ const PropertyDetailsSimple = () => {
                   />
                 </div>
 
+                {/* Phone Number */}
+                <div className="space-y-2">
+                  <Label htmlFor="phone-number">
+                    {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                  </Label>
+                  <PhoneInputComponent
+                    value={phoneNumber}
+                    onChange={setPhoneNumber}
+                    placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter phone number'}
+                    defaultCountry="SY"
+                  />
+                  <p className="text-xs text-gray-500">
+                    {language === 'ar' ? 'مطلوب للتأكيد والتواصل' : 'Required for confirmation and contact'}
+                  </p>
+                </div>
+
                 {/* ID Document */}
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium text-gray-900">
@@ -422,7 +470,7 @@ const PropertyDetailsSimple = () => {
                 {/* Book Button */}
                 <Button 
                   onClick={handleBooking} 
-                  disabled={bookingLoading || !dateRange?.from || !dateRange?.to || !idDocType || !idDocNumber.trim()}
+                  disabled={bookingLoading || !dateRange?.from || !dateRange?.to || !phoneNumber?.trim() || !idDocType || !idDocNumber.trim()}
                   className="w-full"
                   size="lg"
                 >

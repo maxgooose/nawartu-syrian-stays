@@ -10,6 +10,7 @@ import { ReviewsList } from "@/components/ReviewsList";
 import { StarRating } from "@/components/StarRating";
 
 import { PropertyImageGallery } from "@/components/PropertyImageGallery";
+import { PhoneInputComponent } from "@/components/PhoneInput";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { GuestSelector } from "@/components/GuestSelector";
@@ -368,6 +369,7 @@ const PropertyDetails = () => {
   const [currentBookingId, setCurrentBookingId] = useState<string>('');
   const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [idDocType, setIdDocType] = useState<'passport' | 'national_id' | 'driver_license' | ''>('');
   const [idDocNumber, setIdDocNumber] = useState('');
   const isRTL = language === 'ar';
@@ -525,14 +527,23 @@ const PropertyDetails = () => {
       return;
     }
 
-    // Require phone number on profile before booking
-    if (!profile?.phone || profile.phone.trim() === '') {
+    // Require phone number in booking form
+    if (!phoneNumber || phoneNumber.trim() === '') {
       toast({
         title: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number required',
-        description: language === 'ar' ? 'يرجى إضافة رقم الهاتف في الملف الشخصي قبل إتمام الحجز' : 'Please add your phone number in your profile before booking',
+        description: language === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number',
         variant: 'destructive',
       });
-      navigate('/profile');
+      return;
+    }
+
+    // Validate phone number length (basic validation)
+    if (phoneNumber.replace(/[^0-9]/g, '').length < 8) {
+      toast({
+        title: language === 'ar' ? 'رقم هاتف غير صحيح' : 'Invalid phone number',
+        description: language === 'ar' ? 'يرجى إدخال رقم هاتف صحيح' : 'Please enter a valid phone number',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -549,6 +560,19 @@ const PropertyDetails = () => {
     setBookingLoading(true);
 
     try {
+      // Update profile phone number if it's different or missing
+      if (profile.phone !== phoneNumber) {
+        const { error: profileUpdateError } = await supabase
+          .from('profiles')
+          .update({ phone: phoneNumber })
+          .eq('id', profile.id);
+
+        if (profileUpdateError) {
+          console.error('Error updating profile phone:', profileUpdateError);
+          // Don't fail booking for profile update error, just log it
+        }
+      }
+
       const { data: bookingData, error } = await supabase
         .from('bookings')
         .insert({
@@ -1210,6 +1234,22 @@ const PropertyDetails = () => {
                   />
                 </div>
 
+                {/* Phone Number */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-900">
+                    {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                  </h4>
+                  <PhoneInputComponent
+                    value={phoneNumber}
+                    onChange={setPhoneNumber}
+                    placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter phone number'}
+                    defaultCountry="SY"
+                  />
+                  <p className="text-xs text-gray-500">
+                    {language === 'ar' ? 'مطلوب للتأكيد والتواصل' : 'Required for confirmation and contact'}
+                  </p>
+                </div>
+
                 {/* ID Document Requirement */}
                 {dateRange?.from && dateRange?.to && (
                   <div className="space-y-3">
@@ -1321,7 +1361,7 @@ const PropertyDetails = () => {
                 {/* Book Button */}
                 <Button 
                   onClick={handleBooking} 
-                  disabled={bookingLoading || !dateRange?.from || !dateRange?.to}
+                  disabled={bookingLoading || !dateRange?.from || !dateRange?.to || !phoneNumber?.trim() || !idDocType || !idDocNumber.trim()}
                   className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl min-h-[48px] mt-4 sm:mt-0"
                   size="lg"
                 >

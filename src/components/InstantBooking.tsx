@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useAvailability, AvailabilityCheck } from "@/hooks/useAvailability";
 import { AvailabilityCalendar } from "@/components/AvailabilityCalendar";
 import { GuestSelector } from "@/components/GuestSelector";
+import { PhoneInputComponent } from "@/components/PhoneInput";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -58,6 +59,7 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
   const [guests, setGuests] = useState({ adults: 2, children: 0, infants: 0 });
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
   const [specialRequests, setSpecialRequests] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [idDocType, setIdDocType] = useState<'passport' | 'national_id' | 'driver_license' | ''>('');
   const [idDocNumber, setIdDocNumber] = useState('');
   const [loading, setLoading] = useState(false);
@@ -67,6 +69,13 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
 
   // Availability hook
   const { checkAvailability, reserveDates, releaseReservation, confirmBooking } = useAvailability(listing.id);
+
+  // Initialize phone number from user profile
+  useEffect(() => {
+    if (profile?.phone) {
+      setPhoneNumber(profile.phone);
+    }
+  }, [profile]);
 
   // Check availability whenever dates or guests change
   useEffect(() => {
@@ -176,14 +185,23 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
       return;
     }
 
-    // Require phone number on profile before booking
-    if (!profile?.phone || profile.phone.trim() === '') {
+    // Require phone number in booking form
+    if (!phoneNumber || phoneNumber.trim() === '') {
       toast({
         title: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number required',
-        description: language === 'ar' ? 'يرجى إضافة رقم الهاتف في الملف الشخصي قبل إتمام الحجز' : 'Please add your phone number in your profile before booking',
+        description: language === 'ar' ? 'يرجى إدخال رقم الهاتف' : 'Please enter your phone number',
         variant: 'destructive',
       });
-      navigate('/profile');
+      return;
+    }
+
+    // Validate phone number length (basic validation)
+    if (phoneNumber.replace(/[^0-9]/g, '').length < 8) {
+      toast({
+        title: language === 'ar' ? 'رقم هاتف غير صحيح' : 'Invalid phone number',
+        description: language === 'ar' ? 'يرجى إدخال رقم هاتف صحيح' : 'Please enter a valid phone number',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -200,6 +218,19 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
     setLoading(true);
 
     try {
+      // Update profile phone number if it's different or missing
+      if (profile.phone !== phoneNumber) {
+        const { error: profileUpdateError } = await supabase
+          .from('profiles')
+          .update({ phone: phoneNumber })
+          .eq('id', profile.id);
+
+        if (profileUpdateError) {
+          console.error('Error updating profile phone:', profileUpdateError);
+          // Don't fail booking for profile update error, just log it
+        }
+      }
+
       const checkIn = selectedDates.from.toISOString().split('T')[0];
       const checkOut = selectedDates.to.toISOString().split('T')[0];
       const nights = calculateTotalNights();
@@ -344,6 +375,31 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
           />
         </CardContent>
       </Card>
+
+      {/* Phone Number */}
+      {showBookingStep && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <PhoneInputComponent
+                value={phoneNumber}
+                onChange={setPhoneNumber}
+                placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter phone number'}
+                defaultCountry="SY"
+              />
+              <p className="text-xs text-gray-500">
+                {language === 'ar' ? 'مطلوب للتأكيد والتواصل' : 'Required for confirmation and contact'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ID Document Requirement */}
       {showBookingStep && (
@@ -607,7 +663,7 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
         {showBookingStep && (
           <Button
             onClick={handleInstantBooking}
-            disabled={loading || reservationTimer <= 0}
+            disabled={loading || reservationTimer <= 0 || !phoneNumber?.trim() || !idDocType || !idDocNumber.trim()}
             className="w-full bg-gradient-to-r from-nawartu-green to-nawartu-green/90 hover:from-nawartu-green/90 hover:to-nawartu-green/80 text-white font-semibold py-4 text-lg shadow-lg hover:shadow-xl transition-all"
           >
             {loading ? (
