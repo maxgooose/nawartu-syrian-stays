@@ -33,7 +33,7 @@ const Auth = () => {
     checkAuth();
   }, [navigate]);
 
-  // Check if user just signed in with Google and needs to add phone
+  // Phone is optional at sign-in; we no longer force the phone dialog here
   useEffect(() => {
     if (user && profile && (!profile.phone || profile.phone.trim() === '')) {
       setShowPhoneDialog(true);
@@ -211,7 +211,7 @@ const Auth = () => {
       </div>
 
       {/* Phone Number Required Dialog */}
-      <Dialog open={showPhoneDialog} onOpenChange={() => {}}>
+      <Dialog open={false} onOpenChange={() => {}}>
         <DialogContent className="max-w-md" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <DialogHeader>
             <DialogTitle>

@@ -525,6 +525,17 @@ const PropertyDetails = () => {
       return;
     }
 
+    // Require phone number on profile before booking
+    if (!profile?.phone || profile.phone.trim() === '') {
+      toast({
+        title: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number required',
+        description: language === 'ar' ? 'يرجى إضافة رقم الهاتف في الملف الشخصي قبل إتمام الحجز' : 'Please add your phone number in your profile before booking',
+        variant: 'destructive',
+      });
+      navigate('/profile');
+      return;
+    }
+
     // Require ID document before booking
     if (!idDocType || !idDocNumber.trim()) {
       toast({
