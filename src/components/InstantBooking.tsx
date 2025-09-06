@@ -251,8 +251,8 @@ export const InstantBooking: React.FC<InstantBookingProps> = ({
       toast({
         title: language === 'ar' ? "تم تأكيد الحجز!" : "Booking Confirmed!",
         description: paymentMethod === 'cash' 
-          ? (language === 'ar' ? "تم تأكيد حجزك. سيتم الدفع عند الوصول." : "Your booking is confirmed. Payment due upon arrival.")
-          : (language === 'ar' ? "تم تأكيد حجزك. تم الدفع بنجاح." : "Your booking is confirmed. Payment processed successfully."),
+          ? (language === 'ar' ? "تم تأكيد حجزك. سيتصل بك فريق نورتوا قريباً لتأكيد التفاصيل." : "Your booking is confirmed. The Nawartu team will call you shortly to confirm details.")
+          : (language === 'ar' ? "تم تأكيد حجزك. سيتصل بك فريق نورتوا قريباً لتأكيد التفاصيل." : "Your booking is confirmed. The Nawartu team will call you shortly to confirm details."),
       });
 
       // Call success callback or navigate

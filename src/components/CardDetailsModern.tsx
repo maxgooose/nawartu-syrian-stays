@@ -215,7 +215,7 @@ const CardDetailsForm = ({
 
         toast({
           title: language === 'ar' ? "تم الدفع بنجاح!" : "Payment Successful!",
-          description: language === 'ar' ? "تم تأكيد حجزك" : "Your booking has been confirmed",
+          description: language === 'ar' ? "تم تأكيد حجزك. سيتصل بك فريق نورتوا قريباً لتأكيد التفاصيل." : "Your booking has been confirmed. The Nawartu team will call you shortly to confirm details.",
           variant: "default",
         });
 
