@@ -180,6 +180,39 @@ const CardDetailsForm = ({
           })
           .eq('id', bookingId);
 
+        // Send booking confirmation email
+        try {
+          const { data: bookingData } = await supabase
+            .from('bookings')
+            .select(`
+              *,
+              listing:listings!bookings_listing_id_fkey(name, location),
+              guest:profiles!bookings_guest_id_fkey(email, full_name)
+            `)
+            .eq('id', bookingId)
+            .single();
+
+          if (bookingData) {
+            await supabase.functions.invoke('send-booking-confirmation', {
+              body: {
+                guestEmail: bookingData.guest.email,
+                guestName: bookingData.guest.full_name || bookingData.guest.email,
+                listingName: bookingData.listing.name,
+                listingLocation: bookingData.listing.location,
+                checkInDate: bookingData.check_in_date,
+                checkOutDate: bookingData.check_out_date,
+                totalNights: bookingData.total_nights,
+                totalAmount: bookingData.total_amount_usd,
+                paymentMethod: 'stripe',
+                bookingId: bookingData.id
+              }
+            });
+          }
+        } catch (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+          // Don't fail the payment if email fails
+        }
+
         toast({
           title: language === 'ar' ? "تم الدفع بنجاح!" : "Payment Successful!",
           description: language === 'ar' ? "تم تأكيد حجزك" : "Your booking has been confirmed",

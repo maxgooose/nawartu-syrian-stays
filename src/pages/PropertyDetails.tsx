@@ -563,6 +563,27 @@ const PropertyDetails = () => {
         setBookingLoading(false);
       } else {
         // Cash payment - booking is confirmed immediately
+        // Send booking confirmation email for cash payments
+        try {
+          await supabase.functions.invoke('send-booking-confirmation', {
+            body: {
+              guestEmail: profile.email,
+              guestName: profile.full_name || profile.email,
+              listingName: listing.name,
+              listingLocation: listing.location,
+              checkInDate: format(dateRange.from, 'yyyy-MM-dd'),
+              checkOutDate: format(dateRange.to, 'yyyy-MM-dd'),
+              totalNights: nights,
+              totalAmount: calculateTotalAmount(),
+              paymentMethod: 'cash',
+              bookingId: bookingData.id
+            }
+          });
+        } catch (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+          // Don't fail the booking if email fails
+        }
+
         toast({
           title: language === 'ar' ? "تم تأكيد الحجز!" : "Booking Confirmed!",
           description: language === 'ar' ? "تم تأكيد حجزك. سيتم الدفع عند الوصول." : "Your booking is confirmed. Payment due upon arrival.",
