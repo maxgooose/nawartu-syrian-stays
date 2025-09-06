@@ -59,6 +59,8 @@ const PropertyDetailsSimple = () => {
     children: 0,
     infants: 0
   });
+  const [idDocType, setIdDocType] = useState<'passport' | 'national_id' | 'driver_license' | ''>('');
+  const [idDocNumber, setIdDocNumber] = useState('');
   const [showCardDetails, setShowCardDetails] = useState(false);
   const [currentBookingId, setCurrentBookingId] = useState<string>('');
 
@@ -132,6 +134,27 @@ const PropertyDetailsSimple = () => {
       return;
     }
 
+    // Require phone number on profile before booking
+    if (!profile?.phone || profile.phone.trim() === '') {
+      toast({
+        title: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number required',
+        description: language === 'ar' ? 'يرجى إضافة رقم الهاتف في الملف الشخصي قبل إتمام الحجز' : 'Please add your phone number in your profile before booking',
+        variant: 'destructive',
+      });
+      navigate('/profile');
+      return;
+    }
+
+    // Require ID document before booking
+    if (!idDocType || !idDocNumber.trim()) {
+      toast({
+        title: language === 'ar' ? 'معلومات الهوية مطلوبة' : 'ID information required',
+        description: language === 'ar' ? 'يرجى إدخال نوع ورقم الهوية قبل المتابعة' : 'Please provide ID document type and number before continuing',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setBookingLoading(true);
 
     try {
@@ -145,7 +168,9 @@ const PropertyDetailsSimple = () => {
           total_nights: nights,
           total_amount_usd: calculateTotalAmount(),
           payment_method: 'stripe',
-          status: 'pending'
+          status: 'pending',
+          id_document_type: idDocType,
+          id_document_number: idDocNumber.trim()
         })
         .select('id')
         .single();
@@ -342,6 +367,48 @@ const PropertyDetailsSimple = () => {
                   />
                 </div>
 
+                {/* ID Document */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-900">
+                    {language === 'ar' ? 'معلومات الهوية' : 'ID Information'}
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIdDocType('passport')}
+                      className={`px-3 py-2 rounded-lg border text-sm ${idDocType === 'passport' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                    >
+                      {language === 'ar' ? 'جواز سفر' : 'Passport'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIdDocType('national_id')}
+                      className={`px-3 py-2 rounded-lg border text-sm ${idDocType === 'national_id' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                    >
+                      {language === 'ar' ? 'الهوية الشخصية' : 'National ID'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIdDocType('driver_license')}
+                      className={`px-3 py-2 rounded-lg border text-sm ${idDocType === 'driver_license' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                    >
+                      {language === 'ar' ? 'رخصة القيادة' : 'Driver License'}
+                    </button>
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      value={idDocNumber}
+                      onChange={(e) => setIdDocNumber(e.target.value)}
+                      placeholder={language === 'ar' ? 'رقم الوثيقة' : 'Document number'}
+                      className="w-full h-11 rounded-lg border-2 border-gray-200 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {language === 'ar' ? 'مطلوب وفقاً للوائح المحلية.' : 'Required per local regulations.'}
+                    </p>
+                  </div>
+                </div>
+
                 {/* Total */}
                 {dateRange?.from && dateRange?.to && (
                   <div className="pt-4 border-t">
@@ -355,7 +422,7 @@ const PropertyDetailsSimple = () => {
                 {/* Book Button */}
                 <Button 
                   onClick={handleBooking} 
-                  disabled={bookingLoading || !dateRange?.from || !dateRange?.to}
+                  disabled={bookingLoading || !dateRange?.from || !dateRange?.to || !idDocType || !idDocNumber.trim()}
                   className="w-full"
                   size="lg"
                 >
