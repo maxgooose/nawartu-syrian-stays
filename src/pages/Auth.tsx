@@ -4,22 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Mail, Lock, Languages } from 'lucide-react';
+import { Languages } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PhoneInputComponent } from '@/components/PhoneInput';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [showPhoneDialog, setShowPhoneDialog] = useState(false);
   const [phone, setPhone] = useState('');
+  const [fullName, setFullName] = useState('');
   const { language, handleLanguageChange } = useLanguage();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,107 +33,13 @@ const Auth = () => {
     checkAuth();
   }, [navigate]);
 
-  const handleEmailAuth = async (mode: 'signin' | 'signup') => {
-    setIsLoading(true);
-    try {
-      if (mode === 'signup') {
-        console.log('Starting signup process...', { email, fullName, language });
-        
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: {
-              full_name: fullName.trim(),
-              phone: phone.trim(),
-              preferred_language: language,
-            }
-          }
-        });
-
-        console.log('Signup response:', { data, error });
-
-        if (error) {
-          console.error('Signup error:', error);
-          throw error;
-        }
-
-        // Check if user needs email confirmation
-        if (data?.user && !data.session) {
-          toast({
-            title: language === 'ar' ? 'تم إنشاء الحساب' : 'Account created',
-            description: language === 'ar' ? 
-              'تم إرسال رابط التأكيد إلى بريدك الإلكتروني. يرجى فحص بريدك وإنجاز التأكيد.' : 
-              'Confirmation link sent to your email. Please check your email and confirm your account.',
-          });
-        } else if (data?.session) {
-          // User was created and logged in immediately
-          toast({
-            title: language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully',
-            description: language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu',
-          });
-          navigate('/');
-        }
-      } else {
-        console.log('Starting signin process...', { email });
-        
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-
-        console.log('Signin response:', { data, error });
-
-        if (error) {
-          console.error('Signin error:', error);
-          throw error;
-        }
-
-        if (data?.session) {
-          toast({
-            title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Successfully signed in',
-            description: language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu',
-          });
-          navigate('/');
-        }
-      }
-    } catch (error: any) {
-      console.error('Auth error details:', error);
-      let errorMessage = error.message;
-      
-      // Handle common auth errors with friendly messages
-      if (error.message.includes('Invalid login credentials')) {
-        errorMessage = language === 'ar' ? 
-          'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 
-          'Invalid email or password';
-      } else if (error.message.includes('User already registered')) {
-        errorMessage = language === 'ar' ? 
-          'هذا البريد الإلكتروني مسجل مسبقاً' : 
-          'This email is already registered';
-      } else if (error.message.includes('Password should be at least')) {
-        errorMessage = language === 'ar' ? 
-          'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 
-          'Password should be at least 6 characters';
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = language === 'ar' ? 
-          'يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول' : 
-          'Please confirm your email before signing in';
-      } else if (error.message.includes('Signup disabled')) {
-        errorMessage = language === 'ar' ? 
-          'التسجيل معطل حالياً' : 
-          'Signup is currently disabled';
-      }
-
-      toast({
-        variant: 'destructive',
-        title: language === 'ar' ? 'خطأ' : 'Error',
-        description: errorMessage,
-      });
-    } finally {
-      setIsLoading(false);
+  // Check if user just signed in with Google and needs to add phone
+  useEffect(() => {
+    if (user && profile && (!profile.phone || profile.phone.trim() === '')) {
+      setShowPhoneDialog(true);
+      setFullName(profile.full_name || '');
     }
-  };
+  }, [user, profile]);
 
   const handleGoogleAuth = async () => {
     setIsLoading(true);
@@ -177,213 +82,93 @@ const Auth = () => {
     }
   };
 
+  const handlePhoneSubmit = async () => {
+    if (!phone.trim()) {
+      toast({
+        variant: 'destructive',
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number is required',
+      });
+      return;
+    }
+
+    if (!fullName.trim()) {
+      toast({
+        variant: 'destructive',
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'الاسم الكامل مطلوب' : 'Full name is required',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          phone: phone.trim(),
+          full_name: fullName.trim()
+        })
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: language === 'ar' ? 'تم التحديث بنجاح' : 'Successfully updated',
+        description: language === 'ar' ? 'تم حفظ معلوماتك بنجاح' : 'Your information has been saved successfully',
+      });
+
+      setShowPhoneDialog(false);
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      toast({
+        variant: 'destructive',
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      <Card className="w-full max-w-md bg-background/95 backdrop-blur-sm shadow-elegant">
-        <CardHeader className="text-center pb-8">
-          <CardTitle className="text-3xl font-light mb-2">
-            {language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu'}
-          </CardTitle>
-          <CardDescription className="text-sm text-muted-foreground">
-            {language === 'ar' ? 'منصة الإقامة السورية' : 'Syrian Hospitality Platform'}
-          </CardDescription>
-          
-          <div className="flex justify-center mt-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleLanguageChange(language === 'ar' ? 'en' : 'ar')}
-              className="gap-2 text-sm hover:bg-gray-100 transition-colors"
-              title={language === 'ar' ? 'تغيير إلى الإنجليزية' : 'Switch to Arabic'}
-            >
-              <Languages className="h-4 w-4" />
-              {language === 'ar' ? 'EN' : 'AR'}
-            </Button>
-          </div>
-        </CardHeader>
-
-        <CardContent className="px-8 pb-8">
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-xl">
-              <TabsTrigger 
-                value="signin" 
-                className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-200"
+    <>
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <Card className="w-full max-w-md bg-background/95 backdrop-blur-sm shadow-elegant">
+          <CardHeader className="text-center pb-8">
+            <CardTitle className="text-3xl font-light mb-2">
+              {language === 'ar' ? 'مرحباً بك في نورتوا' : 'Welcome to Nawartu'}
+            </CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
+              {language === 'ar' ? 'منصة الإقامة السورية' : 'Syrian Hospitality Platform'}
+            </CardDescription>
+            
+            <div className="flex justify-center mt-6">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleLanguageChange(language === 'ar' ? 'en' : 'ar')}
+                className="gap-2 text-sm hover:bg-gray-100 transition-colors"
+                title={language === 'ar' ? 'تغيير إلى الإنجليزية' : 'Switch to Arabic'}
               >
-                {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="signup"
-                className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all duration-200"
-              >
-                {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="signin" className="space-y-6 mt-8">
-              <div className="space-y-3">
-                <Label htmlFor="signin-email" className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="signin-password" className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'كلمة المرور' : 'Password'}
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="signin-password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter your password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
-                    disabled={isLoading}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <Button 
-                className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg"
-                onClick={() => handleEmailAuth('signin')}
-                disabled={isLoading || !email || !password}
-              >
-                {isLoading ? (language === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing in...') : 
-                            (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')}
+                <Languages className="h-4 w-4" />
+                {language === 'ar' ? 'EN' : 'AR'}
               </Button>
-            </TabsContent>
-
-            <TabsContent value="signup" className="space-y-6 mt-8">
-              <div className="space-y-3">
-                <Label htmlFor="signup-name" className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
-                </Label>
-                <Input
-                  id="signup-name"
-                  type="text"
-                  placeholder={language === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="signup-email" className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="signup-phone" className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
-                </Label>
-                <div className="[&_.react-tel-input]:h-12 [&_.react-tel-input]:rounded-xl [&_.react-tel-input]:border-gray-200 [&_.react-tel-input]:focus-within:border-blue-400 [&_.react-tel-input]:focus-within:ring-2 [&_.react-tel-input]:focus-within:ring-blue-100 [&_.react-tel-input]:transition-all [&_.react-tel-input]:duration-200">
-                  <PhoneInputComponent
-                    value={phone}
-                    onChange={(value) => setPhone(value || '')}
-                    placeholder={language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
-                    disabled={isLoading}
-                    defaultCountry="SY"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="signup-password" className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'كلمة المرور' : 'Password'}
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="signup-password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder={language === 'ar' ? 'أنشئ كلمة المرور' : 'Create your password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
-                    disabled={isLoading}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <Button 
-                className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg"
-                onClick={() => handleEmailAuth('signup')}
-                disabled={isLoading || !email || !password || !fullName}
-              >
-                {isLoading ? (language === 'ar' ? 'جاري إنشاء الحساب...' : 'Creating account...') : 
-                            (language === 'ar' ? 'إنشاء حساب' : 'Sign Up')}
-              </Button>
-            </TabsContent>
-          </Tabs>
-
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator className="w-full" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  {language === 'ar' ? 'أو' : 'or'}
-                </span>
-              </div>
             </div>
-            <div className="mt-6">
+          </CardHeader>
+
+          <CardContent className="px-8 pb-8">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-xl font-semibold mb-2">
+                  {language === 'ar' ? 'سجل الدخول أو أنشئ حساب' : 'Sign In or Create Account'}
+                </h2>
+                <p className="text-sm text-muted-foreground mb-6">
+                  {language === 'ar' ? 'استخدم حساب Google للمتابعة' : 'Use your Google account to continue'}
+                </p>
+              </div>
+
               <Button
                 variant="outline"
                 className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
@@ -408,13 +193,86 @@ const Auth = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                {language === 'ar' ? 'المتابعة مع جوجل' : 'Continue with Google'}
+                {isLoading ? 
+                  (language === 'ar' ? 'جاري التحميل...' : 'Loading...') :
+                  (language === 'ar' ? 'المتابعة مع Google' : 'Continue with Google')
+                }
               </Button>
+
+              <div className="text-center text-xs text-muted-foreground">
+                {language === 'ar' ? 
+                  'بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية' :
+                  'By continuing, you agree to our Terms of Service and Privacy Policy'
+                }
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Phone Number Required Dialog */}
+      <Dialog open={showPhoneDialog} onOpenChange={() => {}}>
+        <DialogContent className="max-w-md" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+          <DialogHeader>
+            <DialogTitle>
+              {language === 'ar' ? 'أكمل ملفك الشخصي' : 'Complete Your Profile'}
+            </DialogTitle>
+            <DialogDescription>
+              {language === 'ar' ? 
+                'يرجى إضافة رقم هاتفك لإكمال التسجيل. رقم الهاتف مطلوب للتواصل معك.' :
+                'Please add your phone number to complete registration. Phone number is required for communication.'
+              }
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="full-name" className="text-sm font-medium text-gray-700">
+                {language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+              </Label>
+              <Input
+                id="full-name"
+                type="text"
+                placeholder={language === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="h-12 rounded-xl border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
+                disabled={isLoading}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone-number" className="text-sm font-medium text-gray-700">
+                {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
+              </Label>
+              <div className="[&_.react-tel-input]:h-12 [&_.react-tel-input]:rounded-xl [&_.react-tel-input]:border-gray-200 [&_.react-tel-input]:focus-within:border-blue-400 [&_.react-tel-input]:focus-within:ring-2 [&_.react-tel-input]:focus-within:ring-blue-100 [&_.react-tel-input]:transition-all [&_.react-tel-input]:duration-200">
+                <PhoneInputComponent
+                  value={phone}
+                  onChange={(value) => setPhone(value || '')}
+                  placeholder={language === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
+                  disabled={isLoading}
+                  defaultCountry="SY"
+                />
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+
+          <div className="flex gap-3 mt-6">
+            <Button
+              onClick={handlePhoneSubmit}
+              disabled={isLoading || !phone.trim() || !fullName.trim()}
+              className="flex-1 h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg"
+            >
+              {isLoading ? 
+                (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') :
+                (language === 'ar' ? 'حفظ والمتابعة' : 'Save & Continue')
+              }
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
