@@ -52,6 +52,50 @@ export type Database = {
           },
         ]
       }
+      booking_constraints: {
+        Row: {
+          constraint_type: Database["public"]["Enums"]["constraint_type"]
+          created_at: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          listing_id: string
+          start_date: string | null
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          constraint_type: Database["public"]["Enums"]["constraint_type"]
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          listing_id: string
+          start_date?: string | null
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          constraint_type?: Database["public"]["Enums"]["constraint_type"]
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          listing_id?: string
+          start_date?: string | null
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_constraints_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           admin_notes: string | null
@@ -130,19 +174,26 @@ export type Database = {
           created_at: string
           description: string
           description_ar: string | null
+          description_ar_auto_translated: boolean | null
           description_en: string | null
+          description_en_auto_translated: boolean | null
           host_id: string
           id: string
           images: string[] | null
+          last_translation_update: string | null
           latitude: number | null
           location: string
           location_ar: string | null
+          location_ar_auto_translated: boolean | null
           location_en: string | null
+          location_en_auto_translated: boolean | null
           longitude: number | null
           max_guests: number
           name: string
           name_ar: string | null
+          name_ar_auto_translated: boolean | null
           name_en: string | null
+          name_en_auto_translated: boolean | null
           price_per_night_syp: number | null
           price_per_night_usd: number
           status: Database["public"]["Enums"]["listing_status"]
@@ -154,21 +205,28 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           created_at?: string
-          description?: string
+          description: string
           description_ar?: string | null
+          description_ar_auto_translated?: boolean | null
           description_en?: string | null
+          description_en_auto_translated?: boolean | null
           host_id: string
           id?: string
           images?: string[] | null
+          last_translation_update?: string | null
           latitude?: number | null
-          location?: string
+          location: string
           location_ar?: string | null
+          location_ar_auto_translated?: boolean | null
           location_en?: string | null
+          location_en_auto_translated?: boolean | null
           longitude?: number | null
           max_guests?: number
-          name?: string
+          name: string
           name_ar?: string | null
+          name_ar_auto_translated?: boolean | null
           name_en?: string | null
+          name_en_auto_translated?: boolean | null
           price_per_night_syp?: number | null
           price_per_night_usd: number
           status?: Database["public"]["Enums"]["listing_status"]
@@ -182,19 +240,26 @@ export type Database = {
           created_at?: string
           description?: string
           description_ar?: string | null
+          description_ar_auto_translated?: boolean | null
           description_en?: string | null
+          description_en_auto_translated?: boolean | null
           host_id?: string
           id?: string
           images?: string[] | null
+          last_translation_update?: string | null
           latitude?: number | null
           location?: string
           location_ar?: string | null
+          location_ar_auto_translated?: boolean | null
           location_en?: string | null
+          location_en_auto_translated?: boolean | null
           longitude?: number | null
           max_guests?: number
           name?: string
           name_ar?: string | null
+          name_ar_auto_translated?: boolean | null
           name_en?: string | null
+          name_en_auto_translated?: boolean | null
           price_per_night_syp?: number | null
           price_per_night_usd?: number
           status?: Database["public"]["Enums"]["listing_status"]
@@ -248,6 +313,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      property_availability: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          listing_id: string
+          max_stay_nights: number | null
+          min_stay_nights: number | null
+          notes: string | null
+          price_modifier: number | null
+          reserved_by: string | null
+          reserved_until: string | null
+          status: Database["public"]["Enums"]["availability_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          listing_id: string
+          max_stay_nights?: number | null
+          min_stay_nights?: number | null
+          notes?: string | null
+          price_modifier?: number | null
+          reserved_by?: string | null
+          reserved_until?: string | null
+          status?: Database["public"]["Enums"]["availability_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          listing_id?: string
+          max_stay_nights?: number | null
+          min_stay_nights?: number | null
+          notes?: string | null
+          price_modifier?: number | null
+          reserved_by?: string | null
+          reserved_until?: string | null
+          status?: Database["public"]["Enums"]["availability_status"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_availability_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -336,6 +454,46 @@ export type Database = {
         Args: { booking_uuid: string }
         Returns: boolean
       }
+      check_availability: {
+        Args: {
+          p_check_in: string
+          p_check_out: string
+          p_guests?: number
+          p_listing_id: string
+        }
+        Returns: {
+          available_nights: number
+          base_price: number
+          blocked_dates: string[]
+          constraints: Json
+          is_available: boolean
+          total_nights: number
+          total_price: number
+        }[]
+      }
+      cleanup_expired_reservations: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      confirm_booking: {
+        Args: {
+          p_booking_id: string
+          p_check_in: string
+          p_check_out: string
+          p_listing_id: string
+        }
+        Returns: boolean
+      }
+      get_listing_availability: {
+        Args: { p_end_date: string; p_listing_id: string; p_start_date: string }
+        Returns: {
+          date: string
+          is_available: boolean
+          min_stay_nights: number
+          price_modifier: number
+          status: Database["public"]["Enums"]["availability_status"]
+        }[]
+      }
       get_listing_average_rating: {
         Args: { listing_uuid: string }
         Returns: {
@@ -343,13 +501,40 @@ export type Database = {
           review_count: number
         }[]
       }
+      initialize_listing_availability: {
+        Args: { p_days_ahead?: number; p_listing_id: string }
+        Returns: undefined
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      release_reservation: {
+        Args: {
+          p_check_in: string
+          p_check_out: string
+          p_listing_id: string
+          p_user_id?: string
+        }
+        Returns: undefined
+      }
       request_host_upgrade: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      reserve_dates: {
+        Args: {
+          p_check_in: string
+          p_check_out: string
+          p_hold_duration_minutes?: number
+          p_listing_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      translate_existing_listings: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       upgrade_to_host: {
         Args: { target_user_id: string }
@@ -361,7 +546,22 @@ export type Database = {
       }
     }
     Enums: {
+      availability_status:
+        | "available"
+        | "booked"
+        | "blocked"
+        | "maintenance"
+        | "reserved"
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
+      constraint_type:
+        | "min_stay"
+        | "max_stay"
+        | "advance_booking"
+        | "same_day_booking"
+        | "weekend_only"
+        | "seasonal_pricing"
+        | "weekend_pricing"
+        | "holiday_pricing"
       listing_status: "pending" | "approved" | "rejected"
       payment_method: "cash" | "stripe"
       user_role: "guest" | "host" | "admin"
@@ -492,7 +692,24 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      availability_status: [
+        "available",
+        "booked",
+        "blocked",
+        "maintenance",
+        "reserved",
+      ],
       booking_status: ["pending", "confirmed", "cancelled", "completed"],
+      constraint_type: [
+        "min_stay",
+        "max_stay",
+        "advance_booking",
+        "same_day_booking",
+        "weekend_only",
+        "seasonal_pricing",
+        "weekend_pricing",
+        "holiday_pricing",
+      ],
       listing_status: ["pending", "approved", "rejected"],
       payment_method: ["cash", "stripe"],
       user_role: ["guest", "host", "admin"],
