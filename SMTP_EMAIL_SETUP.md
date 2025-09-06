@@ -33,7 +33,7 @@ In Supabase Dashboard → Authentication → Settings → Email Auth:
 
 **Custom SMTP Settings:**
 - ✅ Enable "Send custom SMTP emails"
-- ✅ Set Auth Email Hook URL: `https://your-project-id.supabase.co/functions/v1/send-auth-email`
+- ✅ Set Auth Email Hook URL: `https://mbwmcjxtpuwscxdzijsz.supabase.co/functions/v1/send-auth-email`
 - ✅ Set Hook Secret: Same as `SEND_AUTH_EMAIL_HOOK_SECRET` environment variable
 
 ### 4. Verify Email Templates
@@ -88,7 +88,7 @@ Your email functions should be accessible at:
 ## ✅ Verification Checklist
 - [ ] SMTP settings configured in Supabase dashboard
 - [ ] Environment variables set for RESEND_API_KEY and webhook secret
-- [ ] Auth email hook URL and secret configured
+- [x] Auth email hook URL and secret configured
 - [ ] Domain verified in Resend dashboard
 - [ ] Test emails sent successfully
 - [ ] Email branding and formatting look correct
