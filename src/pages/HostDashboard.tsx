@@ -56,6 +56,8 @@ const HostDashboard = () => {
   const getImageUrl = (imagePath: string) => getPublicImageUrl(imagePath);
 
   useEffect(() => {
+    console.log('HostDashboard useEffect - authLoading:', authLoading, 'user:', user, 'profile:', profile);
+    
     if (authLoading) return;
 
     if (!user) {
@@ -63,13 +65,22 @@ const HostDashboard = () => {
       return;
     }
 
-    if (profile?.role !== 'host') {
+    // Wait for profile to load before checking role
+    if (!profile) {
+      console.log('Profile not loaded yet, waiting...');
+      return;
+    }
+
+    console.log('Profile loaded, role:', profile.role);
+
+    if (profile.role !== 'host') {
+      console.log('User is not a host, redirecting to become-host');
       navigate('/become-host');
       return;
     }
 
     fetchHostData();
-  }, [user, profile, authLoading]);
+  }, [user, profile, authLoading, navigate]);
 
   const fetchHostData = async () => {
     try {
@@ -137,7 +148,8 @@ const HostDashboard = () => {
     );
   };
 
-  if (loading) {
+  // Show loading while auth is loading OR while we're waiting for profile OR while fetching data
+  if (authLoading || loading || (user && !profile)) {
     return (
       <div className="min-h-screen flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="text-center">
