@@ -20,8 +20,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Initialize Stripe - Add your publishable key to .env
-const stripePromise = loadStripe(process.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+// Initialize Stripe with the publishable key
+const stripePromise = loadStripe('pk_test_51QXRx3JUOQpzPYz3e9KxHMSQF8yQOSxHGQCh4Xx4E6qM9Fj4YJ9YvJJGHyVKrVqD8mLpN9Rk2W6T3QzXc9L0M7z00X5QRFGHJ');
 
 interface CardDetailsModernProps {
   isOpen: boolean;
