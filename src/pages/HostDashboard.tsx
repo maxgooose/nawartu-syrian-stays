@@ -56,11 +56,20 @@ const HostDashboard = () => {
   const getImageUrl = (imagePath: string) => getPublicImageUrl(imagePath);
 
   useEffect(() => {
-    console.log('HostDashboard useEffect - authLoading:', authLoading, 'user:', user, 'profile:', profile);
+    console.log('HostDashboard useEffect triggered:', {
+      authLoading,
+      user: !!user,
+      profile: profile ? { id: profile.id, role: profile.role } : null,
+      loading
+    });
     
-    if (authLoading) return;
+    if (authLoading) {
+      console.log('Auth still loading, waiting...');
+      return;
+    }
 
     if (!user) {
+      console.log('No user, redirecting to auth');
       navigate('/auth');
       return;
     }
@@ -79,45 +88,76 @@ const HostDashboard = () => {
       return;
     }
 
+    console.log('User is a host, fetching host data...');
     fetchHostData();
   }, [user, profile, authLoading, navigate]);
 
   const fetchHostData = async () => {
     try {
+      console.log('fetchHostData called, profile:', profile);
+      
+      if (!profile?.id) {
+        console.error('No profile ID available');
+        return;
+      }
+
       // Fetch listings
+      console.log('Fetching listings for host_id:', profile.id);
       const { data: listingsData, error: listingsError } = await supabase
         .from('listings')
         .select('*')
-        .eq('host_id', profile?.id);
+        .eq('host_id', profile.id);
 
-      if (listingsError) throw listingsError;
+      console.log('Listings query result:', { listingsData, listingsError });
+
+      if (listingsError) {
+        console.error('Listings error:', listingsError);
+        throw listingsError;
+      }
 
       // Fetch bookings for host's listings (excluding payment data for security)
-      const { data: bookingsData, error: bookingsError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          check_in_date,
-          check_out_date,
-          total_nights,
-          status,
-          special_requests,
-          guest:profiles!bookings_guest_id_fkey(full_name, email),
-          listing:listings!bookings_listing_id_fkey(name)
-        `)
-        .in('listing_id', listingsData?.map(l => l.id) || []);
+      const listingIds = listingsData?.map(l => l.id) || [];
+      console.log('Fetching bookings for listing IDs:', listingIds);
+      
+      if (listingIds.length > 0) {
+        const { data: bookingsData, error: bookingsError } = await supabase
+          .from('bookings')
+          .select(`
+            id,
+            check_in_date,
+            check_out_date,
+            total_nights,
+            status,
+            special_requests,
+            guest:profiles!bookings_guest_id_fkey(full_name, email),
+            listing:listings!bookings_listing_id_fkey(name)
+          `)
+          .in('listing_id', listingIds);
 
-      if (bookingsError) throw bookingsError;
+        console.log('Bookings query result:', { bookingsData, bookingsError });
+
+        if (bookingsError) {
+          console.error('Bookings error:', bookingsError);
+          throw bookingsError;
+        }
+        
+        setBookings(bookingsData || []);
+      } else {
+        console.log('No listings found, setting empty bookings');
+        setBookings([]);
+      }
 
       setListings(listingsData || []);
-      setBookings(bookingsData || []);
+      console.log('Data fetching completed successfully');
     } catch (error: any) {
+      console.error('Error in fetchHostData:', error);
       toast({
         title: language === 'ar' ? "خطأ" : "Error",
         description: language === 'ar' ? "حدث خطأ في تحميل البيانات" : "Error loading data",
         variant: "destructive",
       });
     } finally {
+      console.log('Setting loading to false');
       setLoading(false);
     }
   };
