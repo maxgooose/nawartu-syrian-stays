@@ -51,7 +51,20 @@ export async function translateText(
       return text; // Return original text as fallback
     }
 
-    return data?.translatedText || text;
+    const translatedText = data?.translatedText || text;
+    
+    // Filter out MyMemory warnings and return clean text
+    if (translatedText && typeof translatedText === 'string') {
+      // Remove MyMemory warnings and clean up the text
+      const cleanText = translatedText
+        .replace(/^MYMEMORY WARNING:.*?\n/i, '')
+        .replace(/MYMEMORY WARNING:.*?$/i, '')
+        .trim();
+      
+      return cleanText || text; // Return original if cleaning resulted in empty string
+    }
+
+    return translatedText || text;
   } catch (error) {
     console.error('Translation service error:', error);
     return text; // Return original text as fallback
