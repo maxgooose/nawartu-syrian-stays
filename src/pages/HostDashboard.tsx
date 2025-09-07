@@ -115,7 +115,7 @@ const HostDashboard = () => {
         throw listingsError;
       }
 
-      // Fetch bookings for host's listings (excluding payment data for security)
+      // Fetch bookings for host's listings with proper joins
       const listingIds = listingsData?.map(l => l.id) || [];
       console.log('Fetching bookings for listing IDs:', listingIds);
       
@@ -129,8 +129,8 @@ const HostDashboard = () => {
             total_nights,
             status,
             special_requests,
-            guest:profiles!bookings_guest_id_fkey(full_name, email),
-            listing:listings!bookings_listing_id_fkey(name)
+            guest_id,
+            listing_id
           `)
           .in('listing_id', listingIds);
 
@@ -140,8 +140,36 @@ const HostDashboard = () => {
           console.error('Bookings error:', bookingsError);
           throw bookingsError;
         }
+
+        // Fetch guest details separately
+        const guestIds = [...new Set(bookingsData?.map(b => b.guest_id) || [])];
+        let guestsData = [];
         
-        setBookings(bookingsData || []);
+        if (guestIds.length > 0) {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('id, full_name, email')
+            .in('id', guestIds);
+          
+          if (!error) {
+            guestsData = data || [];
+          }
+        }
+
+        // Fetch listing names separately
+        const { data: listingNames } = await supabase
+          .from('listings')
+          .select('id, name')
+          .in('id', listingIds);
+
+        // Combine the data
+        const enrichedBookings = bookingsData?.map(booking => ({
+          ...booking,
+          guest: guestsData.find(g => g.id === booking.guest_id) || { full_name: 'Unknown', email: 'Unknown' },
+          listing: listingNames?.find(l => l.id === booking.listing_id) || { name: 'Unknown' }
+        })) || [];
+        
+        setBookings(enrichedBookings);
       } else {
         console.log('No listings found, setting empty bookings');
         setBookings([]);
