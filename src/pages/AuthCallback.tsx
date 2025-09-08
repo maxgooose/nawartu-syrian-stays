@@ -15,7 +15,7 @@ export const AuthCallback = () => {
       try {
         console.log('Processing auth callback...');
         
-        // First, try to exchange the code for a session
+        // Handle the auth callback with hash fragments
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -34,26 +34,51 @@ export const AuthCallback = () => {
         if (data?.session) {
           console.log('Session established successfully:', data.session.user.email);
           
-          // Give some time for the profile creation trigger to complete
-          setTimeout(() => {
-            toast({
-              title: language === 'ar' ? 'مرحباً بك في نورتوا!' : 'Welcome to Nawartu!',
-              description: language === 'ar' 
-                ? 'تم تأكيد حسابك بنجاح.'
-                : 'Your account has been confirmed successfully.',
-            });
-            navigate('/');
-          }, 1000);
-        } else {
-          console.log('No session found, redirecting to auth');
           toast({
-            variant: 'destructive',
-            title: language === 'ar' ? 'مشكلة في المصادقة' : 'Authentication Issue',
+            title: language === 'ar' ? 'مرحباً بك في نورتوا!' : 'Welcome to Nawartu!',
             description: language === 'ar' 
-              ? 'لا يمكن إنشاء الجلسة. يرجى المحاولة مرة أخرى.'
-              : 'Could not establish session. Please try signing in again.',
+              ? 'تم تأكيد حسابك بنجاح.'
+              : 'Your account has been confirmed successfully.',
           });
-          navigate('/auth');
+          
+          // Redirect to home page
+          navigate('/', { replace: true });
+        } else {
+          // Try to handle auth state change event
+          const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state change:', event, session?.user?.email);
+            
+            if (event === 'SIGNED_IN' && session) {
+              toast({
+                title: language === 'ar' ? 'مرحباً بك في نورتوا!' : 'Welcome to Nawartu!',
+                description: language === 'ar' 
+                  ? 'تم تأكيد حسابك بنجاح.'
+                  : 'Your account has been confirmed successfully.',
+              });
+              navigate('/', { replace: true });
+              authListener.subscription.unsubscribe();
+            } else if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+              // Do nothing for these events in callback
+            }
+          });
+
+          // If no session after 3 seconds, redirect to auth
+          setTimeout(() => {
+            supabase.auth.getSession().then(({ data }) => {
+              if (!data.session) {
+                console.log('No session found after timeout, redirecting to auth');
+                toast({
+                  variant: 'destructive',
+                  title: language === 'ar' ? 'مشكلة في المصادقة' : 'Authentication Issue',
+                  description: language === 'ar' 
+                    ? 'لا يمكن إنشاء الجلسة. يرجى المحاولة مرة أخرى.'
+                    : 'Could not establish session. Please try signing in again.',
+                });
+                navigate('/auth');
+              }
+              authListener.subscription.unsubscribe();
+            });
+          }, 3000);
         }
       } catch (error) {
         console.error('Unexpected auth callback error:', error);

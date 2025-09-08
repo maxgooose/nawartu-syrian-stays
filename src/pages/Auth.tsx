@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +18,10 @@ const Auth = () => {
   const [showPhoneDialog, setShowPhoneDialog] = useState(false);
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const { language, handleLanguageChange } = useLanguage();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
@@ -40,6 +45,71 @@ const Auth = () => {
       setFullName(profile.full_name || '');
     }
   }, [user, profile]);
+
+  const handleEmailAuth = async () => {
+    if (!email || !password) {
+      toast({
+        variant: 'destructive',
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields',
+      });
+      return;
+    }
+
+    if (isSignUp && password !== confirmPassword) {
+      toast({
+        variant: 'destructive',
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (isSignUp) {
+        console.log('Starting email signup...');
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: language === 'ar' ? 'تحقق من بريدك الإلكتروني' : 'Check your email',
+          description: language === 'ar' ? 
+            'تم إرسال رابط التأكيد إلى بريدك الإلكتروني' : 
+            'A confirmation link has been sent to your email',
+        });
+      } else {
+        console.log('Starting email signin...');
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Successfully signed in',
+        });
+        navigate('/');
+      }
+    } catch (error: any) {
+      console.error('Email auth error:', error);
+      toast({
+        variant: 'destructive',
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleGoogleAuth = async () => {
     setIsLoading(true);
@@ -165,16 +235,23 @@ const Auth = () => {
                   {language === 'ar' ? 'سجل الدخول أو أنشئ حساب' : 'Sign In or Create Account'}
                 </h2>
                 <p className="text-sm text-muted-foreground mb-6">
-                  {language === 'ar' ? 'استخدم حساب Google للمتابعة' : 'Use your Google account to continue'}
+                  {language === 'ar' ? 'اختر طريقة المصادقة المفضلة لديك' : 'Choose your preferred authentication method'}
                 </p>
               </div>
 
-              <Button
-                variant="outline"
-                className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
-                onClick={handleGoogleAuth}
-                disabled={isLoading}
-              >
+              <Tabs defaultValue="google" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="google">Google</TabsTrigger>
+                  <TabsTrigger value="email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="google" className="mt-6">
+                  <Button
+                    variant="outline"
+                    className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                    onClick={handleGoogleAuth}
+                    disabled={isLoading}
+                  >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -193,11 +270,89 @@ const Auth = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                {isLoading ? 
-                  (language === 'ar' ? 'جاري التحميل...' : 'Loading...') :
-                  (language === 'ar' ? 'المتابعة مع Google' : 'Continue with Google')
-                }
-              </Button>
+                    {isLoading ? 
+                      (language === 'ar' ? 'جاري التحميل...' : 'Loading...') :
+                      (language === 'ar' ? 'المتابعة مع Google' : 'Continue with Google')
+                    }
+                  </Button>
+                </TabsContent>
+
+                <TabsContent value="email" className="mt-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-center mb-4">
+                      <div className="flex bg-muted rounded-lg p-1">
+                        <Button
+                          variant={!isSignUp ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => setIsSignUp(false)}
+                          className="rounded-md"
+                        >
+                          {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+                        </Button>
+                        <Button
+                          variant={isSignUp ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => setIsSignUp(true)}
+                          className="rounded-md"
+                        >
+                          {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="password">{language === 'ar' ? 'كلمة المرور' : 'Password'}</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter your password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    {isSignUp && (
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">{language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}</Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          placeholder={language === 'ar' ? 'أعد إدخال كلمة المرور' : 'Confirm your password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                    )}
+
+                    <Button
+                      onClick={handleEmailAuth}
+                      disabled={isLoading || !email || !password || (isSignUp && !confirmPassword)}
+                      className="w-full h-12 rounded-xl"
+                    >
+                      {isLoading ? 
+                        (language === 'ar' ? 'جاري التحميل...' : 'Loading...') :
+                        isSignUp ? 
+                          (language === 'ar' ? 'إنشاء حساب' : 'Create Account') :
+                          (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')
+                      }
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
 
               <div className="text-center text-xs text-muted-foreground">
                 {language === 'ar' ? 
@@ -211,7 +366,7 @@ const Auth = () => {
       </div>
 
       {/* Phone Number Required Dialog */}
-      <Dialog open={false} onOpenChange={() => {}}>
+      <Dialog open={showPhoneDialog} onOpenChange={setShowPhoneDialog}>
         <DialogContent className="max-w-md" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <DialogHeader>
             <DialogTitle>
