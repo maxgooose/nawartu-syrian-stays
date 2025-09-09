@@ -178,8 +178,13 @@ const amenityIcons: Record<string, any> = {
   gym: Dumbbell,
   hot_tub: Waves,
   
-  // Default fallback
-  default: Shield
+  // Common variations that might exist in the database
+  'air conditioning': Fan,
+  'television': Tv,
+  'hot tub': Waves,
+  
+  // Default fallback - use a more generic but recognizable icon
+  default: CheckCircle
 };
 
 const amenityCategories = {
