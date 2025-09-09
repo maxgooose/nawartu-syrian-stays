@@ -18,7 +18,7 @@ export const ImageUpload = ({
   onImagesUploaded, 
   existingImages = [], 
   maxImages = 10,
-  bucketName = "property-images",
+  bucketName = "listing-images",
   folder = "listings"
 }: ImageUploadProps) => {
   const [images, setImages] = useState<string[]>(existingImages);
@@ -76,6 +76,14 @@ export const ImageUpload = ({
 
         const fileExt = file.name.split('.').pop()?.toLowerCase();
         const fileName = `${user.id}/${folder}/${crypto.randomUUID()}.${fileExt}`;
+        
+        console.log('Attempting upload:', {
+          fileName,
+          bucketName,
+          fileSize: file.size,
+          fileType: file.type,
+          userID: user.id
+        });
 
         const { data, error } = await supabase.storage
           .from(bucketName)
@@ -85,6 +93,18 @@ export const ImageUpload = ({
           });
 
         if (error) {
+          console.error('Image upload error:', {
+            file: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+            fileName,
+            bucketName,
+            error: error,
+            errorMessage: error.message,
+            errorCode: error.statusCode,
+            user: user ? { id: user.id, email: user.email } : null
+          });
+          
           toast({
             title: "Upload Failed",
             description: `Failed to upload ${file.name}: ${error.message}`,
@@ -111,6 +131,13 @@ export const ImageUpload = ({
       });
 
     } catch (error) {
+      console.error('Unexpected upload error:', {
+        error,
+        bucketName,
+        folder,
+        user: user ? { id: user.id, email: user.email } : null
+      });
+      
       toast({
         title: "Upload Error",
         description: "An unexpected error occurred during upload.",

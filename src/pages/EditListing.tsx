@@ -577,6 +577,8 @@ const EditListing = () => {
                   existingImages={formData.images}
                   onImagesUploaded={(urls) => setFormData(prev => ({ ...prev, images: urls }))}
                   maxImages={10}
+                  bucketName="listing-images"
+                  folder="listings"
                 />
               </div>
 
