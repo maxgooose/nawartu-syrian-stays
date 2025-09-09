@@ -42,7 +42,7 @@ import {
   Microwave,
   Waves,
   Dumbbell,
-  Gamepad2 as GamepadIcon,
+  GamepadIcon,
   Baby,
   Cigarette as Smoking,
   PawPrint,
@@ -60,14 +60,7 @@ import {
   Crown,
   TreePine,
   Camera,
-  Building,
-  Droplet,
-  WashingMachine,
-  BookOpen,
-  Flame,
-  ShieldCheck,
-  Fan,
-  Thermometer
+  Building
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DateRange } from "react-day-picker";
@@ -127,25 +120,25 @@ const amenityIcons: Record<string, any> = {
   bathtub: Bathtub,
   shower: Shower,
   hair_dryer: Wind,
-  shampoo: Droplet,
+  shampoo: Shield,
   
   // Bedroom & Laundry
-  washer: WashingMachine,
+  washer: Shirt,
   dryer: Wind,
   hangers: Shirt,
-  iron: Zap,
+  iron: Shirt,
   
   // Entertainment
   tv: Tv,
   wifi: Wifi,
   sound_system: Volume2,
   games: GamepadIcon,
-  books: BookOpen,
+  books: Monitor,
   
   // Heating & Cooling
-  air_conditioning: Fan,
-  heating: Flame,
-  fireplace: Flame,
+  air_conditioning: Snowflake,
+  heating: Heater,
+  fireplace: Heater,
   
   // Outdoor
   balcony: TreePine,
@@ -153,9 +146,9 @@ const amenityIcons: Record<string, any> = {
   pool: Waves,
   
   // Safety & Accessibility
-  security: ShieldCheck,
+  security: Shield,
   smoke_detector: Shield,
-  first_aid_kit: Heart,
+  first_aid_kit: Shield,
   
   // Parking & Transportation
   parking: Car,
@@ -178,13 +171,8 @@ const amenityIcons: Record<string, any> = {
   gym: Dumbbell,
   hot_tub: Waves,
   
-  // Common variations that might exist in the database
-  'air conditioning': Fan,
-  'television': Tv,
-  'hot tub': Waves,
-  
-  // Default fallback - use a more generic but recognizable icon
-  default: CheckCircle
+  // Default fallback
+  default: Shield
 };
 
 const amenityCategories = {
