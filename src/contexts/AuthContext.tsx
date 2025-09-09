@@ -119,12 +119,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     try {
+      console.log('Signing out user...');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      
+      // Clear local state immediately
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
+      console.log('User signed out successfully');
     } catch (error: any) {
+      console.error('Sign out error:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: profile?.preferred_language === 'ar' ? 'خطأ' : 'Error',
         description: error.message,
       });
     }

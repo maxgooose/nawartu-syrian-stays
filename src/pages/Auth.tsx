@@ -31,8 +31,9 @@ const Auth = () => {
     // Check if user is already authenticated
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/');
+      if (session?.user) {
+        console.log('User already authenticated, redirecting to home');
+        navigate('/', { replace: true });
       }
     };
     checkAuth();
