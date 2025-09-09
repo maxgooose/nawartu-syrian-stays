@@ -42,7 +42,7 @@ import {
   Microwave,
   Waves,
   Dumbbell,
-  GamepadIcon,
+  Gamepad2 as GamepadIcon,
   Baby,
   Cigarette as Smoking,
   PawPrint,
@@ -60,7 +60,14 @@ import {
   Crown,
   TreePine,
   Camera,
-  Building
+  Building,
+  Droplet,
+  WashingMachine,
+  BookOpen,
+  Flame,
+  ShieldCheck,
+  Fan,
+  Thermometer
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DateRange } from "react-day-picker";
@@ -120,25 +127,25 @@ const amenityIcons: Record<string, any> = {
   bathtub: Bathtub,
   shower: Shower,
   hair_dryer: Wind,
-  shampoo: Shield,
+  shampoo: Droplet,
   
   // Bedroom & Laundry
-  washer: Shirt,
+  washer: WashingMachine,
   dryer: Wind,
   hangers: Shirt,
-  iron: Shirt,
+  iron: Zap,
   
   // Entertainment
   tv: Tv,
   wifi: Wifi,
   sound_system: Volume2,
   games: GamepadIcon,
-  books: Monitor,
+  books: BookOpen,
   
   // Heating & Cooling
-  air_conditioning: Snowflake,
-  heating: Heater,
-  fireplace: Heater,
+  air_conditioning: Fan,
+  heating: Flame,
+  fireplace: Flame,
   
   // Outdoor
   balcony: TreePine,
@@ -146,9 +153,9 @@ const amenityIcons: Record<string, any> = {
   pool: Waves,
   
   // Safety & Accessibility
-  security: Shield,
+  security: ShieldCheck,
   smoke_detector: Shield,
-  first_aid_kit: Shield,
+  first_aid_kit: Heart,
   
   // Parking & Transportation
   parking: Car,
