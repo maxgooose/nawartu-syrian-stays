@@ -239,19 +239,12 @@ const Auth = () => {
                 </p>
               </div>
 
-              <Tabs defaultValue="google" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="google">Google</TabsTrigger>
-                  <TabsTrigger value="email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="google" className="mt-6">
-                  <Button
-                    variant="outline"
-                    className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
-                    onClick={handleGoogleAuth}
-                    disabled={isLoading}
-                  >
+              <Button
+                variant="outline"
+                className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                onClick={handleGoogleAuth}
+                disabled={isLoading}
+              >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -270,89 +263,11 @@ const Auth = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                    {isLoading ? 
-                      (language === 'ar' ? 'جاري التحميل...' : 'Loading...') :
-                      (language === 'ar' ? 'المتابعة مع Google' : 'Continue with Google')
-                    }
-                  </Button>
-                </TabsContent>
-
-                <TabsContent value="email" className="mt-6">
-                  <div className="space-y-4">
-                    <div className="flex justify-center mb-4">
-                      <div className="flex bg-muted rounded-lg p-1">
-                        <Button
-                          variant={!isSignUp ? "default" : "ghost"}
-                          size="sm"
-                          onClick={() => setIsSignUp(false)}
-                          className="rounded-md"
-                        >
-                          {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
-                        </Button>
-                        <Button
-                          variant={isSignUp ? "default" : "ghost"}
-                          size="sm"
-                          onClick={() => setIsSignUp(true)}
-                          className="rounded-md"
-                        >
-                          {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email'}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={isLoading}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="password">{language === 'ar' ? 'كلمة المرور' : 'Password'}</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter your password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={isLoading}
-                      />
-                    </div>
-
-                    {isSignUp && (
-                      <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">{language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}</Label>
-                        <Input
-                          id="confirmPassword"
-                          type="password"
-                          placeholder={language === 'ar' ? 'أعد إدخال كلمة المرور' : 'Confirm your password'}
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          disabled={isLoading}
-                        />
-                      </div>
-                    )}
-
-                    <Button
-                      onClick={handleEmailAuth}
-                      disabled={isLoading || !email || !password || (isSignUp && !confirmPassword)}
-                      className="w-full h-12 rounded-xl"
-                    >
-                      {isLoading ? 
-                        (language === 'ar' ? 'جاري التحميل...' : 'Loading...') :
-                        isSignUp ? 
-                          (language === 'ar' ? 'إنشاء حساب' : 'Create Account') :
-                          (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')
-                      }
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                {isLoading ? 
+                  (language === 'ar' ? 'جاري التحميل...' : 'Loading...') :
+                  (language === 'ar' ? 'المتابعة مع Google' : 'Continue with Google')
+                }
+              </Button>
 
               <div className="text-center text-xs text-muted-foreground">
                 {language === 'ar' ? 
