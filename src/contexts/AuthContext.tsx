@@ -152,8 +152,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             let profileData = await fetchProfile(session.user.id);
             
             // If profile doesn't exist, create it manually as fallback
+            // This should rarely happen now that the trigger is fixed, but kept as safety net
             if (!profileData) {
-              console.log('Profile not found, creating manually...');
+              console.log('Profile not found, creating manually as fallback...');
+              console.log('User metadata:', session.user.user_metadata);
               try {
                 const { data: newProfile, error } = await supabase
                   .from('profiles')
@@ -169,13 +171,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                   .single();
                 
                 if (error) {
-                  console.error('Error creating profile:', error);
+                  console.error('Error creating profile manually:', error);
+                  console.error('This should not happen with the fixed RLS policy. Check database logs.');
                 } else {
-                  console.log('Profile created manually:', newProfile);
+                  console.log('Profile created manually as fallback:', newProfile);
                   profileData = newProfile;
                 }
               } catch (createError) {
                 console.error('Error in manual profile creation:', createError);
+                console.error('This indicates the RLS policy fix may not have been applied correctly.');
               }
             }
             
