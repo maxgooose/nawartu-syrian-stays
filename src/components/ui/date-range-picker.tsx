@@ -61,6 +61,14 @@ export function DateRangePicker({
       // Complete selection
       if (date >= dateRange.from) {
         onDateRangeChange({ from: dateRange.from, to: date });
+        // Auto-close when both dates are selected
+        setTimeout(() => {
+          if (onRequestClose) {
+            onRequestClose();
+          } else {
+            setIsOpen(false);
+          }
+        }, 300);
       } else {
         onDateRangeChange({ from: date, to: undefined });
       }
@@ -209,12 +217,12 @@ export function DateRangePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent 
-          className="w-full max-w-sm md:max-w-none p-0 bg-white border border-gray-200 shadow-xl z-50 rounded-3xl mx-4 sm:mx-0" 
+          className="w-full max-w-xs md:max-w-2xl p-0 bg-white border border-gray-200 shadow-xl z-50 rounded-2xl mx-4 sm:mx-0" 
           align="center"
           side="bottom"
           sideOffset={4}
         >
-          <div className="p-4 sm:p-6 relative">
+          <div className="p-3 sm:p-4 relative">
             {/* Mobile Close Button */}
             <button
               onClick={() => {
@@ -230,7 +238,7 @@ export function DateRangePicker({
               <X className="h-4 w-4" />
             </button>
             {/* Calendar Header */}
-            <div className="flex items-center justify-center mb-6 relative">
+            <div className="flex items-center justify-center mb-4 relative">
               {/* Close button positioned absolute */}
               
               {/* Navigation and month display grouped together */}
@@ -266,15 +274,12 @@ export function DateRangePicker({
               </div>
             </div>
 
-            {/* Instruction Banner - Shows when only check-in is selected */}
+            {/* Subtle instruction text - Shows when only check-in is selected */}
             {dateRange?.from && !dateRange?.to && (
-              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <p className="text-sm font-medium text-emerald-800">
-                    {language === 'ar' ? 'الآن اختر تاريخ المغادرة' : 'Now select your check-out date'}
-                  </p>
-                </div>
+              <div className="mb-3 text-center">
+                <p className="text-xs text-gray-500 font-medium">
+                  {language === 'ar' ? 'اختر تاريخ المغادرة' : 'Select check-out date'}
+                </p>
               </div>
             )}
 
