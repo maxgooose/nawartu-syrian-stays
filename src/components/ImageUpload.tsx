@@ -101,7 +101,6 @@ export const ImageUpload = ({
             bucketName,
             error: error,
             errorMessage: error.message,
-            errorCode: error.statusCode,
             user: user ? { id: user.id, email: user.email } : null
           });
           

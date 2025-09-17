@@ -230,32 +230,40 @@ export function DateRangePicker({
               <X className="h-4 w-4" />
             </button>
             {/* Calendar Header */}
-            <div className="flex items-center justify-between mb-6">
-              <button
-                onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <div className="hidden md:flex gap-8">
-                <h3 className="text-lg font-semibold">
-                  {format(currentMonth, 'MMMM yyyy', { locale })}
-                </h3>
-                <h3 className="text-lg font-semibold">
-                  {format(addMonths(currentMonth, 1), 'MMMM yyyy', { locale })}
-                </h3>
+            <div className="flex items-center justify-center mb-6 relative">
+              {/* Close button positioned absolute */}
+              
+              {/* Navigation and month display grouped together */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
+                  className="p-1.5 hover:bg-gray-100 rounded-full transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                
+                <div className="hidden md:flex gap-8 px-2">
+                  <h3 className="text-lg font-semibold">
+                    {format(currentMonth, 'MMMM yyyy', { locale })}
+                  </h3>
+                  <h3 className="text-lg font-semibold">
+                    {format(addMonths(currentMonth, 1), 'MMMM yyyy', { locale })}
+                  </h3>
+                </div>
+                
+                <div className="md:hidden px-2">
+                  <h3 className="text-lg font-semibold">
+                    {format(currentMonth, 'MMMM yyyy', { locale })}
+                  </h3>
+                </div>
+                
+                <button
+                  onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                  className="p-1.5 hover:bg-gray-100 rounded-full transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
-              <div className="md:hidden">
-                <h3 className="text-lg font-semibold">
-                  {format(currentMonth, 'MMMM yyyy', { locale })}
-                </h3>
-              </div>
-              <button
-                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
             </div>
 
             {/* Responsive Calendar: single month on small screens */}
