@@ -266,6 +266,18 @@ export function DateRangePicker({
               </div>
             </div>
 
+            {/* Instruction Banner - Shows when only check-in is selected */}
+            {dateRange?.from && !dateRange?.to && (
+              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <p className="text-sm font-medium text-emerald-800">
+                    {language === 'ar' ? 'الآن اختر تاريخ المغادرة' : 'Now select your check-out date'}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Responsive Calendar: single month on small screens */}
             <div className="flex gap-8 md:flex-row flex-col">
               {/* First Month */}
@@ -304,6 +316,8 @@ export function DateRangePicker({
                         <span className={cn(
                           "relative z-10 w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full min-w-[40px] min-h-[40px] md:min-w-[44px] md:min-h-[44px]",
                           (isStart || isEnd) ? "bg-emerald-600 text-white" : "",
+                          // Highlight potential check-out dates when only check-in is selected
+                          dateRange?.from && !dateRange?.to && isAfter(date, dateRange.from) && !isPast ? "ring-2 ring-emerald-300 bg-emerald-50" : ""
                         )}>
                           {date.getDate()}
                         </span>
@@ -349,6 +363,8 @@ export function DateRangePicker({
                         <span className={cn(
                           "relative z-10 w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full min-w-[44px] min-h-[44px]",
                           (isStart || isEnd) ? "bg-emerald-600 text-white" : "",
+                          // Highlight potential check-out dates when only check-in is selected
+                          dateRange?.from && !dateRange?.to && isAfter(date, dateRange.from) && !isPast ? "ring-2 ring-emerald-300 bg-emerald-50" : ""
                         )}>
                           {date.getDate()}
                         </span>
