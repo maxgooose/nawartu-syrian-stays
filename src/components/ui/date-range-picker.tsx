@@ -79,6 +79,7 @@ export function DateRangePicker({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDateRangeChange(undefined);
+    setIsOpen(false);
   };
 
   // Generate month cells (exact month only, no overflow days)
@@ -320,9 +321,7 @@ export function DateRangePicker({
                         )}
                         <span className={cn(
                           "relative z-10 w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full min-w-[40px] min-h-[40px] md:min-w-[44px] md:min-h-[44px]",
-                          (isStart || isEnd) ? "bg-emerald-600 text-white" : "",
-                          // Highlight potential check-out dates when only check-in is selected
-                          dateRange?.from && !dateRange?.to && isAfter(date, dateRange.from) && !isPast ? "ring-2 ring-emerald-300 bg-emerald-50" : ""
+                          (isStart || isEnd) ? "bg-emerald-600 text-white" : ""
                         )}>
                           {date.getDate()}
                         </span>
@@ -367,9 +366,7 @@ export function DateRangePicker({
                         )}
                         <span className={cn(
                           "relative z-10 w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full min-w-[44px] min-h-[44px]",
-                          (isStart || isEnd) ? "bg-emerald-600 text-white" : "",
-                          // Highlight potential check-out dates when only check-in is selected
-                          dateRange?.from && !dateRange?.to && isAfter(date, dateRange.from) && !isPast ? "ring-2 ring-emerald-300 bg-emerald-50" : ""
+                          (isStart || isEnd) ? "bg-emerald-600 text-white" : ""
                         )}>
                           {date.getDate()}
                         </span>
