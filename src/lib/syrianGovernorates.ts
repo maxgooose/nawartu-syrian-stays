@@ -53,7 +53,7 @@ export const SYRIAN_GOVERNORATES: SyrianGovernorate[] = [
   {
     id: 'latakia',
     nameAr: 'اللاذقية',
-    nameEn: 'Latakia',
+    nameEn: 'Lattakia',
     latitude: 35.5376,
     longitude: 35.7800,
     region: 'west',

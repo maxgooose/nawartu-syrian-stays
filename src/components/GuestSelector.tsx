@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Minus, Plus, Users, ChevronDown } from 'lucide-react';
+import { Minus, Plus, Users, ChevronDown, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -84,8 +84,10 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
 
   // Dropdown variant for search boxes and compact areas
   if (variant === 'dropdown') {
+    const [isOpen, setIsOpen] = useState(false);
+    
     return (
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -102,9 +104,19 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-80 p-4" align="start">
           <div className="space-y-4">
-            <Label className="text-sm font-medium">
-              {language === 'ar' ? 'الضيوف' : 'Guests'}
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">
+                {language === 'ar' ? 'الضيوف' : 'Guests'}
+              </Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsOpen(false)}
+                className="h-6 w-6 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
             
             {/* Adults */}
             <div className="flex items-center justify-between">
@@ -206,11 +218,21 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
             </div>
 
             {/* Summary */}
-            <div className="text-sm text-muted-foreground pt-2 border-t">
-              {language === 'ar' 
-                ? `إجمالي الضيوف: ${getTotalGuests()}`
-                : `Total guests: ${getTotalGuests()}`
-              }
+            <div className="flex items-center justify-between pt-2 border-t">
+              <div className="text-sm text-muted-foreground">
+                {language === 'ar' 
+                  ? `إجمالي الضيوف: ${getTotalGuests()}`
+                  : `Total guests: ${getTotalGuests()}`
+                }
+              </div>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setIsOpen(false)}
+                className="h-8 px-4"
+              >
+                {language === 'ar' ? 'موافق' : 'Done'}
+              </Button>
             </div>
           </div>
         </PopoverContent>
